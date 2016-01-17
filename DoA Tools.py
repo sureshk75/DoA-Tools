@@ -8,8 +8,6 @@ __author__ = 'AlphaQ2 (Suresh Kumar)'
 __credits__ = 'Lucifa & Temprid'
 __version__ = '1.2.2'
 __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
-# __license__ = 'MIT'
-# __status__ = 'RTW'
 
 ########################################################################################################################
 #                                        SCRIPT SECTION - Editable Information!                                        #
