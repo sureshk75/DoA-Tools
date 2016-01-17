@@ -1,5 +1,4 @@
-# DoA-Tools
-[the sanctuary](https://www.facebook.com/groups/thesanctuary.doa/)
+# DoA-Tools @ [the sanctuary](https://www.facebook.com/groups/thesanctuary.doa/)
 
 ### Version 1.2.2
 
