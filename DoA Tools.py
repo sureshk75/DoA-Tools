@@ -13,11 +13,11 @@ __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
 #                                        SCRIPT SECTION - Editable Information!                                        #
 ########################################################################################################################
 
-user_id = 0  # Replace this number with your USER ID number
-dragon_heart = ''  # Enter your DRAGON HEART code between the quotes
-session_id = ''  # Enter your DRAGON HEART code between the quotes
-realm_number = 0  # Replace this number with your REALM number
-c_number = 0  # Replace this number with your CLUSTER SERVER number
+# user_id = 0  # Replace this number with your USER ID number
+# dragon_heart = ''  # Enter your DRAGON HEART code between the quotes
+# session_id = ''  # Enter your DRAGON HEART code between the quotes
+# realm_number = 0  # Replace this number with your REALM number
+# c_number = 0  # Replace this number with your CLUSTER SERVER number
 
 ########################################################################################################################
 #                                             SCRIPT SECTION - Do Not Edit!                                            #
@@ -481,9 +481,9 @@ def http_operation(conn, operation, param_add_on, method='POST', post=True):
 def get_manifest():
     global std_param
     for x in range(1, 15):
-        conn = http.client.HTTPConnection('realm{0}.c{0}.castle.rykaiju.com'.format(realm_number, x), 80)
-        url = 'http://realm{0}.c{0}.castle.rykaiju.com/api/manifest.json'.format(realm_number, x)
-        params = '?' + std_param + '&timestamp=' + str(int(time()))
+        conn = http.client.HTTPConnection('realm{0}.c{0}.castle.rykaiju.com'.format(x), 80)
+        url = 'http://realm{0}.c{0}.castle.rykaiju.com/api/manifest.json'.format(x)
+        params = '?' + std_param + '&timestamp={0}'.format(int(time()))
         conn.request('GET', url + params)
         try:
             conn_resp = conn.getresponse()
@@ -502,7 +502,7 @@ def get_manifest():
         except (http.client.IncompleteRead, http.client.ResponseNotReady, http.client.RemoteDisconnected):
             conn.close()
             sleep(1)
-        print(' .', end='', flush=True)
+        print('.', end='', flush=True)
 
 
 def progress(p_count, p_total, prefix, suffix=None):
@@ -550,7 +550,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                 if unmute:
                     screen_update(title, sub_header)
                     progress(count, max_count, 'Retrieving {0}...'.format(prefix),
-                             'Retrying {0} of 5'.format(retry_server + 1))
+                             'Retrying {0} of 2'.format(retry_server + 1))
                 continue
             else:
                 break
@@ -988,7 +988,7 @@ def create_equipment(title):
                 d_max_queue = 9999
                 y = (len(recipe['items']))
                 for r_key, r_value in recipe['items'].items():
-                    for r_item in range(0, len(ingredients)):
+                    for r_item in range(len(ingredients)):
                         if r_key == ingredients[r_item]['name']:
                             if r_value < ingredients[r_item]['quantity']:
                                 y -= 1
@@ -1007,7 +1007,7 @@ def create_equipment(title):
         nothing_to_do('Craftable Troop Items')
         return
     else:
-        for x in range(0, len(d_list)):
+        for x in range(len(d_list)):
             if d_list[x]['troop'] not in selection.keys():
                 selection[d_list[x]['troop']] = t(d_list[x]['troop'])
 
@@ -1029,7 +1029,7 @@ def create_equipment(title):
                             d_troop = key
     d_list[:] = [d for d in d_list if d.get('troop') == d_troop]
     selection.clear()
-    for x in range(0, len(d_list)):
+    for x in range(len(d_list)):
         if d_list[x]['item'] not in selection.keys():
             selection[d_list[x]['item']] = '{0}: {1:,}'.format(t(d_list[x]['item']), d_list[x]['craftable'])
 
@@ -1240,13 +1240,13 @@ def forge_ingredient(title):
                 except KeyError:
                     continue
                 d_max_queue = 1024
-                for r_item in range(0, len(ingredients)):
+                for r_item in range(len(ingredients)):
                     if forge_key == ingredients[r_item]['name']:
                         d_max_queue = 1024 - ingredients[r_item]['quantity']
                 if d_max_queue != 0:
                     count = (len(recipe['items']))
                     for r_key, r_qty in recipe['items'].items():
-                        for r_item in range(0, len(ingredients)):
+                        for r_item in range(len(ingredients)):
                             if r_key == ingredients[r_item]['name']:
                                 if r_qty < ingredients[r_item]['quantity']:
                                     count -= 1
@@ -1264,7 +1264,7 @@ def forge_ingredient(title):
         nothing_to_do('Forgeable Ingrediants')
         return
     else:
-        for x in range(0, len(d_list)):
+        for x in range(len(d_list)):
             if t(d_list[x]['item']) not in selection.keys():
                 selection[t(d_list[x]['item'])] = d_list[x]['craftable']
 
@@ -1443,7 +1443,7 @@ def farm_mission(title):
         return
     else:
         selection.clear()
-        for x in range(0, len(d_list)):
+        for x in range(len(d_list)):
             if t(d_list[x]['mission']) not in selection.keys():
                 if d_list[x]['batch'] == 9999999:
                     selection[t(d_list[x]['mission'])] = '*'
@@ -1470,7 +1470,7 @@ def farm_mission(title):
                             d_mission = d_list[x]['mission']
     d_list[:] = [d for d in d_list if d.get('mission') == d_mission]
     selection.clear()
-    for x in range(0, len(d_list)):
+    for x in range(len(d_list)):
         if d_list[x]['adventurer'] not in selection.keys():
             selection[d_list[x]['adventurer']] = t(d_list[x]['adventurer'])
 
@@ -1669,7 +1669,7 @@ def farm_mission(title):
                         continue
             elif duration != 0 and len(d_speed) > 0:
                 speed_item = None
-                for z in range(0, len(d_speed)):
+                for z in range(len(d_speed)):
                     if duration > d_speed[z]['exceed'] and d_speed[z]['quantity'] != 0:
                         speed_item = d_speed[z]['item']
                         break
@@ -1688,7 +1688,7 @@ def farm_mission(title):
                         item_json = http_operation(d_conn, 'player_items/{0}'.format(speed_item), add_on_params)
                         result = item_json['result']['success']
                         if result:
-                            for z in range(0, len(d_speed)):
+                            for z in range(len(d_speed)):
                                 if speed_item == d_speed[z]['item']:
                                     d_speed[z]['quantity'] -= 1
                             if speed_item in speeds_used:
@@ -1755,7 +1755,7 @@ def farm_mission(title):
 def open_chest(title):
     # Initialize Chest Opener
     screen_update(title, 'Select Chests To Open')
-    center_it('Initializing...')
+    center_it(' Initializing...')
     d_chest = list()
     d_list = list()
     selection = {}
@@ -1972,7 +1972,7 @@ def open_chest(title):
 def unpack_arsenal(title):
     # Initialize Open Arsenal
     screen_update(title, 'Select Troop Type')
-    center_it('Initializing...')
+    center_it(' Initializing...')
     d_list = list()
     selection = {}
     max_use_quantity = 0
@@ -2191,12 +2191,12 @@ def unpack_arsenal(title):
 def fill_building(title):
     # Initialize
     screen_update(title, 'Fills Slots With Buildings')
-    center_it('Initializing...')
+    center_it(' Initializing...')
     d_list = list()
     selection = {}
     built = list()
     capital_buildings = {}
-    for x in range(0, len(c_data['capital']['city']['buildings'])):
+    for x in range(len(c_data['capital']['city']['buildings'])):
         if c_data['capital']['city']['buildings'][x]['type'] not in capital_buildings:
             capital_buildings[c_data['capital']['city']['buildings'][x]['type']] = \
                 c_data['capital']['city']['buildings'][x]['level']
@@ -2225,13 +2225,13 @@ def fill_building(title):
                 c_slot = building_dict[key]['c_slots'][city['level']]
                 f_slot = building_dict[key]['f_slots'][city['level']]
         if not city_busy:
-            for x in range(0, len(m_data['buildings'])):
+            for x in range(len(m_data['buildings'])):
                 manifest = m_data['buildings'][x]
                 if (manifest['location'] in 'city' and len(city_slot) < c_slot) or (
                                 manifest['location'] in 'field' and len(field_slot) < f_slot):
                     if manifest['buildable'] is True and manifest['city_max'][key] != 0:
                         if manifest['per_city'] == 0 or (manifest['per_city'] == 1 and manifest['type'] not in built):
-                            for z in range(0, len(manifest['levels'])):
+                            for z in range(len(manifest['levels'])):
                                 if manifest['levels'][z]['level'] == 1:
                                     level = manifest['levels'][z]
                                     my_dict = {'city': key, 'location': manifest['location'], 'type': manifest['type'],
@@ -2323,7 +2323,7 @@ def fill_building(title):
                 if not d_select.isnumeric():
                     sleep(1)
                 else:
-                    if int(d_select) in range(0, max_slot + 1):
+                    if int(d_select) in range(max_slot + 1):
                         d_slots = int(d_select)
         while gtg is False:
             requirements = {'items': {}, 'buildings': {}, 'resources': {}}
@@ -2395,7 +2395,7 @@ def fill_building(title):
                     if not d_select.isnumeric():
                         sleep(1)
                     else:
-                        if int(d_select) in range(0, max_slot + 1):
+                        if int(d_select) in range(max_slot + 1):
                             d_slots = int(d_select)
                             req_check.clear()
 
@@ -2499,11 +2499,11 @@ def fill_building(title):
     slots = list()
     count = 0
     if d_list[0]['location'] == 'city':
-        for x in range(0, d_list[0]['c_slot_max']):
+        for x in range(d_list[0]['c_slot_max']):
             if x not in d_list[0]['c_slot']:
                 slots.append(x)
     else:
-        for x in range(0, d_list[0]['f_slot_max']):
+        for x in range(d_list[0]['f_slot_max']):
             if x not in d_list[0]['f_slot']:
                 slots.append(x)
     for x in range(d_slots):
@@ -2544,7 +2544,7 @@ def fill_building(title):
                         continue
             elif duration != 0 and len(d_speed) > 0:
                 speed_item = None
-                for y in range(0, len(d_speed)):
+                for y in range(len(d_speed)):
                     if duration > d_speed[y]['exceed']:
                         speed_item = d_speed[y]['item']
                         break
@@ -2607,11 +2607,11 @@ def fill_building(title):
 def upgrade_building(title):
     # Initialize
     screen_update(title, 'Choose A Location To Upgrade')
-    center_it('Initializing...')
+    center_it(' Initializing...')
     d_list = list()
     selection = {}
     capital_buildings = {}
-    for x in range(0, len(c_data['capital']['city']['buildings'])):
+    for x in range(len(c_data['capital']['city']['buildings'])):
         if c_data['capital']['city']['buildings'][x]['type'] not in capital_buildings:
             capital_buildings[c_data['capital']['city']['buildings'][x]['type']] = \
                 c_data['capital']['city']['buildings'][x]['level']
@@ -2951,7 +2951,7 @@ def upgrade_building(title):
                                 continue
                     elif duration > 0 and len(d_speed) > 0:
                         speed_item = None
-                        for z in range(0, len(d_speed)):
+                        for z in range(len(d_speed)):
                             if duration > d_speed[z]['exceed'] and d_speed[z]['quantity'] != 0:
                                 speed_item = d_speed[z]['item']
                                 break
@@ -2970,7 +2970,7 @@ def upgrade_building(title):
                                 item_json = http_operation(d_conn, 'player_items/{0}'.format(speed_item), add_on_params)
                                 result = item_json['result']['success']
                                 if result:
-                                    for z in range(0, len(d_speed)):
+                                    for z in range(len(d_speed)):
                                         if speed_item == d_speed[z]['item']:
                                             d_speed[z]['quantity'] -= 1
                                     if speed_item in speeds_used:
@@ -3018,10 +3018,227 @@ def upgrade_building(title):
 # -------------------------------------------------------------------------------------------------------------------- #
 
 def train_troop(title):
-    print(title)
+    # Initialize
+    screen_update(title, 'Select Troop To Train')
+    center_it(' Initializing...')
+    d_list = list()
+    selection = {}
+    pseudo_tc = ('Garrison', 'TrainingCamp', 'CaveTrainingCamp')
+    for x in c_data:
+        tc_level = 0
+        tc_total = 0
+        tc_combo = 0
+        for y in range(len(c_data[x]['city']['buildings'])):
+            if c_data[x]['city']['buildings'][y]['type'] in pseudo_tc:
+                tc_level = c_data[x]['city']['buildings'][y]['level'] if tc_level < c_data[x]['city']['buildings'][y][
+                    'level'] else tc_level
+                tc_total += 1
+                tc_combo += c_data[x]['city']['buildings'][y]['level']
+        my_dict = {'tc_level': tc_level, 'tc_combo': tc_combo, 'tc_total': tc_total}
+        selection[x] = my_dict
+    d_rookery = 0
+    for x in range(len(m_data['units'])):
+        if m_data['units'][x]['trainable_in']:
+            d_max_queue = d_pop = 0
+            met_research = met_resource = met_item = met_unit = met_idle = met_building = True
+            d_unit = m_data['units'][x]
+            d_req = d_unit['requirements']['capital']
+            if 'research' in d_req.keys():
+                met_req = len(d_req['research'])
+                for key, value in d_req['research'].items():
+                    if key in p_data['research']:
+                        if value <= p_data['research'][key]:
+                            met_req -= 1
+                met_research = True if met_req == 0 else False
+            if 'resources' in d_req.keys():
+                met_req = len(d_req['resources'])
+                lookup = c_data['capital']['city']['resources']
+                for key, value in d_req['resources'].items():
+                    if key in lookup:
+                        if value <= lookup[key]:
+                            met_req -= 1
+                            if value != 0:
+                                if d_max_queue > int(lookup[key] / value) or d_max_queue == 0:
+                                    d_max_queue = int(lookup[key] / value)
+                met_resource = True if met_req == 0 else False
+            if 'items' in d_req.keys():
+                met_req = len(d_req['items'])
+                lookup = p_data['items']
+                for key, value in d_req['items'].items():
+                    if key in lookup:
+                        if value <= lookup[key]:
+                            met_req -= 1
+                            if value != 0:
+                                if d_max_queue > int(lookup[key] / value) or d_max_queue == 0:
+                                    d_max_queue = int(lookup[key] / value)
+                met_item = True if met_req == 0 else False
+            if 'units' in d_req.keys():
+                met_req = len(d_req['units'])
+                lookup = c_data['capital']['city']['units']
+                for key, value in d_req['units'].items():
+                    if key in lookup:
+                        if value <= lookup[key]:
+                            met_req -= 1
+                            if value != 0:
+                                if d_max_queue > int(lookup[key] / value) or d_max_queue == 0:
+                                    d_max_queue = int(lookup[key] / value)
+                met_unit = True if met_req == 0 else False
+            if 'population' in d_req.keys():
+                lookup = c_data['capital']['city']['figures']['population']
+                if d_req['population']['idle'] <= lookup['current'] - (lookup['laborers'] + lookup['armed_forces']) - 1:
+                    met_idle = True
+                    d_pop = int((lookup['current'] - (lookup['laborers'] + lookup['armed_forces']) - 1) /
+                                d_req['population']['idle'])
+                else:
+                    met_idle = False
+            if 'buildings' in d_req.keys():
+                met_req = len(d_req['buildings'])
+                lookup = c_data['capital']['city']['buildings']
+                for key, value in d_req['buildings'].items():
+                    if key in pseudo_tc:
+                        met_req -= 1
+                    else:
+                        for y in range(len(lookup)):
+                            if key == lookup[y]['type'] and value <= lookup[y]['level']:
+                                met_req -= 1
+                                d_rookery = lookup[y]['level'] if key == 'Rookery' else 0
+                                break
+                met_building = True if met_req == 0 else False
+            if met_research and met_resource and met_item and met_unit and met_idle and met_building:
+                for d_loc in m_data['units'][x]['trainable_in']:
+                    if 'buildings' in d_req.keys():
+                        for key, value in d_req['buildings'].items():
+                            if key in pseudo_tc and value <= selection[d_loc]['tc_level']:
+                                multiplier = selection[d_loc]['tc_total'] + \
+                                             ((selection[d_loc]['tc_combo'] - selection[d_loc]['tc_total']) / 10)
+                                if m_data['units'][x]['type'] in ('BattleDragon', 'SwiftStrikeDragon') \
+                                        and d_loc == 'capital':
+                                    multiplier += (multiplier / 100) * d_rookery
+                                if d_pop > d_max_queue:
+                                    d_pop = d_max_queue
+                                my_dict = {'troop': m_data['units'][x]['type'], 'location': d_loc,
+                                           'tc_level': selection[d_loc]['tc_level'], 'multiplier': multiplier,
+                                           'tc_total': selection[d_loc]['tc_total'], 'quantity': d_pop,
+                                           'trainable': d_max_queue, 'time': m_data['units'][x]['time']}
+                                d_list.append(my_dict)
+    d_troop = None
+    selection.clear()
+    if not d_list:
+        nothing_to_do('Trainable Troops')
+    elif len(d_list) == 1:
+        d_troop = d_list[0]['troop']
+    else:
+        for x in range(len(d_list)):
+            if d_list[x]['troop'] not in selection.keys():
+                selection[d_list[x]['troop']] = t(d_list[x]['troop'])
+
+    # Select Troop To Train
+    while d_troop is None:
+        screen_update(title, 'Select Troop To Train')
+        center_it('~~~ Available Troops ~~~')
+        display_it(selection)
+        div_line()
+        d_select = input(' Enter selection : ')
+        if len(d_select) >= 3:
+            if all(i.isalpha() or i == ' ' for i in d_select):
+                if d_select.lower() == 'exit':
+                    return
+                else:
+                    for key, value in selection.items():
+                        if d_select.lower() in value.lower() or d_select.lower() == value.lower():
+                            d_troop = key
+    d_list[:] = [d for d in d_list if d.get('troop') == d_troop]
+    d_location = None
+    selection.clear()
+    if len(d_list) == 1:
+        d_location = d_list[0]['location']
+    else:
+        for x in range(len(d_list)):
+            print(d_list[x]['time'], d_list[x]['multiplier'])
+            if t(d_list[x]['location']) not in selection.keys():
+                my_dict = {'location': d_list[x]['location'],
+                           'tc_level': d_list[x]['tc_level'],
+                           'tc_total': d_list[x]['tc_total'],
+                           'time': int(d_list[x]['time'] / d_list[x]['multiplier'])}
+                selection[t(d_list[x]['location'])] = my_dict
+
+    # Select Location To Train
+    a = 'Location'
+    len_a = len(a)
+    b = 'Level'
+    len_b = len(b)
+    c = 'Total'
+    len_c = len(c)
+    d = 'Time'
+    len_d = len(d)
+    for x in selection.keys():
+        if len(x) > len_a:
+            len_a = len(x)
+        if len('{0}'.format(selection[x]['tc_level'])) > len_b:
+            len_b = len('{0}'.format(selection[x]['tc_level']))
+        if len('{0}'.format(selection[x]['tc_total'])) > len_c:
+            len_c = len('{0}'.format(selection[x]['tc_total']))
+        if len(convert_time(selection[x]['time'])) > len_d:
+            len_d = len(convert_time(selection[x]['time']))
+    while d_location is None:
+        screen_update(title, 'Select Location To Train')
+        center_it('Troop: {0}'.format(t(d_troop)))
+        center_it(' ')
+        div_line('-')
+        center_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
+        center_it('{0}  {1}  {2}  {3}'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
+        for x in sorted(selection.keys()):
+            center_it('{0:<{1}}  {2:^{3}}  {4:^{5}}  {6:>{7}}'.format(
+                    x, len_a, selection[x]['tc_level'], len_b, selection[x]['tc_total'], len_c,
+                    convert_time(selection[x]['time']), len_d))
+        div_line()
+        d_select = input(' Enter selection : ')
+        if len(d_select) >= 3:
+            if all(i.isalpha() or i == ' ' for i in d_select):
+                if d_select.lower() == 'exit':
+                    return
+                else:
+                    for x in sorted(selection.keys()):
+                        if d_select.lower() in x.lower() or d_select.lower() == x.lower():
+                            d_location = selection[x]['location']
+    d_list[:] = [d for d in d_list if d.get('location') == d_location]
+
+    # Set Training Queue Size
+    d_max_queue = 0
+    while d_max_queue is 0:
+        screen_update(title, 'Set Quantity for Training Queue')
+        center_it('Troop: {0}   Location: {1}'.format(t(d_troop), t(d_location)))
+        center_it(' ')
+        div_line('-')
+        center_it('~~~ Available Options ~~~')
+        center_it('1 to {0}'.format(d_list[0]['quantity']))
+        div_line()
+        d_select = input(' Enter selection : ')
+        if len(d_select) >= 1:
+            if d_select.lower() == 'exit':
+                return
+            elif d_select.isnumeric():
+                if int(d_select) in range(1, d_list[0]['quantity'] + 1):
+                    d_max_queue = int(d_select)
+    d_list[0]['quantity'] = d_max_queue
+
+    # Set Speed Items
+    while True:
+        screen_update(title, 'Set Speed Items To Use For Each Queue')
+        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(t(d_troop), t(d_location), d_max_queue))
+        center_it(' ')
+        div_line('-')
+        center_it('Training Duration: {0}'.format(
+                convert_time((d_list[0]['time'] / d_list[0]['multiplier']) * d_list[0]['quantity'])), prefix=True)
+        div_line()
+        d_select = input(' Enter selection : ')
+        if len(d_select) >= 1:
+            if d_select.lower() == 'exit':
+                return
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
+
 
 def revive_soul(title):
     print(title)
@@ -3058,8 +3275,8 @@ def refresh_data(title):
 def menu():
     module_dict = {create_equipment: 'Craft Equipment', forge_ingredient: 'Forge Ingredients',
                    farm_mission: 'Farm Mission', open_chest: 'Open Chests', unpack_arsenal: 'Unpack Arsenal',
-                   upgrade_building: 'Upgrade Buildings', fill_building: 'Fill Building Slots'}
-    # ,train_troop: 'Train Troops', revive_soul: 'Revive Souls'}
+                   upgrade_building: 'Upgrade Buildings', fill_building: 'Fill Building Slots',
+                   train_troop: 'Train Troops', revive_soul: 'Revive Souls'}
     system_dict = {switch_realm: 'Switch Realms', refresh_data: 'Refresh Game'}
 
     while True:
