@@ -6,18 +6,18 @@ from time import time, sleep
 
 __author__ = 'AlphaQ2 (Suresh Kumar)'
 __credits__ = 'Lucifa & Temprid'
-__version__ = '1.2.2'
+__version__ = '1.2.2a'
 __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
 
 ########################################################################################################################
 #                                        SCRIPT SECTION - Editable Information!                                        #
 ########################################################################################################################
 
-# user_id = 0  # Replace this number with your USER ID number
-# dragon_heart = ''  # Enter your DRAGON HEART code between the quotes
-# session_id = ''  # Enter your DRAGON HEART code between the quotes
-# realm_number = 0  # Replace this number with your REALM number
-# c_number = 0  # Replace this number with your CLUSTER SERVER number
+user_id = 0  # Replace this number with your USER ID number
+dragon_heart = ''  # Enter your DRAGON HEART code between the quotes
+session_id = ''  # Enter your DRAGON HEART code between the quotes
+realm_number = 0  # Replace this number with your REALM number
+c_number = 0  # Replace this number with your CLUSTER SERVER number
 
 ########################################################################################################################
 #                                             SCRIPT SECTION - Do Not Edit!                                            #
@@ -481,10 +481,11 @@ def http_operation(conn, operation, param_add_on, method='POST', post=True):
 def get_manifest():
     global std_param
     for x in range(1, 15):
-        conn = http.client.HTTPConnection('realm{0}.c{0}.castle.rykaiju.com'.format(x), 80)
-        url = 'http://realm{0}.c{0}.castle.rykaiju.com/api/manifest.json'.format(x)
+        conn = http.client.HTTPSConnection('dl.dropboxusercontent.com', 443)
+        # url = 'http://realm{0}.c{0}.castle.rykaiju.com/api/manifest.json'.format(x)
+        url = 'https://dl.dropboxusercontent.com/u/83643256/manifest.json'
         params = '?' + std_param + '&timestamp={0}'.format(int(time()))
-        conn.request('GET', url + params)
+        conn.request('GET', url)
         try:
             conn_resp = conn.getresponse()
             if conn_resp.status == 200:
