@@ -482,9 +482,7 @@ def get_manifest():
     global std_param
     for x in range(1, 15):
         conn = http.client.HTTPSConnection('dl.dropboxusercontent.com', 443)
-        # url = 'http://realm{0}.c{0}.castle.rykaiju.com/api/manifest.json'.format(x)
         url = 'https://dl.dropboxusercontent.com/u/83643256/manifest.json'
-        params = '?' + std_param + '&timestamp={0}'.format(int(time()))
         conn.request('GET', url)
         try:
             conn_resp = conn.getresponse()
@@ -3222,7 +3220,11 @@ def train_troop(title):
                 if int(d_select) in range(1, d_list[0]['quantity'] + 1):
                     d_max_queue = int(d_select)
     d_list[0]['quantity'] = d_max_queue
-
+    selection.clear()
+    a = 'Speed Item'
+    b = 'Available'
+    c = 'Required'
+    d = 'Use'
     # Set Speed Items
     while True:
         screen_update(title, 'Set Speed Items To Use For Each Queue')
