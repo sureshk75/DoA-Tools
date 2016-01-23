@@ -3255,7 +3255,11 @@ def train_troop(title):
                 if int(d_select) in range(1, d_list[0]['quantity'] + 1):
                     d_max_queue = int(d_select)
     d_list[0]['quantity'] = d_max_queue
-
+    selection.clear()
+    a = 'Speed Item'
+    b = 'Available'
+    c = 'Required'
+    d = 'Use'
     # Set Speed Items
     a = 'Speed Item'
     len_a = len(a)
