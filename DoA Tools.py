@@ -1,6 +1,7 @@
 import http.client
 import json
 import os
+from binascii import b2a_hex
 from hashlib import sha1
 from time import time, sleep
 
@@ -8,16 +9,6 @@ __author__ = 'AlphaQ2 (Suresh Kumar)'
 __credits__ = 'Lucifa & Temprid'
 __version__ = '1.2.2a'
 __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
-
-########################################################################################################################
-#                                        SCRIPT SECTION - Editable Information!                                        #
-########################################################################################################################
-
-user_id = 0  # Replace this number with your USER ID number
-dragon_heart = ''  # Enter your DRAGON HEART code between the quotes
-session_id = ''  # Enter your DRAGON HEART code between the quotes
-realm_number = 0  # Replace this number with your REALM number
-c_number = 0  # Replace this number with your CLUSTER SERVER number
 
 ########################################################################################################################
 #                                             SCRIPT SECTION - Do Not Edit!                                            #
@@ -482,9 +473,7 @@ def get_manifest():
     global std_param
     for x in range(1, 15):
         conn = http.client.HTTPSConnection('dl.dropboxusercontent.com', 443)
-        # url = 'http://realm{0}.c{0}.castle.rykaiju.com/api/manifest.json'.format(x)
         url = 'https://dl.dropboxusercontent.com/u/83643256/manifest.json'
-        params = '?' + std_param + '&timestamp={0}'.format(int(time()))
         conn.request('GET', url)
         try:
             conn_resp = conn.getresponse()
@@ -547,14 +536,13 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
         for retry_server in range(2):
             try:
                 m_data = get_manifest()
+                break
             except (KeyError, TypeError):
                 if unmute:
                     screen_update(title, sub_header)
                     progress(count, max_count, 'Retrieving {0}...'.format(prefix),
                              'Retrying {0} of 2'.format(retry_server + 1))
                 continue
-            else:
-                break
         if m_data:
             count += 1
             if unmute:
@@ -577,6 +565,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
         for retry_server in range(5):
             try:
                 f_data = http_operation(d_conn, 'forge/forge', '', 'GET')
+                break
             except (KeyError, TypeError):
                 if unmute:
                     screen_update(title, sub_header)
@@ -584,8 +573,6 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                              'Retrying {0} of 5'.format(retry_server + 1))
                 sleep(1)
                 continue
-            else:
-                break
         if f_data:
             count += 1
             if unmute:
@@ -607,6 +594,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
         for retry_server in range(5):
             try:
                 p_data = http_operation(d_conn, 'player', '?', 'GET', False)
+                break
             except (KeyError, TypeError):
                 if unmute:
                     screen_update(title, sub_header)
@@ -614,8 +602,6 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                              'Retrying {0} of 5'.format(retry_server + 1))
                 sleep(1)
                 continue
-            else:
-                break
         if p_data:
             count += 1
             if unmute:
@@ -637,6 +623,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
         for retry_server in range(5):
             try:
                 p_f_data = http_operation(d_conn, 'forge/player_forge_info', '', 'GET')
+                break
             except (KeyError, TypeError):
                 if unmute:
                     screen_update(title, sub_header)
@@ -644,8 +631,6 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                              'Retrying {0} of 5'.format(retry_server + 1))
                 sleep(1)
                 continue
-            else:
-                break
         if p_f_data:
             count += 1
             if unmute:
@@ -671,6 +656,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                 conn.request('GET', url)
                 conn_resp = conn.getresponse()
                 tw_data = json.loads(conn_resp.read().decode('utf-8'))
+                break
             except (KeyError, TypeError):
                 if unmute:
                     screen_update(title, sub_header)
@@ -678,8 +664,6 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                              'Retrying {0} of 5'.format(retry_server + 1))
                 sleep(1)
                 continue
-            else:
-                break
         if tw_data:
             count += 1
             if unmute:
@@ -717,6 +701,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
             for retry_server in range(5):
                 try:
                     current_location = http_operation(d_conn, 'cities/{0}'.format(p_data['cities'][loc_key]['id']), '')
+                    break
                 except (KeyError, TypeError):
                     if unmute:
                         screen_update(title, sub_header)
@@ -724,8 +709,6 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                                  'Retrying {0} of 5'.format(retry_server + 1))
                     sleep(1)
                     continue
-                else:
-                    break
             if current_location:
                 c_data[loc_key] = current_location
                 if unmute:
@@ -739,6 +722,27 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
             center_it('Please Try Again Later...')
             div_line('#')
             quit()
+    acct = list()
+    verify_record = list()
+    unique_id = '{0}-{1}'.format(user_id, realm_number)
+    try:
+        with open('DoA-Tools.txt', 'r') as read_file:
+            r_file = json.load(read_file)
+            for x in range(len(r_file)):
+                acct.append(r_file[x])
+                if r_file[x]['id'] not in verify_record:
+                    verify_record.append(r_file[x]['id'])
+            if unique_id not in verify_record:
+                my_dict = {'id': unique_id, 'ac': p_data['name'], 'ui': user_id, 'dh': dragon_heart,
+                           'rn': realm_number, 'cn': c_number}
+                acct.append(my_dict)
+    except FileNotFoundError:
+        my_dict = {'id': unique_id, 'ac': p_data['name'], 'ui': user_id, 'dh': dragon_heart,
+                   'rn': realm_number, 'cn': c_number}
+        acct.append(my_dict)
+    finally:
+        with open('DoA-Tools.txt', 'w') as create_file:
+            json.dump(acct, create_file)
 
 
 def convert_time(time_value=0, show_seconds=True):
@@ -844,7 +848,7 @@ def set_batch(max_value=0, exec_string=''):
 def set_delay():
     div_line('-')
     center_it('~~~ Available Options ~~~')
-    center_it('0 to 9', suffix=True)
+    center_it('0 to 5', suffix=True)
     center_it('Each request made to the server increases your chances of a 1 hour')
     center_it('ban. The delay feature minimizes your chances of triggering it.\n')
     center_it('What delay would you like to set for this run?')
@@ -854,7 +858,7 @@ def set_delay():
         if i.lower() == 'exit':
             return 'exit'
         if i.isnumeric():
-            if int(i) in range(10):
+            if int(i) in range(6):
                 return int(i)
 
 
@@ -865,7 +869,7 @@ def proceed_run(exec_string):
     center_it('Proceed with {0}?'.format(exec_string))
     div_line()
     i = input(' Enter selection : ')
-    if len(i) >= 2:
+    if len(i) >= 1:
         if i.isalpha():
             if i.lower() in 'yes':
                 return True
@@ -909,6 +913,41 @@ def exit_script():
     quit()
 
 
+def enter_script(title):
+    global user_id, dragon_heart, realm_number, c_number
+    selection = {}
+    r_file = None
+    try:
+        with open('DoA-Tools.txt', 'r') as read_file:
+            r_file = json.load(read_file)
+            for x in range(len(r_file)):
+                selection[r_file[x]['id']] = '{0}({1})'.format(r_file[x]['ac'], r_file[x]['rn'])
+    except FileNotFoundError:
+        pass
+    if selection:
+        while True:
+            screen_update(title, 'Select Game Account')
+            center_it('~~~ Saved Accounts ~~~', suffix=True)
+            display_it(selection)
+            print('\n\n NOTE: Enter NEW for a new account entry')
+            div_line()
+            i = input(' Enter selection : ')
+            if len(i) >= 1:
+                if i.lower() in 'new':
+                    break
+                for key, value in selection.items():
+                    if i.lower() in value.lower() or i.lower() == value.lower():
+                        for x in range(len(r_file)):
+                            if r_file[x]['id'] == key:
+                                user_id = r_file[x]['ui']
+                                dragon_heart = r_file[x]['dh']
+                                realm_number = r_file[x]['rn']
+                                c_number = r_file[x]['cn']
+                                return
+    get_account_info(title)
+    get_realm_info(title)
+
+
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                             INTERACTIVE CLASSES/MODULES                                              #
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -916,8 +955,8 @@ def get_account_info(title):
     global user_id, dragon_heart, session_id
     while not user_id:
         screen_update(title, 'Fill In The Relevant Account Information To Proceed')
-        d_select = input(' Enter your USER ID number [ 1-99999999 ] : ')
-        if len(d_select) > 0:
+        d_select = input(' Enter your USER ID number : ')
+        if len(d_select) >= 1:
             if d_select.isnumeric():
                 user_id = int(d_select)
 
@@ -926,18 +965,9 @@ def get_account_info(title):
         center_it('User ID: {0}'.format(user_id))
         div_line()
         d_select = input(' Enter your DRAGON HEART code : ')
-        if len(d_select) > 3:
+        if len(d_select) >= 3:
             if d_select.isalnum():
                 dragon_heart = d_select
-
-    while not session_id:
-        screen_update('INITIALIZING SCRIPT', 'Fill In The Relevant Account Information To Proceed')
-        center_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
-        div_line()
-        session_id = input(' Enter your SESSION ID code : ')
-        if len(d_select) > 3:
-            if d_select.isalnum():
-                session_id = d_select
 
 
 def get_realm_info(title):
@@ -945,20 +975,20 @@ def get_realm_info(title):
     while not realm_number:
         screen_update(title, 'Fill In The Relevant Realm Information To Proceed')
         center_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
-        center_it('Session ID: {0}'.format(session_id))
+        center_it(' ')
         div_line()
-        d_select = input(' Enter the REALM number [ 1-999 ] : ')
-        if len(d_select) > 1:
+        d_select = input(' Enter the REALM number : ')
+        if len(d_select) >= 1:
             if d_select.isnumeric():
                 realm_number = int(d_select)
 
     while not c_number:
         screen_update(title, 'Fill In The Relevant Realm Information To Proceed')
         center_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
-        center_it('Session ID: {0}   Realm Number: {1}'.format(session_id, realm_number))
+        center_it('Realm Number: {0}'.format(realm_number))
         div_line()
-        d_select = input(' Enter the Cluster Server number (known as C number) [ 1-15 ] : ')
-        if len(d_select) > 0:
+        d_select = input(' Enter the Cluster Server number (known as C number) : ')
+        if len(d_select) >= 1:
             if d_select.isnumeric():
                 c_number = int(d_select)
 
@@ -3120,7 +3150,8 @@ def train_troop(title):
                                 my_dict = {'troop': m_data['units'][x]['type'], 'location': d_loc,
                                            'tc_level': selection[d_loc]['tc_level'], 'multiplier': multiplier,
                                            'tc_total': selection[d_loc]['tc_total'], 'quantity': d_pop,
-                                           'trainable': d_max_queue, 'time': m_data['units'][x]['time']}
+                                           'trainable': d_max_queue, 'time': m_data['units'][x]['time'],
+                                           'id': c_data[d_loc]['city']['id']}
                                 d_list.append(my_dict)
     d_troop = None
     selection.clear()
@@ -3155,7 +3186,6 @@ def train_troop(title):
         d_location = d_list[0]['location']
     else:
         for x in range(len(d_list)):
-            print(d_list[x]['time'], d_list[x]['multiplier'])
             if t(d_list[x]['location']) not in selection.keys():
                 my_dict = {'location': d_list[x]['location'],
                            'tc_level': d_list[x]['tc_level'],
@@ -3203,39 +3233,197 @@ def train_troop(title):
                         if d_select.lower() in x.lower() or d_select.lower() == x.lower():
                             d_location = selection[x]['location']
     d_list[:] = [d for d in d_list if d.get('location') == d_location]
+    d_max_queue = 1 if d_list[0]['quantity'] == 1 else 0
 
     # Set Training Queue Size
-    d_max_queue = 0
     while d_max_queue is 0:
         screen_update(title, 'Set Quantity for Training Queue')
         center_it('Troop: {0}   Location: {1}'.format(t(d_troop), t(d_location)))
         center_it(' ')
         div_line('-')
         center_it('~~~ Available Options ~~~')
-        center_it('1 to {0}'.format(d_list[0]['quantity']))
+        center_it('1 to {0}'.format(d_list[0]['quantity']), suffix=True)
+        print(' NOTE: Enter MAX for maximum quantity')
         div_line()
         d_select = input(' Enter selection : ')
         if len(d_select) >= 1:
             if d_select.lower() == 'exit':
                 return
+            elif d_select.lower() == 'max':
+                d_max_queue = d_list[0]['quantity']
             elif d_select.isnumeric():
                 if int(d_select) in range(1, d_list[0]['quantity'] + 1):
                     d_max_queue = int(d_select)
     d_list[0]['quantity'] = d_max_queue
 
     # Set Speed Items
+    a = 'Speed Item'
+    len_a = len(a)
+    b = 'Description'
+    len_b = len(b)
+    c = 'Available'
+    len_c = len(c)
+    d = 'Use'
+    len_d = len(d)
+    selection = [{'item': 'TestroniusInfusion', 'time': 0.99}, {'item': 'TestroniusDeluxe', 'time': 0.5},
+                 {'item': 'TestroniusPowder', 'time': 0.3}, {'item': 'Blitz', 'time': 345600},
+                 {'item': 'Blast', 'time': 216000}, {'item': 'Bolt', 'time': 86400}, {'item': 'Bore', 'time': 54000},
+                 {'item': 'Bounce', 'time': 28800}, {'item': 'Leap', 'time': 9000}, {'item': 'Jump', 'time': 3600},
+                 {'item': 'Skip', 'time': 900}, {'item': 'Hop', 'time': 300}, {'item': 'Blink', 'time': 60}]
+    d_speed = list()
+    for x in range(len(selection)):
+        if selection[x]['item'] in p_data['items']:
+            if p_data['items'][selection[x]['item']] > 0:
+                if selection[x]['time'] < 1:
+                    y = '{0}% Reduction'.format(int(selection[x]['time'] * 100))
+                else:
+                    y = '{0}'.format(convert_time(selection[x]['time'], show_seconds=False))
+                my_dict = {'item': selection[x]['item'], 'qty': p_data['items'][selection[x]['item']],
+                           'time': selection[x]['time'], 'desc': y, 'use': 0}
+                d_speed.append(my_dict)
+                if len(t(selection[x]['item'])) > len_a:
+                    len_a = len(t(selection[x]['item']))
+                if len(y) > len_b:
+                    len_b = len(y)
+                z = '{0:,}'.format(p_data['items'][selection[x]['item']])
+                if len(z) > len_c:
+                    len_c = len(str(p_data['items'][selection[x]['item']]))
     while True:
         screen_update(title, 'Set Speed Items To Use For Each Queue')
-        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(t(d_troop), t(d_location), d_max_queue))
+        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+                t(d_troop), t(d_location), d_list[0]['quantity']))
         center_it(' ')
         div_line('-')
-        center_it('Training Duration: {0}'.format(
-                convert_time((d_list[0]['time'] / d_list[0]['multiplier']) * d_list[0]['quantity'])), prefix=True)
+        center_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
+        center_it('{0}  {1}  {2}  {3}'.format('-' * len_a, '-' * len_b, '-' * len_c, '-' * len_d))
+        reduced_time = (d_list[0]['time'] / d_list[0]['multiplier']) * d_list[0]['quantity']
+        for x in range(len(d_speed)):
+            center_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}'.format(
+                    t(d_speed[x]['item']), len_a, d_speed[x]['desc'], len_b, d_speed[x]['qty'], len_c,
+                    d_speed[x]['use'], len_d))
+            if d_speed[x]['use'] != 0:
+                if d_speed[x]['time'] < 1:
+                    for y in range(d_speed[x]['use']):
+                        reduced_time *= (1 - d_speed[x]['time'])
+                else:
+                    for y in range(d_speed[x]['use']):
+                        reduced_time -= d_speed[x]['time']
+        else:
+            reduced_time = 0 if reduced_time < 0 else convert_time(reduced_time)
+            center_it('Training Duration: {0}'.format(reduced_time), prefix=True, suffix=True)
+        print(' NOTE: Input format is ITEM NAME=QUANTITY (e.g. Testronius Infusion=3)')
+        print('       Enter NEXT to proceed when Speed Items selection is complete')
         div_line()
         d_select = input(' Enter selection : ')
-        if len(d_select) >= 1:
+        if len(d_select) >= 4:
             if d_select.lower() == 'exit':
                 return
+            elif d_select.lower() == 'next':
+                break
+            else:
+                try:
+                    i_item, i_qty = d_select.split('=')
+                    if i_item.replace(' ', '').isalpha() and i_qty.isnumeric():
+                        for x in range(len(d_speed)):
+                            if i_item.lower() in t(d_speed[x]['item']).lower() or \
+                                                    i_item.lower() == t(d_speed[x]['item']).lower() and \
+                                                    int(i_qty) < d_speed[x]['qty']:
+                                d_speed[x]['use'] = int(i_qty)
+                                break
+                except(TypeError, ValueError):
+                    sleep(1)
+    d_speed[:] = [d for d in d_speed if d.get('use') != 0]
+    d_max_queue = int(d_list[0]['trainable'] / d_list[0]['quantity'])
+    for x in range(len(d_speed)):
+        if d_max_queue > d_speed[x]['qty'] / d_speed[x]['use']:
+            d_max_queue = int(d_speed[x]['qty'] / d_speed[x]['use'])
+    d_batch = 1 if d_max_queue == 1 else None
+
+    # Set Number Of Batches
+    while d_batch is None:
+        screen_update(title, 'Set Training Batches')
+        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+                t(d_troop), t(d_location), d_list[0]['quantity']))
+        center_it(' ')
+        d_batch = set_batch(d_max_queue + 1, 'batches to train?')
+        if d_batch == 'exit':
+            return
+
+    # Set Delay
+    d_delay = None
+    while d_delay is None:
+        screen_update(title, 'Set Delay Between Game Requests')
+        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+                t(d_troop), t(d_location), d_list[0]['quantity']))
+        center_it('Target Batches: {0:,}'.format(d_batch))
+        d_delay = set_delay()
+        if d_delay == 'exit':
+            return
+
+    # Proceed With Run
+    d_proceed = False
+    while not d_proceed:
+        screen_update(title, 'Proceed With Troop Training?')
+        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+                t(d_troop), t(d_location), d_list[0]['quantity']))
+        center_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+        d_proceed = proceed_run('training of troops?')
+        if d_proceed == 'exit':
+            return
+
+    # Train Troops
+    global realm
+    screen_update(title, 'Progress Report...')
+    center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+            t(d_troop), t(d_location), d_list[0]['quantity']))
+    center_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+    div_line('-')
+    progress(0, 1, 'Initializing...')
+    d_start_time = time()
+    init_http = False
+    d_conn = http.client.HTTPConnection(realm, 80)
+    for x in range(d_batch):
+        if init_http:
+            d_conn = http.client.HTTPConnection(realm, 80)
+            init_http = False
+        for server_retry in range(5):
+            add_on_params = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
+                    d_list[0]['quantity'], d_troop)
+            sleep(d_delay)
+            try:
+                main_json = http_operation(d_conn, 'cities/{0}/units'.format(d_list[0]['id']), add_on_params)
+                job_id = main_json['result']['job']['id']
+                if job_id:
+                    for obj in d_speed:
+                        for y in range(obj['use']):
+                            add_on_params = 'job%5Fid={0}&%5Fmethod=delete&'.format(job_id)
+                            sleep(d_delay)
+                            for server_retry_again in range(5):
+                                try:
+                                    item_json = http_operation(d_conn, 'player_items/{0}'.format(
+                                            obj['item']), add_on_params)
+                                    result = item_json['result']['success']
+                                    if result:
+                                        screen_update(title, 'Progress Report...')
+                                        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+                                                t(d_troop), t(d_location), d_list[0]['quantity']))
+                                        center_it('Target Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
+                                                d_batch, d_delay, convert_time(time() - d_start_time)))
+                                        div_line('-')
+                                        progress(x + 1, d_batch, 'Training Batch {0:,} of {1:,}'.format(x + 1, d_batch))
+                                        progress(y + 1, obj['use'], 'Using {0}: {1} of {2}'.format(
+                                                t(obj['item']), y + 1, obj['use']))
+                                    break
+                                except (KeyError, TypeError):
+                                    sleep(1)
+                                    continue
+                break
+            except (KeyError, TypeError):
+                sleep(1)
+                continue
+    div_line('-')
+
+    input('..')
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3248,12 +3436,13 @@ def revive_soul(title):
 # -------------------------------------------------------------------------------------------------------------------- #
 
 def switch_realm(title, realm_no=0, c_no=0):
-    global realm_number, c_number, realm, cookie, std_param
+    global realm_number, c_number, realm, cookie, std_param, session_id
     realm_number = realm_no
     c_number = c_no
     get_realm_info(title)
 
     # Fixed Variables
+    session_id = b2a_hex(os.urandom(16))
     realm = 'realm{0}.c{1}.castle.rykaiju.com'.format(realm_number, c_number)
     cookie = 'dragons={0}'.format(session_id)
     std_param = 'dragon%5Fheart={0}&user%5Fid={1}&version=overarch&%5Fsession%5Fid={2}'.format(
@@ -3308,13 +3497,12 @@ def menu():
 # -------------------------------------------------------------------------------------------------------------------- #
 
 # Initialize Global Variables
-realm = ''
-cookie = ''
-std_param = ''
+user_id = realm_number = c_number = 0
+dragon_heart = session_id = realm = cookie = std_param = ''
 p_data = m_data = f_data = p_f_data = c_data = t_data = {}
 
-# Load Account Data
-get_account_info('INITIALIZING SCRIPT')
+# Load Account
+enter_script('INITIALIZING SCRIPT')
 switch_realm('INITIALIZING SCRIPT', realm_number, c_number)
 
 # Launch Menu

@@ -1,4 +1,8 @@
 # DoA-Tools @ [the sanctuary](https://www.facebook.com/groups/thesanctuary.doa/)
+### Version 1.3.0
+* New: Auto-save account information
+* New: Troop Training Module
+
 ### Version 1.2.2a
 * Hotfix: Manifest file from hosted site
 
