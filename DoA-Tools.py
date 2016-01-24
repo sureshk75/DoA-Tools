@@ -441,7 +441,7 @@ def web_ops(conn, operation, param_add_on, method='POST', post=True):
             conn.close()
             for ban_countdown in range(3660):
                 screen_update('TOO MANY REQUESTS ERROR', 'Your Recent Activities Has Triggered A Temporary Ban')
-                progress(ban_countdown, 3660, 'Ban duration left {0}'.format(cvt_time(3660 - ban_countdown)))
+                progress(ban_countdown, 3660, 'Ban dur left {0}'.format(cvt_time(3660 - ban_countdown)))
                 sleep(1)
             conn.connect()
         elif conn_resp.status == 509:
@@ -1473,7 +1473,7 @@ def farm_mission(title):
                         selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
                         selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
                         len_d, use_item))
-            print('\n Exceeding - Item used when duration exceeds the displayed time')
+            print('\n Exceeding - Item used when dur exceeds the displayed time')
             div_line('-')
             print(' Selection options available:')
             print(' ALL = Enable all, NONE = Disable all, Item Name = Enable/Disable selected')
@@ -1565,9 +1565,9 @@ def farm_mission(title):
     d_conn = http.client.HTTPConnection(realm, 80)
     for x in range(1, d_batch + 1):
         job_id = 0
-        duration = -1
+        dur = -1
         restart_http = False
-        while duration != 0:
+        while dur != 0:
             screen_update(title, 'Progress Report...')
             ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
             ctr_it('Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
@@ -1578,16 +1578,16 @@ def farm_mission(title):
                 ctr_it('~~~ Speed Items Used ~~~')
                 display_it(speeds_used, single=False)
                 print(' ')
-            elif duration == -1:
+            elif dur == -1:
                 progress(x, d_batch, 'Farming {0} of {1}'.format(x, d_batch), 'Initializing...\n')
             else:
                 restart_http = True
                 progress(x, d_batch, 'Farming {0} of {1}'.format(x, d_batch),
-                         'Waiting {0} for job to finish...\n'.format(cvt_time(duration)))
+                         'Waiting {0} for job to finish...\n'.format(cvt_time(dur)))
             if items_gained:
                 ctr_it('~~~ Items Gained ~~~')
                 display_it(items_gained, single=False)
-            if duration == -1:
+            if dur == -1:
                 for retry_server in range(5):
                     sleep(d_delay)
                     x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
@@ -1595,7 +1595,7 @@ def farm_mission(title):
                         main_json = web_ops(d_conn, 'player_missions', x_param)
                         result = main_json['result']['success']
                         if result:
-                            duration = d_list[0]['time']
+                            dur = d_list[0]['time']
                             job_id = main_json['result']['job']['id']
                             break
                     except (KeyError, TypeError):
@@ -1604,10 +1604,10 @@ def farm_mission(title):
                     else:
                         sleep(1)
                         continue
-            elif duration != 0 and len(d_speed) > 0:
+            elif dur != 0 and len(d_speed) > 0:
                 speed_item = None
                 for z in range(len(d_speed)):
-                    if duration > d_speed[z]['exceed'] and d_speed[z]['quantity'] != 0:
+                    if dur > d_speed[z]['exceed'] and d_speed[z]['quantity'] != 0:
                         speed_item = d_speed[z]['item']
                         break
                 if speed_item is None:
@@ -1615,7 +1615,7 @@ def farm_mission(title):
                         speed_item = d_speed[0]['item']
                     else:
                         for z in range(len(d_speed) - 1, -1, -1):
-                            if duration <= d_speed[z]['time'] and d_speed[z]['quantity'] != 0:
+                            if dur <= d_speed[z]['time'] and d_speed[z]['quantity'] != 0:
                                 speed_item = d_speed[z]['item']
                                 break
                 for retry_server in range(5):
@@ -1632,9 +1632,9 @@ def farm_mission(title):
                                 speeds_used[speed_item] += 1
                             else:
                                 speeds_used[speed_item] = 1
-                            duration = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
-                            if duration < 1:
-                                duration = 0
+                            dur = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
+                            if dur < 1:
+                                dur = 0
                             break
                     except (KeyError, TypeError):
                         sleep(1)
@@ -1643,9 +1643,9 @@ def farm_mission(title):
                         sleep(1)
                         continue
             else:
-                duration -= 1
-                if duration < 1:
-                    duration = 0
+                dur -= 1
+                if dur < 1:
+                    dur = 0
                 sleep(1)
         if restart_http:
             d_conn = http.client.HTTPConnection(realm, 80)
@@ -2376,7 +2376,7 @@ def fill_building(title):
                         selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
                         selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
                         len_d, use_item))
-            print('\n Exceeding - Item used when duration exceeds the displayed time')
+            print('\n Exceeding - Item used when dur exceeds the displayed time')
             div_line('-')
             print(' Selection options available:')
             print(' ALL = Enable all, NONE = Disable all, Item Name = Enable/Disable selected')
@@ -2445,8 +2445,8 @@ def fill_building(title):
                 slots.append(x)
     for x in range(d_slots):
         jobid = 0
-        duration = -1
-        while duration != 0:
+        dur = -1
+        while dur != 0:
             screen_update(title, 'Progress Report')
             ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
             ctr_it('Slots To Fill: {0}   Delay: {1}   Elapsed Time: {2}'.format(
@@ -2457,12 +2457,12 @@ def fill_building(title):
                 ctr_it(' ')
                 ctr_it('~~~ Speed Items Used ~~~')
                 display_it(speeds_used, single=False)
-            elif duration != -1:
+            elif dur != -1:
                 progress(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots),
-                         'Waiting {0} for job to finish...'.format(cvt_time(duration)))
+                         'Waiting {0} for job to finish...'.format(cvt_time(dur)))
             else:
                 progress(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots), 'Initializing...')
-            if duration == -1:
+            if dur == -1:
                 x_param = 'city%5F{0}%5B{0}%5Ftype%5D={1}&%5Fmethod=post&city%5F{0}%5Bslot%5D={2}&'.format(
                         'building', d_building, slots[x])
                 for retry_server in range(5):
@@ -2472,17 +2472,17 @@ def fill_building(title):
                                 d_list[0]['location_id']), x_param)
                         result = json_data['result']['success']
                         if result:
-                            duration = json_data['result']['job']['duration']
+                            dur = json_data['result']['job']['dur']
                             jobid = json_data['result']['job']['id']
                             count += 1
                             break
                     except (KeyError, TypeError):
                         sleep(1)
                         continue
-            elif duration != 0 and len(d_speed) > 0:
+            elif dur != 0 and len(d_speed) > 0:
                 speed_item = None
                 for y in range(len(d_speed)):
-                    if duration > d_speed[y]['exceed']:
+                    if dur > d_speed[y]['exceed']:
                         speed_item = d_speed[y]['item']
                         break
                 if speed_item is None:
@@ -2490,7 +2490,7 @@ def fill_building(title):
                         speed_item = d_speed[0]['item']
                     else:
                         for y in range(len(d_speed) + 1, -1, -1):
-                            if duration <= d_speed[y]['time']:
+                            if dur <= d_speed[y]['time']:
                                 speed_item = d_speed[y]['item']
                                 break
                 x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(jobid)
@@ -2504,17 +2504,17 @@ def fill_building(title):
                                 speeds_used[speed_item] += 1
                             else:
                                 speeds_used[speed_item] = 1
-                            duration = int(json_data['result']['item_response']['run_at'] - json_data['timestamp'])
-                            if duration < 1:
-                                duration = 0
+                            dur = int(json_data['result']['item_response']['run_at'] - json_data['timestamp'])
+                            if dur < 1:
+                                dur = 0
                             break
                     except TypeError:
                         sleep(1)
                         continue
             else:
-                duration -= 1
-                if duration < 1:
-                    duration = 0
+                dur -= 1
+                if dur < 1:
+                    dur = 0
                 sleep(1)
     screen_update(title, 'Summary Report')
     ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
@@ -2784,7 +2784,7 @@ def upgrade_building(title):
                         selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
                         selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
                         len_d, use_item))
-            print('\n Exceeding - Item used when duration exceeds the displayed time')
+            print('\n Exceeding - Item used when dur exceeds the displayed time')
             div_line('-')
             print(' Selection options available:')
             print(' ALL = Enable all, NONE = Disable all, Item Name = Enable/Disable selected')
@@ -2848,9 +2848,9 @@ def upgrade_building(title):
         for x in range(d_list_len):
             if d_list[x]['level'] == y:
                 jobid = 0
-                duration = -1
+                dur = -1
                 speed_item = None
-                while duration != 0:
+                while dur != 0:
                     screen_update('UPGRADE BUILDING', 'Progress Report...')
                     ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(
                             t(d_location), t(d_building), d_level))
@@ -2862,14 +2862,14 @@ def upgrade_building(title):
                     if total > 1:
                         progress(count, total, 'Upgrading Slot {0} of {1}'.format(count, total))
                     elif speed_item:
-                        progress(prog_dur - duration, prog_dur, 'Used {0} to speed through'.format(speed_item))
+                        progress(prog_dur - dur, prog_dur, 'Used {0} to speed through'.format(speed_item))
                     else:
                         pass
                     if speeds_used:
                         ctr_it(' ')
                         ctr_it('~~~ Speed Items Used ~~~')
                         display_it(speeds_used, single=False)
-                    if duration == -1:
+                    if dur == -1:
                         x_param = '%5Fmethod=put&'
                         for server_retry in range(5):
                             sleep(d_delay + 1)
@@ -2878,18 +2878,18 @@ def upgrade_building(title):
                                         d_list[x]['location_id'], d_list[x]['building_id']), x_param)
                                 result = main_json['result']['success']
                                 if result:
-                                    duration = int(main_json['result']['job']['duration'])
-                                    prog_dur = duration
+                                    dur = int(main_json['result']['job']['dur'])
+                                    prog_dur = dur
                                     jobid = main_json['result']['job']['id']
                                     count += 1
                                     break
                             except (KeyError, TypeError):
                                 sleep(1)
                                 continue
-                    elif duration > 0 and len(d_speed) > 0:
+                    elif dur > 0 and len(d_speed) > 0:
                         speed_item = None
                         for z in range(len(d_speed)):
-                            if duration > d_speed[z]['exceed'] and d_speed[z]['quantity'] != 0:
+                            if dur > d_speed[z]['exceed'] and d_speed[z]['quantity'] != 0:
                                 speed_item = d_speed[z]['item']
                                 break
                         if speed_item is None:
@@ -2897,7 +2897,7 @@ def upgrade_building(title):
                                 speed_item = d_speed[0]['item']
                             else:
                                 for z in range(len(d_speed) - 1, -1, -1):
-                                    if duration <= d_speed[z]['time'] and d_speed[z]['quantity'] != 0:
+                                    if dur <= d_speed[z]['time'] and d_speed[z]['quantity'] != 0:
                                         speed_item = d_speed[z]['item']
                                         break
                         x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(jobid)
@@ -2914,19 +2914,19 @@ def upgrade_building(title):
                                         speeds_used[speed_item] += 1
                                     else:
                                         speeds_used[speed_item] = 1
-                                    duration = int(
+                                    dur = int(
                                             item_json['result']['item_response']['run_at'] - item_json['timestamp'])
-                                    if duration < 1:
-                                        duration = 0
+                                    if dur < 1:
+                                        dur = 0
                                         d_list[x]['level'] = item_json['result']['item_response']['level']
                                     break
                             except (KeyError, TypeError):
                                 sleep(1)
                                 continue
                     else:
-                        duration -= 1
-                        if duration < 1:
-                            duration = 0
+                        dur -= 1
+                        if dur < 1:
+                            dur = 0
                             d_list[x]['level'] += 1
                         sleep(1)
     screen_update(title, 'Summary Report')
@@ -3053,11 +3053,11 @@ def train_troop(title):
                                     multiplier += (multiplier / 100) * d_rookery
                                 if d_pop > d_max_queue:
                                     d_pop = d_max_queue
-                                my_dict = {'troop': m_data['units'][x]['type'], 'location': d_loc,
-                                           'tc_level': selection[d_loc]['tc_level'], 'multiplier': multiplier,
-                                           'tc_total': selection[d_loc]['tc_total'], 'quantity': d_pop,
-                                           'trainable': d_max_queue, 'time': m_data['units'][x]['time'],
-                                           'id': c_data[d_loc]['city']['id']}
+                                my_dict = {'troop': m_data['units'][x]['type'], 'id': c_data[d_loc]['city']['id'],
+                                           'tc_level': selection[d_loc]['tc_level'], 'quantity': d_pop,
+                                           'tc_total': selection[d_loc]['tc_total'], 'trainable': d_max_queue,
+                                           'time': m_data['units'][x]['time'], 'multiplier': multiplier,
+                                           'power': m_data['units'][x]['stats']['power'], 'location': d_loc}
                                 d_list.append(my_dict)
                                 break
     d_troop = None
@@ -3218,7 +3218,7 @@ def train_troop(title):
                         reduced_time -= d_speed[x]['time']
         else:
             reduced_time = 0 if reduced_time < 0 else cvt_time(reduced_time)
-            ctr_it('Training Duration: {0}'.format(reduced_time), prefix=True, suffix=True)
+            ctr_it('Training dur: {0}'.format(reduced_time), prefix=True, suffix=True)
         if reduced_time != 0:
             print(' NOTE: Enter ITEM=QUANTITY (e.g. Infusion=3)')
         else:
@@ -3290,11 +3290,11 @@ def train_troop(title):
     d_start = time()
     d_conn = http.client.HTTPConnection(realm, 80)
     for x in range(d_batch):
-        duration = -1
+        dur = -1
         job_id = 0
         for item in d_speed:
             for y in range(item['use']):
-                if 'Testronius' in item['item'] and speed_cut_off >= duration != -1 or duration == 0:
+                if 'Testronius' in item['item'] and speed_cut_off >= dur != -1 or dur == 0:
                     break
                 screen_update(title, 'Progress Report...')
                 ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
@@ -3304,13 +3304,19 @@ def train_troop(title):
                 div_line('-')
                 progress(x + 1, d_batch, 'Training Batch {0:,} of {1:,}'.format(x + 1, d_batch))
                 if speeds_used:
-                    progress(y + 1, item['use'], 'Using {0}: {1} of {2}'.format(
-                            t(item['item']), y + 1, item['use']), 'Remaning Duration: {0}'.format(cvt_time(duration)))
+                    init = 'Initializing Queue...' if dur == -1 else 'Remaning dur: {0}'.format(cvt_time(dur))
+                    progress(y + 1, item['use'], 'Using {0}'.format(t(item['item'])), init)
                     ctr_it('~~~ Speed Items Used ~~~', prefix=True)
-                    display_it(speeds_used, single=False)
+                    for key, value in speeds_used.items():
+                        ctr_it('{0}: {1:,}'.format(t(key), value))
+                    if x > 0:
+                        ctr_it('~~~ Troops Trained ~~~', prefix=True)
+                        ctr_it('{0:,}'.format(d_list[0]['quantity'] * x))
+                        ctr_it('~~~ Power Gained ~~~', prefix=True)
+                        ctr_it('{0:,}'.format(d_list[0]['quantity'] * x * d_list[0]['power']))
                 else:
                     progress(0, 1, 'Initializing...')
-                if duration == -1:
+                if dur == -1:
                     x_param = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
                             d_list[0]['quantity'], d_troop)
                     for server_retry in range(5):
@@ -3320,12 +3326,12 @@ def train_troop(title):
                             result = main_json['result']['success']
                             if result:
                                 job_id = main_json['result']['job']['id']
-                                duration = int(main_json['result']['job']['duration'])
+                                dur = int(main_json['result']['job']['dur'])
                                 break
                         except (KeyError, TypeError):
                             sleep(1)
                             continue
-                if duration > (d_delay + 1):
+                if dur > (d_delay + 1):
                     x_param = 'job%5Fid={0}&%5Fmethod=delete&'.format(job_id)
                     for server_retry in range(5):
                         sleep(d_delay)
@@ -3333,9 +3339,9 @@ def train_troop(title):
                             item_json = web_ops(d_conn, 'player_items/{0}'.format(item['item']), x_param)
                             result = item_json['result']['success']
                             if result:
-                                duration = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
-                                if duration < 0:
-                                    duration = 0
+                                dur = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
+                                if dur < 0:
+                                    dur = 0
                                 if t(item['item']) in speeds_used:
                                     speeds_used[t(item['item'])] += 1
                                 else:
@@ -3351,7 +3357,12 @@ def train_troop(title):
     progress(1, 1, 'Training Completed Successfully!', 'Process completed in {0}'.format(cvt_time(time() - d_start)))
     if speeds_used:
         ctr_it('~~~ Speed Items Used ~~~', prefix=True)
-        display_it(speeds_used, single=False)
+        for key, value in speeds_used.items():
+            ctr_it('{0}: {1:,}'.format(t(key), value))
+    ctr_it('~~~ Troops Trained ~~~', prefix=True)
+    ctr_it('{0:,}'.format(d_list[0]['quantity'] * d_batch))
+    ctr_it('~~~ Power Gained ~~~', prefix=True)
+    ctr_it('{0:,}'.format(d_list[0]['quantity'] * d_batch * d_list[0]['power']))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     print('Refreshing... Please wait!')
