@@ -7,7 +7,7 @@ from time import time, sleep
 
 __author__ = 'AlphaQ2 (Suresh Kumar)'
 __credits__ = 'Lucifa & Temprid'
-__version__ = '1.2.2a'
+__version__ = '1.3.0'
 __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
 
 ########################################################################################################################
@@ -407,7 +407,7 @@ def screen_update(title, subtitle):
     div_line()
 
 
-def http_operation(conn, operation, param_add_on, method='POST', post=True):
+def web_ops(conn, operation, param_add_on, method='POST', post=True):
     global realm, std_param, cookie
     url = 'http://{0}/api/{1}.json'.format(realm, operation)
     params = param_add_on + '{0}&timestamp={1}'.format(std_param, int(time()))
@@ -441,58 +441,32 @@ def http_operation(conn, operation, param_add_on, method='POST', post=True):
             conn.close()
             for ban_countdown in range(3660):
                 screen_update('TOO MANY REQUESTS ERROR', 'Your Recent Activities Has Triggered A Temporary Ban')
-                progress(ban_countdown, 3660, 'Ban duration left {0}'.format(convert_time(3660 - ban_countdown)))
+                progress(ban_countdown, 3660, 'Ban duration left {0}'.format(cvt_time(3660 - ban_countdown)))
                 sleep(1)
             conn.connect()
         elif conn_resp.status == 509:
             conn.close()
             for ban_countdown in range(60):
                 screen_update('TOO MANY REQUESTS ERROR', 'Your Recent Activities Has Triggered A Warning')
-                progress(ban_countdown, 60, 'Script paused for {0}'.format(convert_time(60 - ban_countdown)))
+                progress(ban_countdown, 60, 'Script paused for {0}'.format(cvt_time(60 - ban_countdown)))
                 sleep(1)
             conn.connect()
         elif conn_resp.status == 502:
             sleep(5)
         else:
             div_line('#')
-            center_it('SERVER ERROR: Error Code {0} Returned By The Server'.format(conn_resp.status))
-            center_it('Please try again later...')
+            ctr_it('SERVER ERROR: Error Code {0} Returned By The Server'.format(conn_resp.status))
+            ctr_it('Please try again later...')
             os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
             quit()
     except (http.client.IncompleteRead, http.client.ResponseNotReady, http.client.RemoteDisconnected):
         sleep(2)
     except http.client.CannotSendRequest:
         div_line('#')
-        center_it('SERVER ERROR: HTTP Connection Failed!')
-        center_it('Please reload script and try again...')
+        ctr_it('SERVER ERROR: HTTP Connection Failed!')
+        ctr_it('Please reload script and try again...')
         os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
         quit()
-
-
-def get_manifest():
-    global std_param
-    for x in range(1, 15):
-        conn = http.client.HTTPSConnection('dl.dropboxusercontent.com', 443)
-        url = 'https://dl.dropboxusercontent.com/u/83643256/manifest.json'
-        conn.request('GET', url)
-        try:
-            conn_resp = conn.getresponse()
-            if conn_resp.status == 200:
-                conn_json = conn_resp.read().decode('utf-8')
-                return json.loads(conn_json)
-            elif conn_resp.status == 502:
-                conn.close()
-                sleep(1)
-            else:
-                div_line('#')
-                center_it('SERVER ERROR: Error Code {0} Returned By The Server'.format(conn_resp.status))
-                center_it('Please try again later...')
-                os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-                quit()
-        except (http.client.IncompleteRead, http.client.ResponseNotReady, http.client.RemoteDisconnected):
-            conn.close()
-            sleep(1)
-        print('.', end='', flush=True)
 
 
 def progress(p_count, p_total, prefix, suffix=None):
@@ -511,179 +485,105 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
     sub_header = '{0} Game Files. Please Wait...'.format(title_text)
     tw_data = None
     max_count = count = 0
-    if manifest:
-        max_count += 1
-    if forge:
-        max_count += 1
-    if player:
-        max_count += 1
-    if player_forge:
-        max_count += 1
-    if cities:
-        max_count += 1
-    if translation:
-        max_count += 1
+    for check in (manifest, forge, player, player_forge, translation):
+        if check:
+            max_count += 1
     if unmute:
         screen_update(title, sub_header)
         progress(count, max_count, 'Initializing...')
 
-    # Get Manifest
-    if manifest:
-        prefix = 'Game Manifest'
-        if unmute:
-            screen_update(title, sub_header)
-            progress(count, max_count, 'Retrieving {0}...'.format(prefix))
-        for retry_server in range(2):
-            try:
-                m_data = get_manifest()
-                break
-            except (KeyError, TypeError):
-                if unmute:
-                    screen_update(title, sub_header)
-                    progress(count, max_count, 'Retrieving {0}...'.format(prefix),
-                             'Retrying {0} of 2'.format(retry_server + 1))
-                continue
-        if m_data:
-            count += 1
+    # Get Manifest and Translation
+    d_conn = http.client.HTTPConnection('wackoscripts.com', 80)
+    req = [{'0': manifest, '1': 'Game Manifest', '2': 'manifest'},
+           {'0': translation, '1': 'Chests Matrix', '2': 'chest'}]
+    for x in range(len(req)):
+        if req[x]['0']:
+            name = req[x]['1']
             if unmute:
                 screen_update(title, sub_header)
-                progress(count, max_count, '{0} Retrieved!'.format(prefix))
-        else:
-            div_line('#')
-            center_it('SERVER ERROR: Failed To Retrieve The {0}'.format(prefix))
-            center_it('Please Try Again Later...')
-            div_line('#')
-            quit()
+                progress(count, max_count, 'Retrieving {0}...'.format(name))
+            url = 'http://wackoscripts.com/sanctuary/{0}.json'.format(req[x]['2'])
+            for retry_server in range(2):
+                try:
+                    d_conn.request('GET', url)
+                    conn_resp = d_conn.getresponse()
+                    conn_data = json.loads(conn_resp.read().decode('utf-8'))
+                    if req[x]['2'] == 'manifest':
+                        m_data = conn_data
+                    elif req[x]['2'] == 'chest':
+                        tw_data = conn_data
+                    break
+                except (KeyError, TypeError):
+                    if unmute:
+                        screen_update(title, sub_header)
+                        progress(count, max_count, 'Retrieving {0}...'.format(name),
+                                 'Retrying {0} of 5'.format(retry_server + 1))
+                    sleep(1)
+                    continue
+            if m_data or tw_data:
+                count += 1
+                if unmute:
+                    screen_update(title, sub_header)
+                    progress(count, max_count, '{0} Retrieved!'.format(name))
+            else:
+                div_line('#')
+                ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(name))
+                ctr_it('Please Try Again Later...')
+                div_line('#')
+                sleep(5)
+                quit()
+            if req[x]['2'] == 'chest':
+                translate = (troop_dict, game_dict, forge_dict, tw_data)
+                txt_count = 1
+                for lookup in translate:
+                    for key, value in lookup.items():
+                        if key not in t_data and value != '':
+                            t_data[key] = value
+                        if key not in t_data and value == '':
+                            t_data[key] = key
+                    txt_count += 1
+    d_conn.close()
 
+    # Get Forge and Player
     d_conn = http.client.HTTPConnection(realm, 80)
-    # Get Forge
-    if forge:
-        prefix = 'Forge Manifest'
-        if unmute:
-            screen_update(title, sub_header)
-            progress(count, max_count, 'Retrieving {0}...'.format(prefix))
-        for retry_server in range(5):
-            try:
-                f_data = http_operation(d_conn, 'forge/forge', '', 'GET')
-                break
-            except (KeyError, TypeError):
-                if unmute:
-                    screen_update(title, sub_header)
-                    progress(count, max_count, 'Retrieving {0}...'.format(prefix),
-                             'Retrying {0} of 5'.format(retry_server + 1))
-                sleep(1)
-                continue
-        if f_data:
-            count += 1
+    req = [{'0': forge, '1': 'Forge Manifest', '2': 'forge/forge', '3': '', '4': 'GET', '5': True},
+           {'0': player, '1': 'Player Data', '2': 'player', '3': '?', '4': 'GET', '5': False},
+           {'0': player_forge, '1': 'Forge Data', '2': 'forge/player_forge_info', '3': '', '4': 'GET', '5': True}]
+    for x in range(len(req)):
+        if req[x]['0']:
+            name = req[x]['1']
             if unmute:
                 screen_update(title, sub_header)
-                progress(count, max_count, '{0} Retrieved!'.format(prefix))
-        else:
-            div_line('#')
-            center_it('SERVER ERROR: Failed To Retrieve The {0}'.format(prefix))
-            center_it('Please Try Again Later...')
-            div_line('#')
-            quit()
-
-    # Get Player
-    if player:
-        prefix = 'Player Data'
-        if unmute:
-            screen_update(title, sub_header)
-            progress(count, max_count, 'Retrieving {0}...'.format(prefix))
-        for retry_server in range(5):
-            try:
-                p_data = http_operation(d_conn, 'player', '?', 'GET', False)
-                break
-            except (KeyError, TypeError):
+                progress(count, max_count, 'Retrieving {0}...'.format(name))
+            for retry_server in range(2):
+                try:
+                    conn_data = web_ops(d_conn, req[x]['2'], req[x]['3'], req[x]['4'], req[x]['5'])
+                    if req[x]['2'] == 'forge/forge':
+                        f_data = conn_data
+                    elif req[x]['2'] == 'player':
+                        p_data = conn_data
+                    elif req[x]['2'] == 'forge/player_forge_info':
+                        p_f_data = conn_data
+                    break
+                except (KeyError, TypeError):
+                    if unmute:
+                        screen_update(title, sub_header)
+                        progress(count, max_count, 'Retrieving {0}...'.format(name),
+                                 'Retrying {0} of 5'.format(retry_server + 1))
+                    sleep(1)
+                    continue
+            if m_data or tw_data:
+                count += 1
                 if unmute:
                     screen_update(title, sub_header)
-                    progress(count, max_count, 'Retrieving {0}...'.format(prefix),
-                             'Retrying {0} of 5'.format(retry_server + 1))
-                sleep(1)
-                continue
-        if p_data:
-            count += 1
-            if unmute:
-                screen_update(title, sub_header)
-                progress(count, max_count, '{0} Retrieved!'.format(prefix))
-        else:
-            div_line('#')
-            center_it('SERVER ERROR: Failed To Retrieve The {0}'.format(prefix))
-            center_it('Please Try Again Later...')
-            div_line('#')
-            quit()
-
-    # Get Player Forge
-    if player_forge:
-        prefix = 'Forge Data'
-        if unmute:
-            screen_update(title, sub_header)
-            progress(count, max_count, 'Retrieving {0}...'.format(prefix))
-        for retry_server in range(5):
-            try:
-                p_f_data = http_operation(d_conn, 'forge/player_forge_info', '', 'GET')
-                break
-            except (KeyError, TypeError):
-                if unmute:
-                    screen_update(title, sub_header)
-                    progress(count, max_count, 'Retrieving {0}...'.format(prefix),
-                             'Retrying {0} of 5'.format(retry_server + 1))
-                sleep(1)
-                continue
-        if p_f_data:
-            count += 1
-            if unmute:
-                screen_update(title, sub_header)
-                progress(count, max_count, '{0} Retrieved!'.format(prefix))
-        else:
-            div_line('#')
-            center_it('SERVER ERROR: Failed To Retrieve The {0}'.format(prefix))
-            center_it('Please Try Again Later...')
-            div_line('#')
-            quit()
-
-    # Get Translation Matrix
-    if translation:
-        prefix = 'Translation Matrix from WackoScripts'
-        if unmute:
-            screen_update(title, sub_header)
-            progress(count, max_count, 'Retrieving {0}'.format(prefix))
-        conn = http.client.HTTPConnection('wackoscripts.com', 80)
-        url = 'http://wackoscripts.com/sanctuary/chest.json'
-        for retry_server in range(5):
-            try:
-                conn.request('GET', url)
-                conn_resp = conn.getresponse()
-                tw_data = json.loads(conn_resp.read().decode('utf-8'))
-                break
-            except (KeyError, TypeError):
-                if unmute:
-                    screen_update(title, sub_header)
-                    progress(count, max_count, 'Retrieving {0}...'.format(prefix),
-                             'Retrying {0} of 5'.format(retry_server + 1))
-                sleep(1)
-                continue
-        if tw_data:
-            count += 1
-            if unmute:
-                screen_update(title, sub_header)
-                progress(count, max_count, '{0} Retrieved!'.format(prefix))
-        else:
-            div_line('#')
-            center_it('SERVER ERROR: Failed To Retrieve The {0}'.format(prefix))
-            center_it('Please Try Again Later...')
-            div_line('#')
-            quit()
-
-        # Post process Translation Matrix
-        translate = (troop_dict, game_dict, forge_dict, tw_data)
-        for lookup in translate:
-            for key, value in lookup.items():
-                if key not in t_data and value != '':
-                    t_data[key] = value
-                if key not in t_data and value == '':
-                    t_data[key] = key
+                    progress(count, max_count, '{0} Retrieved!'.format(name))
+            else:
+                div_line('#')
+                ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(name))
+                ctr_it('Please Try Again Later...')
+                div_line('#')
+                sleep(5)
+                quit()
 
     # Process City Data
     if cities:
@@ -700,7 +600,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
             current_location = None
             for retry_server in range(5):
                 try:
-                    current_location = http_operation(d_conn, 'cities/{0}'.format(p_data['cities'][loc_key]['id']), '')
+                    current_location = web_ops(d_conn, 'cities/{0}'.format(p_data['cities'][loc_key]['id']), '')
                     break
                 except (KeyError, TypeError):
                     if unmute:
@@ -712,14 +612,14 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
             if current_location:
                 c_data[loc_key] = current_location
                 if unmute:
-                    count += 1 / len(p_data['cities'])
+                    # count += 1 / len(p_data['cities'])
                     screen_update(title, sub_header)
                     progress(count, max_count, 'Retrieving {0}...'.format(
                             prefix), '{0} Processed'.format(t(loc_key)))
         if not c_data:
             div_line('#')
-            center_it('SERVER ERROR: Failed To Retrieve The {0}'.format(prefix))
-            center_it('Please Try Again Later...')
+            ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(prefix))
+            ctr_it('Please Try Again Later...')
             div_line('#')
             quit()
     acct = list()
@@ -745,7 +645,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
             json.dump(acct, create_file)
 
 
-def convert_time(time_value=0, show_seconds=True):
+def cvt_time(time_value=0, show_seconds=True):
     m, s = divmod(time_value, 60)
     h, m = divmod(m, 60)
     d, h = divmod(h, 24)
@@ -767,7 +667,7 @@ def convert_time(time_value=0, show_seconds=True):
             return '{0}m'.format(int(m))
 
 
-def center_it(print_string, prefix=False, suffix=False):
+def ctr_it(print_string, prefix=False, suffix=False):
     if prefix:
         print('')
     print(print_string.center(78))
@@ -793,7 +693,7 @@ def display_it(my_list, single=True):
         for value in sorted(my_list.values()):
             x += ' {0:{1}} '.format(value, max_len)
             if y == max_items - 1:
-                center_it(x)
+                ctr_it(x)
                 y = 0
                 x = ''
             else:
@@ -801,7 +701,7 @@ def display_it(my_list, single=True):
         if y != 0:
             z = ' ' * ((max_len + 2) * (max_items - y))
             x += z
-            center_it(x)
+            ctr_it(x)
     else:
         max_len_key = max_len_value = 0
         for key, value in my_list.items():
@@ -819,7 +719,7 @@ def display_it(my_list, single=True):
             txt = '{0:>{1}}: {2:<{3}}'.format(key, max_len_key, value, max_len_value)
             x += ' {0:<{1}} '.format(txt, max_len)
             if y == max_items - 1:
-                center_it(x)
+                ctr_it(x)
                 y = 0
                 x = ''
             else:
@@ -827,14 +727,14 @@ def display_it(my_list, single=True):
         if y != 0:
             z = ' ' * ((max_len + 4) * (max_items - y))
             x += z
-            center_it(x)
+            ctr_it(x)
 
 
 def set_batch(max_value=0, exec_string=''):
     div_line('-')
-    center_it('~~~ Available Options ~~~')
-    center_it('1 to {0}'.format(max_value - 1), suffix=True)
-    center_it('How many {0}?'.format(exec_string))
+    ctr_it('~~~ Available Options ~~~')
+    ctr_it('1 to {0}'.format(max_value - 1), suffix=True)
+    ctr_it('How many {0}?'.format(exec_string))
     div_line()
     i = input(' Enter selection : ')
     if len(i) >= 1:
@@ -847,11 +747,11 @@ def set_batch(max_value=0, exec_string=''):
 
 def set_delay():
     div_line('-')
-    center_it('~~~ Available Options ~~~')
-    center_it('0 to 5', suffix=True)
-    center_it('Each request made to the server increases your chances of a 1 hour')
-    center_it('ban. The delay feature minimizes your chances of triggering it.\n')
-    center_it('What delay would you like to set for this run?')
+    ctr_it('~~~ Available Options ~~~')
+    ctr_it('0 to 5', suffix=True)
+    ctr_it('Each request made to the server increases your chances of a 1 hour')
+    ctr_it('ban. The delay feature minimizes your chances of triggering it.\n')
+    ctr_it('What delay would you like to set for this run?')
     div_line()
     i = input(' Enter selection : ')
     if len(i) >= 1:
@@ -864,9 +764,9 @@ def set_delay():
 
 def proceed_run(exec_string):
     div_line('-')
-    center_it('~~~ Available Options ~~~')
-    center_it('Yes   No', suffix=True)
-    center_it('Proceed with {0}?'.format(exec_string))
+    ctr_it('~~~ Available Options ~~~')
+    ctr_it('Yes   No', suffix=True)
+    ctr_it('Proceed with {0}?'.format(exec_string))
     div_line()
     i = input(' Enter selection : ')
     if len(i) >= 1:
@@ -879,7 +779,7 @@ def proceed_run(exec_string):
 
 def nothing_to_do(text):
     div_line('*')
-    center_it('There Are No {0} Available For Now'.format(text), suffix=True)
+    ctr_it('There Are No {0} Available For Now'.format(text), suffix=True)
     div_line('*')
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     return
@@ -887,8 +787,8 @@ def nothing_to_do(text):
 
 def result_error(text):
     div_line('#')
-    center_it('SERVER ERROR')
-    center_it(text)
+    ctr_it('SERVER ERROR')
+    ctr_it(text)
     div_line('#')
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     quit()
@@ -903,18 +803,19 @@ def smart_truncate(content, length=100, suffix='..'):
 
 def exit_script():
     os.system('cls' if os.name == 'nt' else 'clear')
-    center_it('Thank you for using DoA Tools ({0})'.format(__version__), suffix=True)
-    center_it('Brought to you by')
-    center_it(__author__)
-    center_it('With thanks to {0}'.format(__credits__), suffix=True)
-    center_it('Join us at the sanctuary')
-    center_it(__maintainer__)
+    ctr_it('Thank you for using DoA Tools ({0})'.format(__version__), prefix=True, suffix=True)
+    ctr_it('Brought to you by')
+    ctr_it(__author__)
+    ctr_it('With thanks to {0}'.format(__credits__), suffix=True)
+    ctr_it('Join us at the sanctuary')
+    ctr_it(__maintainer__)
     sleep(3)
     quit()
 
 
 def enter_script(title):
     global user_id, dragon_heart, realm_number, c_number
+    user_id = dragon_heart = realm_number = c_number = 0
     selection = {}
     r_file = None
     try:
@@ -925,9 +826,10 @@ def enter_script(title):
     except FileNotFoundError:
         pass
     if selection:
-        while True:
+        selected = False
+        while not selected:
             screen_update(title, 'Select Game Account')
-            center_it('~~~ Saved Accounts ~~~', suffix=True)
+            ctr_it('~~~ Saved Accounts ~~~', suffix=True)
             display_it(selection)
             print('\n\n NOTE: Enter NEW for a new account entry')
             div_line()
@@ -943,9 +845,13 @@ def enter_script(title):
                                 dragon_heart = r_file[x]['dh']
                                 realm_number = r_file[x]['rn']
                                 c_number = r_file[x]['cn']
-                                return
+                                selected = True
+                                break
+                        break
+
     get_account_info(title)
     get_realm_info(title)
+    switch_realm('INITIALIZING SCRIPT', realm_number, c_number)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -962,7 +868,7 @@ def get_account_info(title):
 
     while not dragon_heart:
         screen_update(title, 'Fill In The Relevant Account Information To Proceed')
-        center_it('User ID: {0}'.format(user_id))
+        ctr_it('User ID: {0}'.format(user_id))
         div_line()
         d_select = input(' Enter your DRAGON HEART code : ')
         if len(d_select) >= 3:
@@ -974,8 +880,8 @@ def get_realm_info(title):
     global realm_number, c_number
     while not realm_number:
         screen_update(title, 'Fill In The Relevant Realm Information To Proceed')
-        center_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
-        center_it(' ')
+        ctr_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
+        ctr_it(' ')
         div_line()
         d_select = input(' Enter the REALM number : ')
         if len(d_select) >= 1:
@@ -984,8 +890,8 @@ def get_realm_info(title):
 
     while not c_number:
         screen_update(title, 'Fill In The Relevant Realm Information To Proceed')
-        center_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
-        center_it('Realm Number: {0}'.format(realm_number))
+        ctr_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
+        ctr_it('Realm Number: {0}'.format(realm_number))
         div_line()
         d_select = input(' Enter the Cluster Server number (known as C number) : ')
         if len(d_select) >= 1:
@@ -999,7 +905,7 @@ def get_realm_info(title):
 def create_equipment(title):
     # Initialize Craftable Equipment
     screen_update(title, 'Create Troop Equipment')
-    center_it(' Initializing...')
+    ctr_it(' Initializing...')
     d_list = list()
     selection = {}
     x = 0
@@ -1046,7 +952,7 @@ def create_equipment(title):
     d_troop = None
     while d_troop is None:
         screen_update(title, 'Create Troop Equipment')
-        center_it('~~~ Available Troops ~~~')
+        ctr_it('~~~ Available Troops ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -1068,10 +974,10 @@ def create_equipment(title):
     d_item = None
     while d_item is None:
         screen_update(title, 'Select Troop Equipment')
-        center_it('Troop: {0}'.format(t(d_troop)))
-        center_it(' ')
+        ctr_it('Troop: {0}'.format(t(d_troop)))
+        ctr_it(' ')
         div_line('-')
-        center_it('~~~ Available Equipment ~~~')
+        ctr_it('~~~ Available Equipment ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -1091,10 +997,10 @@ def create_equipment(title):
                  'speed': 'Speed'}
     while d_attrib is None:
         screen_update(title, 'Select Troop Attribute')
-        center_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        center_it(' ')
+        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
+        ctr_it(' ')
         div_line('-')
-        center_it('~~~ Available Attributes ~~~')
+        ctr_it('~~~ Available Attributes ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -1110,12 +1016,12 @@ def create_equipment(title):
     d_stat = None
     while d_stat is None:
         screen_update(title, 'Set Minimum Value')
-        center_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        center_it('Requirement: {0}'.format(d_attrib.capitalize()))
+        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
+        ctr_it('Requirement: {0}'.format(d_attrib.capitalize()))
         div_line('-')
-        center_it('Items crafted by the script will be auto crushed')
-        center_it('if it does not meet the minimum requirement set.\n')
-        center_it('What would you like to set it to?')
+        ctr_it('Items crafted by the script will be auto crushed')
+        ctr_it('if it does not meet the minimum requirement set.\n')
+        ctr_it('What would you like to set it to?')
         div_line()
         d_select = input(' Enter selection : ')
         if len(d_select) >= 1:
@@ -1129,8 +1035,8 @@ def create_equipment(title):
     d_batch = None
     while d_batch is None:
         screen_update(title, 'Number Of Equipment To Forge')
-        center_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        center_it('Requirement: {0:,} {1}'.format(d_stat, d_attrib.capitalize()))
+        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
+        ctr_it('Requirement: {0:,} {1}'.format(d_stat, d_attrib.capitalize()))
         d_batch = set_batch(d_list[0]['craftable'] + 1, 'equipment would you like to craft')
         if d_batch == 'exit':
             return
@@ -1139,8 +1045,8 @@ def create_equipment(title):
     d_delay = None
     while d_delay is None:
         screen_update(title, 'Set Delay Between Equipment Crafting')
-        center_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        center_it('Requirement: {0:,} {1}   Crafting: {2:,}'.format(
+        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
+        ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}'.format(
                 d_stat, d_attrib.capitalize(), d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
@@ -1150,15 +1056,15 @@ def create_equipment(title):
     d_proceed = False
     while not d_proceed:
         screen_update(title, 'Ready To Begin Crafting')
-        center_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        center_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s'.format(
+        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
+        ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s'.format(
                 d_stat, d_attrib.capitalize(), d_batch, d_delay))
         d_proceed = proceed_run('equipment crafting')
         if d_proceed == 'exit':
             return
 
     # Forge Equipment
-    d_start_time = time()
+    d_start = time()
     forge_succ = 0
     forge_fail = 0
     len_item = 0
@@ -1167,31 +1073,31 @@ def create_equipment(title):
     d_conn = http.client.HTTPConnection(realm, 80)
     for x in range(1, d_batch + 1):
         screen_update(title, 'Progress Report...')
-        center_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        center_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s   Elapsed Time: {4}'.format(
-                d_stat, d_attrib.capitalize(), d_batch, d_delay, convert_time(time() - d_start_time)))
+        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
+        ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s   Elapsed Time: {4}'.format(
+                d_stat, d_attrib.capitalize(), d_batch, d_delay, cvt_time(time() - d_start)))
         div_line('-')
         progress(x, d_batch, 'Crafting {0} Of {1}'.format(x, d_batch),
                  'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}\n'.format(
                          forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
         if kept_items:
-            center_it('~~~ Kept Items ~~~')
+            ctr_it('~~~ Kept Items ~~~')
             for y in range(len(kept_items)):
                 k_item = 'Item {0}: '.format(y + 1) + ', '.join('{0} {1}'.format(
                         k_i.capitalize(), v_i) for k_i, v_i in kept_items[y].items())
                 if len(k_item) > len_item:
                     len_item = len(k_item)
-                center_it('{0:<{1}}'.format(k_item, len_item))
+                ctr_it('{0:<{1}}'.format(k_item, len_item))
             print(' ')
         if crushed_items:
-            center_it('~~~ Crushed Items Received ~~~')
+            ctr_it('~~~ Crushed Items Received ~~~')
             display_it(crushed_items, single=False)
         crush_it = False
-        add_on_params = 'output%5Fname={0}&'.format(d_item)  # item=StrengthOfHephaestusCommon&output%5Fname={0}&
+        x_param = 'output%5Fname={0}&'.format(d_item)  # item=StrengthOfHephaestusCommon&output%5Fname={0}&
         for retry_server in range(5):
             sleep(d_delay)
             try:
-                main_json = http_operation(d_conn, 'forge/forge_item', add_on_params)
+                main_json = web_ops(d_conn, 'forge/forge_item', x_param)
                 result = main_json['result']['success']
                 if result:
                     forge_equip = main_json['result']['forge_result']
@@ -1200,7 +1106,7 @@ def create_equipment(title):
                         if d_attrib in forge_equip['stats'].keys() and d_stat <= forge_equip['stats'][d_attrib]:
                             kept_items.append(forge_equip['stats'])
                         else:
-                            add_on_params = 'player%5Fforge%5Fequipment%5Fid={0}&'.format(forge_equip['id'])
+                            x_param = 'player%5Fforge%5Fequipment%5Fid={0}&'.format(forge_equip['id'])
                             crush_it = True
                     else:
                         forge_fail += 1
@@ -1212,7 +1118,7 @@ def create_equipment(title):
             for retry_server in range(5):
                 sleep(d_delay)
                 try:
-                    crush_json = http_operation(d_conn, 'forge/disenchant_equipment', add_on_params)
+                    crush_json = web_ops(d_conn, 'forge/disenchant_equipment', x_param)
                     result = crush_json['result']['success']
                     if result:
                         for y in range(len(crush_json['result']['disenchanted_ingredients'])):
@@ -1225,22 +1131,22 @@ def create_equipment(title):
                     sleep(1)
                     continue
     screen_update(title, 'Summary Report')
-    center_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-    center_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s'.format(
+    ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
+    ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s'.format(
             d_stat, d_attrib.capitalize(), d_batch, d_delay))
     div_line('-')
     progress(1, 1, 'Crafting Equipment Completed!',
              'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}'.format(
                      forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
-    center_it('Process took {0} to complete!'.format(convert_time(time() - d_start_time)))
+    ctr_it('Process took {0} to complete!'.format(cvt_time(time() - d_start)))
     if kept_items:
-        center_it('~~~ Kept Items ~~~', prefix=True)
+        ctr_it('~~~ Kept Items ~~~', prefix=True)
         for y in range(len(kept_items)):
             k_item = 'Item {0}: '.format(y + 1) + ', '.join('{0} {1}'.format(
                     k_i.capitalize(), v_i) for k_i, v_i in kept_items[y].items())
-            center_it('{0:<{1}}'.format(k_item, len_item))
+            ctr_it('{0:<{1}}'.format(k_item, len_item))
     if crushed_items:
-        center_it('~~~ Crushed Items Received ~~~', prefix=True)
+        ctr_it('~~~ Crushed Items Received ~~~', prefix=True)
         display_it(crushed_items, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
@@ -1253,7 +1159,7 @@ def create_equipment(title):
 def forge_ingredient(title):
     # Initialize Craftable Ingredient
     screen_update(title, 'Create Forge Ingredient')
-    center_it(' Initializing...')
+    ctr_it(' Initializing...')
     d_list = list()
     selection = {}
     d_blacksmith = p_f_data['result']['blacksmith']['level']
@@ -1303,7 +1209,7 @@ def forge_ingredient(title):
     d_item = None
     while d_item is None:
         screen_update(title, 'Create Forge Ingredient')
-        center_it('~~~ Available Ingredients ~~~')
+        ctr_it('~~~ Available Ingredients ~~~')
         display_it(selection, single=False)
         div_line()
         d_select = input(' Enter selection : ')
@@ -1322,8 +1228,8 @@ def forge_ingredient(title):
     d_batch = None
     while d_batch is None:
         screen_update(title, 'Number Of Ingredient To Forge')
-        center_it('Ingredient: {0}'.format(t(d_item)))
-        center_it(' ')
+        ctr_it('Ingredient: {0}'.format(t(d_item)))
+        ctr_it(' ')
         d_batch = set_batch(d_list[0]['craftable'] + 1, 'ingredients would you like to forge')
         if d_batch == 'exit':
             return
@@ -1332,8 +1238,8 @@ def forge_ingredient(title):
     d_delay = None
     while d_delay is None:
         screen_update(title, 'Set Delay Between Ingredient Crafting')
-        center_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
-        center_it(' ')
+        ctr_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
+        ctr_it(' ')
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -1342,8 +1248,8 @@ def forge_ingredient(title):
     d_proceed = False
     while not d_proceed:
         screen_update(title, 'Proceed With Ingredient Forging?')
-        center_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
-        center_it('Delay: {0}s'.format(d_delay))
+        ctr_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
+        ctr_it('Delay: {0}s'.format(d_delay))
         d_proceed = proceed_run('ingredient forging')
         if d_proceed == 'exit':
             return
@@ -1351,7 +1257,7 @@ def forge_ingredient(title):
     # Forge Ingredients
     selection.clear()
     base_list = {}
-    d_start_time = time()
+    d_start = time()
     for x in range(len(p_data['forge']['items']['ingredients'])):
         if t(p_data['forge']['items']['ingredients'][x]['name']) not in base_list:
             base_list[t(p_data['forge']['items']['ingredients'][x]['name'])] = p_data[
@@ -1359,19 +1265,19 @@ def forge_ingredient(title):
     d_conn = http.client.HTTPConnection(realm, 80)
     for x in range(1, d_batch + 1):
         screen_update(title, 'Progress Report...')
-        center_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
-        center_it('Delay: {0}s   Elapsed Time: {1}'.format(
-                d_delay, convert_time(time() - d_start_time)))
+        ctr_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
+        ctr_it('Delay: {0}s   Elapsed Time: {1}'.format(
+                d_delay, cvt_time(time() - d_start)))
         div_line('-')
         progress(x, d_batch, 'Forging {0} of {1}'.format(x, d_batch), ' ')
         if selection:
-            center_it('~~~ Items Used ~~~')
+            ctr_it('~~~ Items Used ~~~')
             display_it(selection, single=False)
         for retry_server in range(5):
             sleep(d_delay)
             try:
-                add_on_params = 'output%5Fname={0}&'.format(d_item)
-                main_json = http_operation(d_conn, 'forge/forge_item', add_on_params)
+                x_param = 'output%5Fname={0}&'.format(d_item)
+                main_json = web_ops(d_conn, 'forge/forge_item', x_param)
                 result = main_json['result']['success']
                 if result:
                     check_use = main_json['result']['forge_items']['ingredients']
@@ -1384,13 +1290,13 @@ def forge_ingredient(title):
                 sleep(1)
                 continue
     screen_update(title, 'Summary Report')
-    center_it('Ingredient: {0}   Crafted: {1:,}'.format(t(d_item), d_batch))
-    center_it('Delay: {0}s'.format(d_delay))
+    ctr_it('Ingredient: {0}   Crafted: {1:,}'.format(t(d_item), d_batch))
+    ctr_it('Delay: {0}s'.format(d_delay))
     div_line('-')
     progress(1, 1, 'Forging Ingredients Completed!', 'Process completed in {0}'.format(
-            convert_time(time() - d_start_time)))
+            cvt_time(time() - d_start)))
     if selection:
-        center_it('~~~ Items Used ~~~', prefix=True)
+        ctr_it('~~~ Items Used ~~~', prefix=True)
         display_it(selection, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
@@ -1404,7 +1310,7 @@ def forge_ingredient(title):
 def farm_mission(title):
     # Initialize Player Missions
     screen_update(title, 'Select Adventurer For Mission')
-    center_it(' Initializing...')
+    ctr_it(' Initializing...')
     d_list = list()
     selection = {}
     adventurers = p_data['forge']['adventurers']
@@ -1413,9 +1319,9 @@ def farm_mission(title):
     d_conn = http.client.HTTPConnection(realm, 80)
     for x in range(len(adventurers)):
         if adventurers[x]['current_mission'] is not None:
-            add_on_params = 'adventurer_id={0}&mission_type={1}&'.format(
+            x_param = 'adventurer_id={0}&mission_type={1}&'.format(
                     adventurers[x]['adventurer_id'], adventurers[x]['current_mission'])
-            item_json = http_operation(d_conn, 'player_missions/claim_mission', add_on_params)
+            item_json = web_ops(d_conn, 'player_missions/claim_mission', x_param)
             if item_json['result']['success']:
                 claimed = True
             else:
@@ -1485,7 +1391,7 @@ def farm_mission(title):
     d_mission = None
     while d_mission is None:
         screen_update(title, 'Select A Mission To Farm')
-        center_it('~~~ Available Missions ~~~')
+        ctr_it('~~~ Available Missions ~~~')
         display_it(selection, single=False)
         print('\n * - No limit')
         div_line()
@@ -1509,10 +1415,10 @@ def farm_mission(title):
     d_adventurer = None
     while d_adventurer is None:
         screen_update(title, 'Select An Adventurer To Farm The Mission')
-        center_it('Mission: {0} ({1})'.format(t(d_mission), convert_time(d_list[0]['time'], show_seconds=False)))
-        center_it(' ')
+        ctr_it('Mission: {0} ({1})'.format(t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False)))
+        ctr_it(' ')
         div_line('-')
-        center_it('~~~ Available Adventurers ~~~')
+        ctr_it('~~~ Available Adventurers ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -1537,13 +1443,13 @@ def farm_mission(title):
         if look_up['item'] in p_data['items'] and p_data['items'][look_up['item']] > 0:
             if len(look_up['item']) > len_a:
                 len_a = len(look_up['item'])
-            b = convert_time(look_up['time'], show_seconds=False)
+            b = cvt_time(look_up['time'], show_seconds=False)
             if len(b) > len_b:
                 len_b = len(b)
             c = '{0:,}'.format(p_data['items'][look_up['item']])
             if len(c) > len_c:
                 len_c = len(c)
-            d = convert_time(look_up['exceed'], show_seconds=False)
+            d = cvt_time(look_up['exceed'], show_seconds=False)
             if len(d) > len_d:
                 len_d = len(d)
             my_dict = {'item': look_up['item'], 'exceed': look_up['exceed'], 'time': look_up['time'],
@@ -1552,20 +1458,20 @@ def farm_mission(title):
     if selection:
         while True:
             screen_update('FILL SLOTS', 'Select Speed Items To Use')
-            center_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), convert_time(
+            ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), cvt_time(
                     d_list[0]['time'], show_seconds=False), t(d_adventurer)))
-            center_it(' ')
+            ctr_it(' ')
             div_line('-')
             a = '{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(
                     'Item', len_a, 'Description', len_b, 'Available', len_c, 'Exceeding', len_d)
             b = '{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d)
-            center_it(a)
-            center_it(b)
+            ctr_it(a)
+            ctr_it(b)
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
-                center_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
-                        selection[key]['item'], len_a, convert_time(selection[key]['time'], show_seconds=False), len_b,
-                        selection[key]['quantity'], len_c, convert_time(selection[key]['exceed'], show_seconds=False),
+                ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
+                        selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
+                        selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
                         len_d, use_item))
             print('\n Exceeding - Item used when duration exceeds the displayed time')
             div_line('-')
@@ -1612,13 +1518,13 @@ def farm_mission(title):
     d_batch = None
     while d_batch is None:
         screen_update(title, 'Number Of Times To Farm Mission')
-        center_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), convert_time(
+        ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), cvt_time(
                 d_list[0]['time'], show_seconds=False), t(d_adventurer)))
-        center_it(' ')
+        ctr_it(' ')
         if d_speed:
             div_line('-')
-            center_it('~~~ Speed Items Selected ~~~')
-            center_it(speeds_selected)
+            ctr_it('~~~ Speed Items Selected ~~~')
+            ctr_it(speeds_selected)
         d_batch = set_batch(count + 1, 'times would you like to farm the mission')
         if d_batch == 'exit':
             return
@@ -1627,13 +1533,13 @@ def farm_mission(title):
     d_delay = None
     while d_delay is None:
         screen_update(title, 'Set Delay Between Farming Missions')
-        center_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), convert_time(
+        ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), cvt_time(
                 d_list[0]['time'], show_seconds=False), t(d_adventurer)))
-        center_it('Batches: {0:,}'.format(d_batch))
+        ctr_it('Batches: {0:,}'.format(d_batch))
         if d_speed:
             div_line('-')
-            center_it('~~~ Speed Items Selected ~~~')
-            center_it(speeds_selected)
+            ctr_it('~~~ Speed Items Selected ~~~')
+            ctr_it(speeds_selected)
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -1642,18 +1548,18 @@ def farm_mission(title):
     d_proceed = False
     while not d_proceed:
         screen_update(title, 'Proceed With Farming Mission?')
-        center_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
-        center_it('Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+        ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
+        ctr_it('Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
         if d_speed:
             div_line('-')
-            center_it('~~~ Speed Items Selected ~~~')
-            center_it(speeds_selected)
+            ctr_it('~~~ Speed Items Selected ~~~')
+            ctr_it(speeds_selected)
         d_proceed = proceed_run('farming mission')
         if d_proceed == 'exit':
             return
 
     # Farm Mission
-    d_start_time = time()
+    d_start = time()
     speeds_used = {}
     items_gained = {}
     d_conn = http.client.HTTPConnection(realm, 80)
@@ -1663,13 +1569,13 @@ def farm_mission(title):
         restart_http = False
         while duration != 0:
             screen_update(title, 'Progress Report...')
-            center_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
-            center_it('Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                    d_batch, d_delay, convert_time(time() - d_start_time)))
+            ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
+            ctr_it('Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
+                    d_batch, d_delay, cvt_time(time() - d_start)))
             div_line('-')
             if speeds_used:
                 progress(x, d_batch, 'Farming {0} of {1}'.format(x, d_batch), ' ')
-                center_it('~~~ Speed Items Used ~~~')
+                ctr_it('~~~ Speed Items Used ~~~')
                 display_it(speeds_used, single=False)
                 print(' ')
             elif duration == -1:
@@ -1677,16 +1583,16 @@ def farm_mission(title):
             else:
                 restart_http = True
                 progress(x, d_batch, 'Farming {0} of {1}'.format(x, d_batch),
-                         'Waiting {0} for job to finish...\n'.format(convert_time(duration)))
+                         'Waiting {0} for job to finish...\n'.format(cvt_time(duration)))
             if items_gained:
-                center_it('~~~ Items Gained ~~~')
+                ctr_it('~~~ Items Gained ~~~')
                 display_it(items_gained, single=False)
             if duration == -1:
                 for retry_server in range(5):
                     sleep(d_delay)
-                    add_on_params = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
+                    x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
                     try:
-                        main_json = http_operation(d_conn, 'player_missions', add_on_params)
+                        main_json = web_ops(d_conn, 'player_missions', x_param)
                         result = main_json['result']['success']
                         if result:
                             duration = d_list[0]['time']
@@ -1714,9 +1620,9 @@ def farm_mission(title):
                                 break
                 for retry_server in range(5):
                     sleep(d_delay)
-                    add_on_params = '%5Fmethod=delete&job%5Fid={0}&'.format(job_id)
+                    x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(job_id)
                     try:
-                        item_json = http_operation(d_conn, 'player_items/{0}'.format(speed_item), add_on_params)
+                        item_json = web_ops(d_conn, 'player_items/{0}'.format(speed_item), x_param)
                         result = item_json['result']['success']
                         if result:
                             for z in range(len(d_speed)):
@@ -1745,9 +1651,9 @@ def farm_mission(title):
             d_conn = http.client.HTTPConnection(realm, 80)
         for retry_server in range(5):
             sleep(d_delay)
-            add_on_params = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
+            x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
             try:
-                claim_json = http_operation(d_conn, 'player_missions/claim_mission', add_on_params)
+                claim_json = web_ops(d_conn, 'player_missions/claim_mission', x_param)
                 result = claim_json['result']['success']
                 if result:
                     for y in range(len(claim_json['result']['items'])):
@@ -1763,16 +1669,16 @@ def farm_mission(title):
                 sleep(1)
                 continue
     screen_update(title, 'Summary Report')
-    center_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
-    center_it('Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+    ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
+    ctr_it('Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
     progress(1, 1, 'Farming Mission Completed!', 'Process completed in {0}'.format(
-            convert_time(time() - d_start_time)))
+            cvt_time(time() - d_start)))
     if speeds_used:
-        center_it('~~~ Speed Items Used ~~~', prefix=True)
+        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
         display_it(speeds_used, single=False)
     if items_gained:
-        center_it('~~~ Items Gained ~~~', prefix=True)
+        ctr_it('~~~ Items Gained ~~~', prefix=True)
         display_it(items_gained, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
@@ -1786,7 +1692,7 @@ def farm_mission(title):
 def open_chest(title):
     # Initialize Chest Opener
     screen_update(title, 'Select Chests To Open')
-    center_it(' Initializing...')
+    ctr_it(' Initializing...')
     d_chest = list()
     d_list = list()
     selection = {}
@@ -1826,7 +1732,7 @@ def open_chest(title):
     # Select Chests
     while len(d_list) == 0:
         screen_update(title, 'Select Chests To Open')
-        center_it('~~~ Available Chests ~~~')
+        ctr_it('~~~ Available Chests ~~~')
         display_it(selection, single=False)
         print('\n Note: ALL = Opens all chests listed above')
         div_line()
@@ -1863,8 +1769,8 @@ def open_chest(title):
     d_batch = None
     while d_batch is None:
         screen_update(title, 'Set Batches Of Chests To Open')
-        center_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
-        center_it(' ')
+        ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
+        ctr_it(' ')
         d_batch = set_batch(max_chest + 1, 'chests would you like to open in batches')
         if d_batch == 'exit':
             return
@@ -1873,8 +1779,8 @@ def open_chest(title):
     d_delay = None
     while d_delay is None:
         screen_update(title, 'Set Batches Of Chests To Open')
-        center_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
-        center_it('Open in Batches: {0}'.format(d_batch))
+        ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
+        ctr_it('Open in Batches: {0}'.format(d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -1883,8 +1789,8 @@ def open_chest(title):
     d_proceed = False
     while not d_proceed:
         screen_update(title, 'Set Batches Of Chests To Open')
-        center_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
-        center_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
+        ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
+        ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
         d_proceed = proceed_run('Opening of Chests')
         if d_proceed == 'exit':
             return
@@ -1892,12 +1798,12 @@ def open_chest(title):
     # Open Chests
     global realm
     screen_update(title, 'Progress Report...')
-    center_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
-    center_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
+    ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
+    ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
     progress(0, 1, 'Initializing...')
     selection.clear()
-    d_start_time = time()
+    d_start = time()
     look_up = p_data['items']
     overall_received = {'Chests': {}, 'Arsenal': {}, 'Speeds': {}, 'Grants & Seals': {}, 'Others': {}}
     speed_items = ('DarkTestroniusInfusion', 'DarkTestroniusPowder', 'DarkTestroniusDeluxe', 'Hop', 'TranceMarchDrops',
@@ -1912,9 +1818,9 @@ def open_chest(title):
         open_quantity = d_batch
         while opened != 0:
             screen_update(title, 'Progress Report...')
-            center_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
-            center_it('Open in Batches: {0}   Delay: {1}s   Elapsed Time: {2}'.format(
-                    d_batch, d_delay, convert_time(time() - d_start_time)))
+            ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
+            ctr_it('Open in Batches: {0}   Delay: {1}s   Elapsed Time: {2}'.format(
+                    d_batch, d_delay, cvt_time(time() - d_start)))
             div_line('-')
             if len(d_list) > 1:
                 progress(total_opened, d_quantity, 'Overall Opened: {0:,} of {1:,}'.format(total_opened, d_quantity))
@@ -1926,7 +1832,7 @@ def open_chest(title):
             for category in ('Chests', 'Arsenal', 'Speeds', 'Grants & Seals', 'Others'):
                 if len(received_items[category]) > 0:
                     selection = received_items[category]
-                    center_it('~~~ {0} Received ~~~'.format(category))
+                    ctr_it('~~~ {0} Received ~~~'.format(category))
                     display_it(selection, single=False)
                     print(' ')
             if opened < open_quantity:
@@ -1934,8 +1840,8 @@ def open_chest(title):
             for retry_server in range(5):
                 sleep(d_delay)
                 try:
-                    add_on_params = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
-                    main_data = http_operation(d_conn, 'player_items/{0}'.format(d_list[x]['chest']), add_on_params)
+                    x_param = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
+                    main_data = web_ops(d_conn, 'player_items/{0}'.format(d_list[x]['chest']), x_param)
                     result = main_data['result']['success']
                     if result:
                         opened -= open_quantity
@@ -1982,15 +1888,15 @@ def open_chest(title):
                 else:
                     overall_received[category][r_key] = r_value
     screen_update(title, 'Summary Report')
-    center_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
-    center_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
+    ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_quantity))
+    ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
     progress(1, 1, 'Chest Opening Completed!', 'Process completed in {0}'.format(
-            convert_time(time() - d_start_time)))
+            cvt_time(time() - d_start)))
     for category in ('Chests', 'Arsenal', 'Speeds', 'Grants & Seals', 'Others'):
         if len(overall_received[category]) > 0:
             selection = overall_received[category]
-            center_it('~~~ {0} Received ~~~'.format(category), prefix=True)
+            ctr_it('~~~ {0} Received ~~~'.format(category), prefix=True)
             display_it(selection, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
@@ -2003,7 +1909,7 @@ def open_chest(title):
 def unpack_arsenal(title):
     # Initialize Open Arsenal
     screen_update(title, 'Select Troop Type')
-    center_it(' Initializing...')
+    ctr_it(' Initializing...')
     d_list = list()
     selection = {}
     max_use_quantity = 0
@@ -2049,7 +1955,7 @@ def unpack_arsenal(title):
     # Select Troop Type
     while not d_troop:
         screen_update(title, 'Select Troop Type')
-        center_it('~~~ Available Troop Bins ~~~')
+        ctr_it('~~~ Available Troop Bins ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -2085,19 +1991,19 @@ def unpack_arsenal(title):
     # Select Bins To Open
     while d_bin_type is None:
         screen_update(title, 'Select Arsenal Type')
-        center_it('Selected Troop: {0}'.format(t(d_troop)))
-        center_it(' ')
+        ctr_it('Selected Troop: {0}'.format(t(d_troop)))
+        ctr_it(' ')
         div_line('-')
-        center_it('~~~ Available Bin Types ~~~')
-        center_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^4}'.format(
+        ctr_it('~~~ Available Bin Types ~~~')
+        ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^4}'.format(
                 'Type', len_a, 'Quantity', len_b, 'Power Gain', len_c, 'Open'))
-        center_it('{0}  {1}  {2}  {3}'.format('-' * len_a, '-' * len_b, '-' * len_c, '-' * 4))
+        ctr_it('{0}  {1}  {2}  {3}'.format('-' * len_a, '-' * len_b, '-' * len_c, '-' * 4))
         for x in range(len(d_list)):
             a = '{0}'.format(d_list[x]['bin_desc'])
             b = '{0:,}'.format(d_list[x]['quantity'])
             c = '{0:,}'.format(d_list[x]['bin_type'] * d_list[x]['quantity'] * d_list[x]['power'])
             use_item = 'Yes' if d_list[x]['use'] == True else 'No'
-            center_it('{0:<{1}}  {2:>{3}}  {4:>{5}}  {6:^4}'.format(
+            ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5}}  {6:^4}'.format(
                     a, len_a, b, len_b, c, len_c, use_item))
         print('\n Note: ALL = Unpacks all troop bins listed above')
         div_line()
@@ -2129,8 +2035,8 @@ def unpack_arsenal(title):
     # Set Number Of Batches
     while d_batch is None:
         screen_update(title, 'Set Maximum Troop Bins To Unpack')
-        center_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-        center_it(' ')
+        ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
+        ctr_it(' ')
         d_batch = set_batch(d_list[0]['quantity'] + 1, 'troop bins would you like to unpack')
         if d_batch == 'exit':
             return
@@ -2139,8 +2045,8 @@ def unpack_arsenal(title):
     d_delay = None
     while d_delay is None:
         screen_update(title, 'Set Delay Between Instructions')
-        center_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-        center_it('Bins Selected: {0:,}'.format(d_batch))
+        ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
+        ctr_it('Bins Selected: {0:,}'.format(d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -2149,8 +2055,8 @@ def unpack_arsenal(title):
     d_proceed = False
     while not d_proceed:
         screen_update(title, 'Proceed With Unpacking Troop Bins?')
-        center_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-        center_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+        ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
+        ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
         d_proceed = proceed_run('Unpacking of Troop Bins')
         if d_proceed == 'exit':
             return
@@ -2158,11 +2064,11 @@ def unpack_arsenal(title):
     # Unpack Troop Bins
     global realm
     screen_update(title, 'Progress Report...')
-    center_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-    center_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+    ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
+    ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
     progress(0, 1, 'Initializing...')
-    d_start_time = time()
+    d_start = time()
     total_opened = 0
     d_power = 0
     d_conn = http.client.HTTPConnection(realm, 80)
@@ -2175,22 +2081,22 @@ def unpack_arsenal(title):
         open_quantity = d_list[x]['max_use']
         while d_quantity != 0:
             screen_update(title, 'Progress Report...')
-            center_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-            center_it('Bins Selected: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                    d_batch, d_delay, convert_time(time() - d_start_time)))
+            ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
+            ctr_it('Bins Selected: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
+                    d_batch, d_delay, cvt_time(time() - d_start)))
             div_line('-')
             progress(total_opened, d_batch, 'Unpacking {0:,} of {1:,}'.format(total_opened, d_batch))
             if len(d_list) > 1:
                 progress(current_opened, d_list[x]['quantity'], 'Unpacking {0}'.format(t(d_list[x]['bin'])))
-            center_it('~~~ Power Gained ~~~', prefix=True)
-            center_it('{0:,}'.format(d_power))
+            ctr_it('~~~ Power Gained ~~~', prefix=True)
+            ctr_it('{0:,}'.format(d_power))
             if d_quantity < open_quantity:
                 open_quantity = d_quantity
             for retry_server in range(5):
                 sleep(d_delay)
                 try:
-                    add_on_params = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
-                    json_data = http_operation(d_conn, 'player_items/{0}'.format(d_list[x]['bin']), add_on_params)
+                    x_param = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
+                    json_data = web_ops(d_conn, 'player_items/{0}'.format(d_list[x]['bin']), x_param)
                     result = json_data['result']['success']
                     if result:
                         total_opened += open_quantity
@@ -2202,14 +2108,14 @@ def unpack_arsenal(title):
                     sleep(1)
                     continue
     screen_update(title, 'Summary Report')
-    center_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-    center_it('Bins Selected: {0:,}   Delay: {1}s'.format(
+    ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
+    ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(
             d_batch, d_delay))
     div_line('-')
     progress(total_opened, d_batch, 'Unpacking Troop Bins Completed!'.format(total_opened, d_batch),
-             'Process completed in {0}'.format(convert_time(time() - d_start_time)))
-    center_it('~~~ Power Gained ~~~', prefix=True)
-    center_it('{0:,}'.format(d_power))
+             'Process completed in {0}'.format(cvt_time(time() - d_start)))
+    ctr_it('~~~ Power Gained ~~~', prefix=True)
+    ctr_it('{0:,}'.format(d_power))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
     print('Refreshing... Please wait!')
@@ -2222,7 +2128,7 @@ def unpack_arsenal(title):
 def fill_building(title):
     # Initialize
     screen_update(title, 'Fills Slots With Buildings')
-    center_it(' Initializing...')
+    ctr_it(' Initializing...')
     d_list = list()
     selection = {}
     built = list()
@@ -2283,7 +2189,7 @@ def fill_building(title):
     # Select Location
     while d_location is None:
         screen_update(title, 'Select Location')
-        center_it('~~~ Available Locations ~~~')
+        ctr_it('~~~ Available Locations ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -2310,10 +2216,10 @@ def fill_building(title):
     # Select Building
     while d_building is None:
         screen_update(title, 'Choose Building For Location')
-        center_it('Location: {0}'.format(t(d_location)))
-        center_it(' ')
+        ctr_it('Location: {0}'.format(t(d_location)))
+        ctr_it(' ')
         div_line('-')
-        center_it('~~~ Available Buildings ~~~')
+        ctr_it('~~~ Available Buildings ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -2341,11 +2247,11 @@ def fill_building(title):
         d_slots = 0
         while d_slots is 0:
             screen_update(title, 'How Many Slot To Fill?')
-            center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-            center_it(' ')
+            ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+            ctr_it(' ')
             div_line('-')
-            center_it('~~~ Available Options ~~~')
-            center_it('1 to {0}'.format(max_slot))
+            ctr_it('~~~ Available Options ~~~')
+            ctr_it('1 to {0}'.format(max_slot))
             div_line()
             d_select = input(' Enter selection : ')
             if len(d_select) >= 1:
@@ -2403,15 +2309,15 @@ def fill_building(title):
                                 req = '{0:,} {1} Required. You have none'.format(c_value, c_key)
                                 req_check.append(req)
             screen_update(title, 'How Many Slot To Fill?')
-            center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-            center_it(' ')
+            ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+            ctr_it(' ')
             div_line('-')
             if len(req_check) != 0:
                 for x in range(len(req_check)):
-                    center_it(req_check[x])
-                center_it('')
-                center_it('Requirements Not Met. Try Lowering Slots To Fill')
-                center_it('')
+                    ctr_it(req_check[x])
+                ctr_it('')
+                ctr_it('Requirements Not Met. Try Lowering Slots To Fill')
+                ctr_it('')
                 div_line('-')
                 print(' Selection options available:')
                 print(' 1-{1} = Slots to fill, EXIT = Return to main menu'.format(max_slot))
@@ -2441,13 +2347,13 @@ def fill_building(title):
         if look_up['item'] in p_data['items'] and p_data['items'][look_up['item']] > 0:
             if len(look_up['item']) > len_a:
                 len_a = len(look_up['item'])
-            b = convert_time(look_up['time'], show_seconds=False)
+            b = cvt_time(look_up['time'], show_seconds=False)
             if len(b) > len_b:
                 len_b = len(b)
             c = '{0:,}'.format(p_data['items'][look_up['item']])
             if len(c) > len_c:
                 len_c = len(c)
-            d = convert_time(look_up['exceed'], show_seconds=False)
+            d = cvt_time(look_up['exceed'], show_seconds=False)
             if len(d) > len_d:
                 len_d = len(d)
             my_dict = {'item': look_up['item'], 'exceed': look_up['exceed'], 'time': look_up['time'],
@@ -2456,19 +2362,19 @@ def fill_building(title):
     if selection:
         while True:
             screen_update(title, 'Select Speed Items To Use')
-            center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-            center_it('Slots To Fill: {0}'.format(d_slots))
+            ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+            ctr_it('Slots To Fill: {0}'.format(d_slots))
             div_line('-')
             a = '{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(
                     'Item', len_a, 'Description', len_b, 'Available', len_c, 'Exceeding', len_d)
             b = '{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d)
-            center_it(a)
-            center_it(b)
+            ctr_it(a)
+            ctr_it(b)
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
-                center_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
-                        selection[key]['item'], len_a, convert_time(selection[key]['time'], show_seconds=False), len_b,
-                        selection[key]['quantity'], len_c, convert_time(selection[key]['exceed'], show_seconds=False),
+                ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
+                        selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
+                        selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
                         len_d, use_item))
             print('\n Exceeding - Item used when duration exceeds the displayed time')
             div_line('-')
@@ -2501,8 +2407,8 @@ def fill_building(title):
     d_delay = None
     while d_delay is None:
         screen_update(title, 'Set Delay Between Instructions')
-        center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-        center_it('Slots To Fill: {0}'.format(d_slots))
+        ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+        ctr_it('Slots To Fill: {0}'.format(d_slots))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -2511,8 +2417,8 @@ def fill_building(title):
     d_proceed = False
     while not d_proceed:
         screen_update(title, 'Proceed With Filling Slots?')
-        center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-        center_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
+        ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+        ctr_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
         d_proceed = proceed_run('Filling Building Slots')
         if d_proceed == 'exit':
             return
@@ -2520,11 +2426,11 @@ def fill_building(title):
     # Run Auto Fill
     global realm
     screen_update(title, 'Progress Report')
-    center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-    center_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
+    ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+    ctr_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
     div_line('-')
     progress(0, 1, 'Initializing...')
-    d_start_time = time()
+    d_start = time()
     speeds_used = {}
     d_conn = http.client.HTTPConnection(realm, 80)
     slots = list()
@@ -2542,28 +2448,28 @@ def fill_building(title):
         duration = -1
         while duration != 0:
             screen_update(title, 'Progress Report')
-            center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-            center_it('Slots To Fill: {0}   Delay: {1}   Elapsed Time: {2}'.format(
-                    d_slots, d_delay, convert_time(time() - d_start_time)))
+            ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+            ctr_it('Slots To Fill: {0}   Delay: {1}   Elapsed Time: {2}'.format(
+                    d_slots, d_delay, cvt_time(time() - d_start)))
             div_line('-')
             if speeds_used:
                 progress(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots))
-                center_it(' ')
-                center_it('~~~ Speed Items Used ~~~')
+                ctr_it(' ')
+                ctr_it('~~~ Speed Items Used ~~~')
                 display_it(speeds_used, single=False)
             elif duration != -1:
                 progress(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots),
-                         'Waiting {0} for job to finish...'.format(convert_time(duration)))
+                         'Waiting {0} for job to finish...'.format(cvt_time(duration)))
             else:
                 progress(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots), 'Initializing...')
             if duration == -1:
-                add_on_params = 'city%5F{0}%5B{0}%5Ftype%5D={1}&%5Fmethod=post&city%5F{0}%5Bslot%5D={2}&'.format(
+                x_param = 'city%5F{0}%5B{0}%5Ftype%5D={1}&%5Fmethod=post&city%5F{0}%5Bslot%5D={2}&'.format(
                         'building', d_building, slots[x])
                 for retry_server in range(5):
                     try:
                         sleep(d_delay)
-                        json_data = http_operation(d_conn, 'cities/{0}/buildings'.format(
-                                d_list[0]['location_id']), add_on_params)
+                        json_data = web_ops(d_conn, 'cities/{0}/buildings'.format(
+                                d_list[0]['location_id']), x_param)
                         result = json_data['result']['success']
                         if result:
                             duration = json_data['result']['job']['duration']
@@ -2587,11 +2493,11 @@ def fill_building(title):
                             if duration <= d_speed[y]['time']:
                                 speed_item = d_speed[y]['item']
                                 break
-                add_on_params = '%5Fmethod=delete&job%5Fid={0}&'.format(jobid)
+                x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(jobid)
                 for retry_server in range(5):
                     try:
                         sleep(d_delay)
-                        json_data = http_operation(d_conn, 'player_items/{0}'.format(speed_item), add_on_params)
+                        json_data = web_ops(d_conn, 'player_items/{0}'.format(speed_item), x_param)
                         result = json_data['result']['success']
                         if result:
                             if speed_item in speeds_used:
@@ -2611,22 +2517,22 @@ def fill_building(title):
                     duration = 0
                 sleep(1)
     screen_update(title, 'Summary Report')
-    center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-    center_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
+    ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+    ctr_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
     div_line('-')
     progress(1, 1, 'Filling Completed Successfully!', 'Process completed in {0}'.format(
-            convert_time(time() - d_start_time)))
+            cvt_time(time() - d_start)))
     if speeds_used:
-        center_it('~~~ Speed Items Used ~~~', prefix=True)
+        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
         display_it(speeds_used, single=False)
     if len(requirements['items']) >= 1:
-        center_it('~~~ Seals & Grants Used ~~~', prefix=True)
+        ctr_it('~~~ Seals & Grants Used ~~~', prefix=True)
         for key, value in requirements['items'].items():
-            center_it('{0:>}: {1:,}'.format(t(key), value))
+            ctr_it('{0:>}: {1:,}'.format(t(key), value))
     if len(requirements['resources']) >= 1:
-        center_it('~~~ Resources Used  ~~~', prefix=True)
+        ctr_it('~~~ Resources Used  ~~~', prefix=True)
         for key, value in requirements['resources'].items():
-            center_it('{0:>5}: {1:,}'.format(key.capitalize(), value))
+            ctr_it('{0:>5}: {1:,}'.format(key.capitalize(), value))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     print('Refreshing... Please wait!')
@@ -2638,7 +2544,7 @@ def fill_building(title):
 def upgrade_building(title):
     # Initialize
     screen_update(title, 'Choose A Location To Upgrade')
-    center_it(' Initializing...')
+    ctr_it(' Initializing...')
     d_list = list()
     selection = {}
     capital_buildings = {}
@@ -2682,7 +2588,7 @@ def upgrade_building(title):
     # Select Location
     while d_location is None:
         screen_update(title, 'Choose A Location To Upgrade')
-        center_it('~~~ Available Locations ~~~')
+        ctr_it('~~~ Available Locations ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -2708,10 +2614,10 @@ def upgrade_building(title):
     # Select Building
     while d_building is None:
         screen_update(title, 'Choose Building For Location')
-        center_it('Location: {0}'.format(t(d_location)))
-        center_it(' ')
+        ctr_it('Location: {0}'.format(t(d_location)))
+        ctr_it(' ')
         div_line('-')
-        center_it('~~~ Available Buildings ~~~')
+        ctr_it('~~~ Available Buildings ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -2737,11 +2643,11 @@ def upgrade_building(title):
     requirements = {}
     while d_level is 0:
         screen_update(title, 'Select Level To Upgrade')
-        center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+        ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
         div_line('-')
-        center_it('')
-        center_it('Which Level Would You Like To Upgrade This Building To?')
-        center_it('')
+        ctr_it('')
+        ctr_it('Which Level Would You Like To Upgrade This Building To?')
+        ctr_it('')
         div_line('-')
         print(' Selection options available:')
         print(' {0}-{1} = Level to upgrade, EXIT = Return to main menu'.format(min_level + 1, max_level))
@@ -2812,14 +2718,14 @@ def upgrade_building(title):
                                         c_value, c_key, c_data['capital']['city']['resources'][c_key])
                                 req_check.append(req)
         screen_update(title, 'Select Level To Upgrade')
-        center_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+        ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
         div_line('-')
         if len(req_check) != 0:
             for x in range(len(req_check)):
-                center_it(req_check[x])
-            center_it('')
-            center_it('Requirements Not Met. Try Lowering Upgrade Level')
-            center_it('')
+                ctr_it(req_check[x])
+            ctr_it('')
+            ctr_it('Requirements Not Met. Try Lowering Upgrade Level')
+            ctr_it('')
             div_line('-')
             print(' Selection options available:')
             print(' {0}-{1} = Slots to fill, EXIT = Return to main menu'.format(min_level + 1, max_level))
@@ -2850,13 +2756,13 @@ def upgrade_building(title):
         if look_up['item'] in p_data['items'] and p_data['items'][look_up['item']] > 0:
             if len(look_up['item']) > len_a:
                 len_a = len(look_up['item'])
-            b = convert_time(look_up['time'], show_seconds=False)
+            b = cvt_time(look_up['time'], show_seconds=False)
             if len(b) > len_b:
                 len_b = len(b)
             c = '{0:,}'.format(p_data['items'][look_up['item']])
             if len(c) > len_c:
                 len_c = len(c)
-            d = convert_time(look_up['exceed'], show_seconds=False)
+            d = cvt_time(look_up['exceed'], show_seconds=False)
             if len(d) > len_d:
                 len_d = len(d)
             my_dict = {'item': look_up['item'], 'exceed': look_up['exceed'], 'time': look_up['time'],
@@ -2865,18 +2771,18 @@ def upgrade_building(title):
     if selection:
         while True:
             screen_update(title, 'Select Speed Items To Use')
-            center_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
+            ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
             div_line('-')
             a = '{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(
                     'Item', len_a, 'Description', len_b, 'Available', len_c, 'Exceeding', len_d)
             b = '{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d)
-            center_it(a)
-            center_it(b)
+            ctr_it(a)
+            ctr_it(b)
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
-                center_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
-                        selection[key]['item'], len_a, convert_time(selection[key]['time'], show_seconds=False), len_b,
-                        selection[key]['quantity'], len_c, convert_time(selection[key]['exceed'], show_seconds=False),
+                ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
+                        selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
+                        selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
                         len_d, use_item))
             print('\n Exceeding - Item used when duration exceeds the displayed time')
             div_line('-')
@@ -2909,7 +2815,7 @@ def upgrade_building(title):
     d_delay = None
     while d_delay is None:
         screen_update(title, 'Set Delay Between Requests')
-        center_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
+        ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -2918,8 +2824,8 @@ def upgrade_building(title):
     d_proceed = False
     while not d_proceed:
         screen_update(title, 'Proceed With Upgrading?')
-        center_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
-        center_it('Delay: {0}s'.format(d_delay))
+        ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
+        ctr_it('Delay: {0}s'.format(d_delay))
         d_proceed = proceed_run('Unpacking of Troop Bins')
         if d_proceed == 'exit':
             return
@@ -2927,12 +2833,12 @@ def upgrade_building(title):
     # Run Auto Upgrade
     global realm
     screen_update(title, 'Progress Report...')
-    center_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
-    center_it('Delay: {0}'.format(d_delay))
-    center_it('')
+    ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
+    ctr_it('Delay: {0}'.format(d_delay))
+    ctr_it('')
     div_line('-')
     progress(0, 1, 'Initializing...')
-    d_start_time = time()
+    d_start = time()
     speeds_used = {}
     d_conn = http.client.HTTPConnection(realm, 80)
     d_list_len = len(d_list)
@@ -2946,9 +2852,9 @@ def upgrade_building(title):
                 speed_item = None
                 while duration != 0:
                     screen_update('UPGRADE BUILDING', 'Progress Report...')
-                    center_it('Location: {0}   Building: {1}   Target Level: {2}'.format(
+                    ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(
                             t(d_location), t(d_building), d_level))
-                    center_it('Delay: {0}s   Elapsed Time: {1}'.format(d_delay, convert_time(time() - d_start_time)))
+                    ctr_it('Delay: {0}s   Elapsed Time: {1}'.format(d_delay, cvt_time(time() - d_start)))
                     div_line('-')
                     if (d_level - min_level) > 1:
                         progress((d_level - min_level) - (d_level - y) + 1, d_level - min_level,
@@ -2960,16 +2866,16 @@ def upgrade_building(title):
                     else:
                         pass
                     if speeds_used:
-                        center_it(' ')
-                        center_it('~~~ Speed Items Used ~~~')
+                        ctr_it(' ')
+                        ctr_it('~~~ Speed Items Used ~~~')
                         display_it(speeds_used, single=False)
                     if duration == -1:
-                        add_on_params = '%5Fmethod=put&'
+                        x_param = '%5Fmethod=put&'
                         for server_retry in range(5):
                             sleep(d_delay + 1)
                             try:
-                                main_json = http_operation(d_conn, 'cities/{0}/buildings/{1}'.format(
-                                        d_list[x]['location_id'], d_list[x]['building_id']), add_on_params)
+                                main_json = web_ops(d_conn, 'cities/{0}/buildings/{1}'.format(
+                                        d_list[x]['location_id'], d_list[x]['building_id']), x_param)
                                 result = main_json['result']['success']
                                 if result:
                                     duration = int(main_json['result']['job']['duration'])
@@ -2994,11 +2900,11 @@ def upgrade_building(title):
                                     if duration <= d_speed[z]['time'] and d_speed[z]['quantity'] != 0:
                                         speed_item = d_speed[z]['item']
                                         break
-                        add_on_params = '%5Fmethod=delete&job%5Fid={0}&'.format(jobid)
+                        x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(jobid)
                         for server_retry in range(5):
                             sleep(d_delay + 1)
                             try:
-                                item_json = http_operation(d_conn, 'player_items/{0}'.format(speed_item), add_on_params)
+                                item_json = web_ops(d_conn, 'player_items/{0}'.format(speed_item), x_param)
                                 result = item_json['result']['success']
                                 if result:
                                     for z in range(len(d_speed)):
@@ -3024,22 +2930,22 @@ def upgrade_building(title):
                             d_list[x]['level'] += 1
                         sleep(1)
     screen_update(title, 'Summary Report')
-    center_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
-    center_it('Delay: {0}s'.format(d_delay, convert_time(time() - d_start_time)))
+    ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
+    ctr_it('Delay: {0}s'.format(d_delay, cvt_time(time() - d_start)))
     div_line('-')
     progress(1, 1, 'Upgrade Completed Successfully!', 'Process completed in {0}'.format(
-            convert_time(time() - d_start_time)))
+            cvt_time(time() - d_start)))
     if speeds_used:
-        center_it('~~~ Speed Items Used ~~~', prefix=True)
+        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
         display_it(speeds_used, single=False)
     if len(requirements['items']) >= 1:
-        center_it('~~~ Seals & Grants Used ~~~', prefix=True)
+        ctr_it('~~~ Seals & Grants Used ~~~', prefix=True)
         for key, value in requirements['items'].items():
-            center_it('{0:>}: {1:,}'.format(t(key), value))
+            ctr_it('{0:>}: {1:,}'.format(t(key), value))
     if len(requirements['resources']) >= 1:
-        center_it('~~~ Resources Used  ~~~', prefix=True)
+        ctr_it('~~~ Resources Used  ~~~', prefix=True)
         for key, value in requirements['resources'].items():
-            center_it('{0:>5}: {1:,}'.format(key.capitalize(), value))
+            ctr_it('{0:>5}: {1:,}'.format(key.capitalize(), value))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     print('Refreshing... Please wait!')
@@ -3051,7 +2957,7 @@ def upgrade_building(title):
 def train_troop(title):
     # Initialize
     screen_update(title, 'Select Troop To Train')
-    center_it(' Initializing...')
+    ctr_it(' Initializing...')
     d_list = list()
     selection = {}
     pseudo_tc = ('Garrison', 'TrainingCamp', 'CaveTrainingCamp')
@@ -3070,7 +2976,7 @@ def train_troop(title):
     d_rookery = 0
     for x in range(len(m_data['units'])):
         if m_data['units'][x]['trainable_in']:
-            d_max_queue = d_pop = 0
+            d_max_queue = d_pop = -1
             met_research = met_resource = met_item = met_unit = met_idle = met_building = True
             d_unit = m_data['units'][x]
             d_req = d_unit['requirements']['capital']
@@ -3089,7 +2995,7 @@ def train_troop(title):
                         if value <= lookup[key]:
                             met_req -= 1
                             if value != 0:
-                                if d_max_queue > int(lookup[key] / value) or d_max_queue == 0:
+                                if d_max_queue > int(lookup[key] / value) or d_max_queue == -1:
                                     d_max_queue = int(lookup[key] / value)
                 met_resource = True if met_req == 0 else False
             if 'items' in d_req.keys():
@@ -3100,7 +3006,7 @@ def train_troop(title):
                         if value <= lookup[key]:
                             met_req -= 1
                             if value != 0:
-                                if d_max_queue > int(lookup[key] / value) or d_max_queue == 0:
+                                if d_max_queue > int(lookup[key] / value) or d_max_queue == -1:
                                     d_max_queue = int(lookup[key] / value)
                 met_item = True if met_req == 0 else False
             if 'units' in d_req.keys():
@@ -3111,7 +3017,7 @@ def train_troop(title):
                         if value <= lookup[key]:
                             met_req -= 1
                             if value != 0:
-                                if d_max_queue > int(lookup[key] / value) or d_max_queue == 0:
+                                if d_max_queue > int(lookup[key] / value) or d_max_queue == -1:
                                     d_max_queue = int(lookup[key] / value)
                 met_unit = True if met_req == 0 else False
             if 'population' in d_req.keys():
@@ -3153,6 +3059,7 @@ def train_troop(title):
                                            'trainable': d_max_queue, 'time': m_data['units'][x]['time'],
                                            'id': c_data[d_loc]['city']['id']}
                                 d_list.append(my_dict)
+                                break
     d_troop = None
     selection.clear()
     if not d_list:
@@ -3167,7 +3074,7 @@ def train_troop(title):
     # Select Troop To Train
     while d_troop is None:
         screen_update(title, 'Select Troop To Train')
-        center_it('~~~ Available Troops ~~~')
+        ctr_it('~~~ Available Troops ~~~')
         display_it(selection)
         div_line()
         d_select = input(' Enter selection : ')
@@ -3209,19 +3116,19 @@ def train_troop(title):
             len_b = len('{0}'.format(selection[x]['tc_level']))
         if len('{0}'.format(selection[x]['tc_total'])) > len_c:
             len_c = len('{0}'.format(selection[x]['tc_total']))
-        if len(convert_time(selection[x]['time'])) > len_d:
-            len_d = len(convert_time(selection[x]['time']))
+        if len(cvt_time(selection[x]['time'])) > len_d:
+            len_d = len(cvt_time(selection[x]['time']))
     while d_location is None:
         screen_update(title, 'Select Location To Train')
-        center_it('Troop: {0}'.format(t(d_troop)))
-        center_it(' ')
+        ctr_it('Troop: {0}'.format(t(d_troop)))
+        ctr_it(' ')
         div_line('-')
-        center_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
-        center_it('{0}  {1}  {2}  {3}'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
+        ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
+        ctr_it('{0}  {1}  {2}  {3}'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
         for x in sorted(selection.keys()):
-            center_it('{0:<{1}}  {2:^{3}}  {4:^{5}}  {6:>{7}}'.format(
+            ctr_it('{0:<{1}}  {2:^{3}}  {4:^{5}}  {6:>{7}}'.format(
                     x, len_a, selection[x]['tc_level'], len_b, selection[x]['tc_total'], len_c,
-                    convert_time(selection[x]['time']), len_d))
+                    cvt_time(selection[x]['time']), len_d))
         div_line()
         d_select = input(' Enter selection : ')
         if len(d_select) >= 3:
@@ -3238,12 +3145,12 @@ def train_troop(title):
     # Set Training Queue Size
     while d_max_queue is 0:
         screen_update(title, 'Set Quantity for Training Queue')
-        center_it('Troop: {0}   Location: {1}'.format(t(d_troop), t(d_location)))
-        center_it(' ')
+        ctr_it('Troop: {0}   Location: {1}'.format(t(d_troop), t(d_location)))
+        ctr_it(' ')
         div_line('-')
-        center_it('~~~ Available Options ~~~')
-        center_it('1 to {0}'.format(d_list[0]['quantity']), suffix=True)
-        print(' NOTE: Enter MAX for maximum quantity')
+        ctr_it('~~~ Available Options ~~~')
+        ctr_it('1 to {0}'.format(d_list[0]['quantity']), suffix=True)
+        print(' NOTE: Enter MAX for maximum queue')
         div_line()
         d_select = input(' Enter selection : ')
         if len(d_select) >= 1:
@@ -3278,7 +3185,7 @@ def train_troop(title):
                 if selection[x]['time'] < 1:
                     y = '{0}% Reduction'.format(int(selection[x]['time'] * 100))
                 else:
-                    y = '{0}'.format(convert_time(selection[x]['time'], show_seconds=False))
+                    y = '{0}'.format(cvt_time(selection[x]['time'], show_seconds=False))
                 my_dict = {'item': selection[x]['item'], 'qty': p_data['items'][selection[x]['item']],
                            'time': selection[x]['time'], 'desc': y, 'use': 0}
                 d_speed.append(my_dict)
@@ -3291,15 +3198,15 @@ def train_troop(title):
                     len_c = len(str(p_data['items'][selection[x]['item']]))
     while True:
         screen_update(title, 'Set Speed Items To Use For Each Queue')
-        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+        ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
                 t(d_troop), t(d_location), d_list[0]['quantity']))
-        center_it(' ')
+        ctr_it(' ')
         div_line('-')
-        center_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
-        center_it('{0}  {1}  {2}  {3}'.format('-' * len_a, '-' * len_b, '-' * len_c, '-' * len_d))
+        ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
+        ctr_it('{0}  {1}  {2}  {3}'.format('-' * len_a, '-' * len_b, '-' * len_c, '-' * len_d))
         reduced_time = (d_list[0]['time'] / d_list[0]['multiplier']) * d_list[0]['quantity']
         for x in range(len(d_speed)):
-            center_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}'.format(
+            ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}'.format(
                     t(d_speed[x]['item']), len_a, d_speed[x]['desc'], len_b, d_speed[x]['qty'], len_c,
                     d_speed[x]['use'], len_d))
             if d_speed[x]['use'] != 0:
@@ -3310,16 +3217,18 @@ def train_troop(title):
                     for y in range(d_speed[x]['use']):
                         reduced_time -= d_speed[x]['time']
         else:
-            reduced_time = 0 if reduced_time < 0 else convert_time(reduced_time)
-            center_it('Training Duration: {0}'.format(reduced_time), prefix=True, suffix=True)
-        print(' NOTE: Input format is ITEM NAME=QUANTITY (e.g. Testronius Infusion=3)')
-        print('       Enter NEXT to proceed when Speed Items selection is complete')
+            reduced_time = 0 if reduced_time < 0 else cvt_time(reduced_time)
+            ctr_it('Training Duration: {0}'.format(reduced_time), prefix=True, suffix=True)
+        if reduced_time != 0:
+            print(' NOTE: Enter ITEM=QUANTITY (e.g. Infusion=3)')
+        else:
+            print(' Enter NEXT to proceed...')
         div_line()
         d_select = input(' Enter selection : ')
-        if len(d_select) >= 4:
+        if len(d_select) >= 3:
             if d_select.lower() == 'exit':
                 return
-            elif d_select.lower() == 'next':
+            elif d_select.lower() == 'next' and reduced_time == 0:
                 break
             else:
                 try:
@@ -3335,17 +3244,20 @@ def train_troop(title):
                     sleep(1)
     d_speed[:] = [d for d in d_speed if d.get('use') != 0]
     d_max_queue = int(d_list[0]['trainable'] / d_list[0]['quantity'])
+    speed_cut_off = 0
     for x in range(len(d_speed)):
-        if d_max_queue > d_speed[x]['qty'] / d_speed[x]['use']:
+        if d_max_queue > (d_speed[x]['qty'] / d_speed[x]['use']):
             d_max_queue = int(d_speed[x]['qty'] / d_speed[x]['use'])
+        if 'Testronius' not in d_speed[x]['item']:
+            speed_cut_off += d_speed[x]['time']
     d_batch = 1 if d_max_queue == 1 else None
 
     # Set Number Of Batches
     while d_batch is None:
         screen_update(title, 'Set Training Batches')
-        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+        ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
                 t(d_troop), t(d_location), d_list[0]['quantity']))
-        center_it(' ')
+        ctr_it(' ')
         d_batch = set_batch(d_max_queue + 1, 'batches to train?')
         if d_batch == 'exit':
             return
@@ -3354,9 +3266,9 @@ def train_troop(title):
     d_delay = None
     while d_delay is None:
         screen_update(title, 'Set Delay Between Game Requests')
-        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+        ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
                 t(d_troop), t(d_location), d_list[0]['quantity']))
-        center_it('Target Batches: {0:,}'.format(d_batch))
+        ctr_it('Target Batches: {0:,}'.format(d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -3365,66 +3277,85 @@ def train_troop(title):
     d_proceed = False
     while not d_proceed:
         screen_update(title, 'Proceed With Troop Training?')
-        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+        ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
                 t(d_troop), t(d_location), d_list[0]['quantity']))
-        center_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+        ctr_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
         d_proceed = proceed_run('training of troops?')
         if d_proceed == 'exit':
             return
 
     # Train Troops
     global realm
-    screen_update(title, 'Progress Report...')
-    center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-            t(d_troop), t(d_location), d_list[0]['quantity']))
-    center_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
-    div_line('-')
-    progress(0, 1, 'Initializing...')
-    d_start_time = time()
-    init_http = False
+    speeds_used = {}
+    d_start = time()
     d_conn = http.client.HTTPConnection(realm, 80)
     for x in range(d_batch):
-        if init_http:
-            d_conn = http.client.HTTPConnection(realm, 80)
-            init_http = False
-        for server_retry in range(5):
-            add_on_params = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
-                    d_list[0]['quantity'], d_troop)
-            sleep(d_delay)
-            try:
-                main_json = http_operation(d_conn, 'cities/{0}/units'.format(d_list[0]['id']), add_on_params)
-                job_id = main_json['result']['job']['id']
-                if job_id:
-                    for obj in d_speed:
-                        for y in range(obj['use']):
-                            add_on_params = 'job%5Fid={0}&%5Fmethod=delete&'.format(job_id)
-                            sleep(d_delay)
-                            for server_retry_again in range(5):
-                                try:
-                                    item_json = http_operation(d_conn, 'player_items/{0}'.format(
-                                            obj['item']), add_on_params)
-                                    result = item_json['result']['success']
-                                    if result:
-                                        screen_update(title, 'Progress Report...')
-                                        center_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-                                                t(d_troop), t(d_location), d_list[0]['quantity']))
-                                        center_it('Target Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                                                d_batch, d_delay, convert_time(time() - d_start_time)))
-                                        div_line('-')
-                                        progress(x + 1, d_batch, 'Training Batch {0:,} of {1:,}'.format(x + 1, d_batch))
-                                        progress(y + 1, obj['use'], 'Using {0}: {1} of {2}'.format(
-                                                t(obj['item']), y + 1, obj['use']))
-                                    break
-                                except (KeyError, TypeError):
-                                    sleep(1)
-                                    continue
-                break
-            except (KeyError, TypeError):
-                sleep(1)
-                continue
+        duration = -1
+        job_id = 0
+        for item in d_speed:
+            for y in range(item['use']):
+                if 'Testronius' in item['item'] and speed_cut_off >= duration != -1 or duration == 0:
+                    break
+                screen_update(title, 'Progress Report...')
+                ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
+                        t(d_troop), t(d_location), d_list[0]['quantity']))
+                ctr_it('Target Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
+                        d_batch, d_delay, cvt_time(time() - d_start)))
+                div_line('-')
+                progress(x + 1, d_batch, 'Training Batch {0:,} of {1:,}'.format(x + 1, d_batch))
+                if speeds_used:
+                    progress(y + 1, item['use'], 'Using {0}: {1} of {2}'.format(
+                            t(item['item']), y + 1, item['use']), 'Remaning Duration: {0}'.format(cvt_time(duration)))
+                    ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+                    display_it(speeds_used, single=False)
+                else:
+                    progress(0, 1, 'Initializing...')
+                if duration == -1:
+                    x_param = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
+                            d_list[0]['quantity'], d_troop)
+                    for server_retry in range(5):
+                        sleep(d_delay)
+                        try:
+                            main_json = web_ops(d_conn, 'cities/{0}/units'.format(d_list[0]['id']), x_param)
+                            result = main_json['result']['success']
+                            if result:
+                                job_id = main_json['result']['job']['id']
+                                duration = int(main_json['result']['job']['duration'])
+                                break
+                        except (KeyError, TypeError):
+                            sleep(1)
+                            continue
+                if duration > (d_delay + 1):
+                    x_param = 'job%5Fid={0}&%5Fmethod=delete&'.format(job_id)
+                    for server_retry in range(5):
+                        sleep(d_delay)
+                        try:
+                            item_json = web_ops(d_conn, 'player_items/{0}'.format(item['item']), x_param)
+                            result = item_json['result']['success']
+                            if result:
+                                duration = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
+                                if duration < 0:
+                                    duration = 0
+                                if t(item['item']) in speeds_used:
+                                    speeds_used[t(item['item'])] += 1
+                                else:
+                                    speeds_used[t(item['item'])] = 1
+                                break
+                        except (KeyError, TypeError):
+                            sleep(1)
+                            continue
+    screen_update(title, 'Summary Report')
+    ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(t(d_troop), t(d_location), d_list[0]['quantity']))
+    ctr_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
-
-    input('..')
+    progress(1, 1, 'Training Completed Successfully!', 'Process completed in {0}'.format(cvt_time(time() - d_start)))
+    if speeds_used:
+        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+        display_it(speeds_used, single=False)
+    div_line()
+    os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
+    print('Refreshing... Please wait!')
+    get_server_data(title, player=True, cities=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3468,14 +3399,14 @@ def menu():
                    farm_mission: 'Farm Mission', open_chest: 'Open Chests', unpack_arsenal: 'Unpack Arsenal',
                    upgrade_building: 'Upgrade Buildings', fill_building: 'Fill Building Slots',
                    train_troop: 'Train Troops', revive_soul: 'Revive Souls'}
-    system_dict = {switch_realm: 'Switch Realms', refresh_data: 'Refresh Game'}
+    system_dict = {switch_realm: 'Switch Realm', refresh_data: 'Refresh Game', enter_script: 'Switch Account'}
 
     while True:
         screen_update('MAIN MENU', 'What Would You Like To Do?')
-        center_it('~~~ Available Modules ~~~')
+        ctr_it('~~~ Available Modules ~~~')
         display_it(module_dict)
         print(' ')
-        center_it('~~~ System Modules ~~~')
+        ctr_it('~~~ System Modules ~~~')
         display_it(system_dict)
         print('\n Select from the list or enter QUIT to quit script')
         div_line()
@@ -3486,10 +3417,10 @@ def menu():
                     exit_script()
                 else:
                     for key, value in module_dict.items():
-                        if d_select.lower() in value.lower():
+                        if d_select.lower() in value.lower() or d_select.lower() == value.lower():
                             key(value.upper())
                     for key, value in system_dict.items():
-                        if d_select.lower() in value.lower():
+                        if d_select.lower() in value.lower() or d_select.lower() == value.lower():
                             key(value.upper())
 
 
@@ -3504,7 +3435,6 @@ p_data = m_data = f_data = p_f_data = c_data = t_data = {}
 
 # Load Account
 enter_script('INITIALIZING SCRIPT')
-switch_realm('INITIALIZING SCRIPT', realm_number, c_number)
 
 # Launch Menu
 if __name__ == '__main__':
