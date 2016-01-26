@@ -400,10 +400,10 @@ def screen_update(title, subtitle):
     os.system('cls' if os.name == 'nt' else 'clear')
     v_len = len(__version__)
     try:
-        print('\n {0:<56} {1:>16}({2:<3})\n     {3:<{4}}{5}'.format(
-                title, p_data['name'], realm_number, subtitle, 74 - v_len, __version__))
+        a = '{0}({1})'.format(p_data['name'], d_rn) if d_rn != 0 else ''
     except (KeyError, NameError):
-        print('\n {0:<56}\n     {1:<{2}}{3}'.format(title, subtitle, 74 - v_len, __version__))
+        a = ''
+    print('\n {0:<55}  {1:>21}\n     {2:<{3}}{4}'.format(title, a, subtitle, 74 - v_len, __version__))
     div_line()
 
 
@@ -624,7 +624,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
             quit()
     acct = list()
     verify_record = list()
-    unique_id = '{0}-{1}'.format(user_id, realm_number)
+    unique_id = '{0}-{1}'.format(d_ui, d_rn)
     try:
         with open('DoA-Tools.txt', 'r') as read_file:
             r_file = json.load(read_file)
@@ -633,12 +633,12 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                 if r_file[x]['id'] not in verify_record:
                     verify_record.append(r_file[x]['id'])
             if unique_id not in verify_record:
-                my_dict = {'id': unique_id, 'ac': p_data['name'], 'ui': user_id, 'dh': dragon_heart,
-                           'rn': realm_number, 'cn': c_number}
+                my_dict = {'id': unique_id, 'ac': p_data['name'], 'ui': d_ui, 'dh': d_dh,
+                           'rn': d_rn, 'cn': d_cn}
                 acct.append(my_dict)
     except FileNotFoundError:
-        my_dict = {'id': unique_id, 'ac': p_data['name'], 'ui': user_id, 'dh': dragon_heart,
-                   'rn': realm_number, 'cn': c_number}
+        my_dict = {'id': unique_id, 'ac': p_data['name'], 'ui': d_ui, 'dh': d_dh,
+                   'rn': d_rn, 'cn': d_cn}
         acct.append(my_dict)
     finally:
         with open('DoA-Tools.txt', 'w') as create_file:
@@ -814,8 +814,9 @@ def exit_script():
 
 
 def enter_script(title):
-    global user_id, dragon_heart, realm_number, c_number
-    user_id = dragon_heart = realm_number = c_number = 0
+    global d_ui, d_dh, d_rn, d_cn, p_data, m_data, f_data, p_f_data, c_data, t_data
+    p_data = m_data = f_data = p_f_data = c_data = t_data = {}
+    d_ui = d_dh = d_rn = d_cn = 0
     selection = {}
     r_file = None
     try:
@@ -841,62 +842,62 @@ def enter_script(title):
                     if i.lower() in value.lower() or i.lower() == value.lower():
                         for x in range(len(r_file)):
                             if r_file[x]['id'] == key:
-                                user_id = r_file[x]['ui']
-                                dragon_heart = r_file[x]['dh']
-                                realm_number = r_file[x]['rn']
-                                c_number = r_file[x]['cn']
+                                d_ui = r_file[x]['ui']
+                                d_dh = r_file[x]['dh']
+                                d_rn = r_file[x]['rn']
+                                d_cn = r_file[x]['cn']
                                 selected = True
                                 break
                         break
 
     get_account_info(title)
     get_realm_info(title)
-    switch_realm('INITIALIZING SCRIPT', realm_number, c_number)
+    switch_realm('INITIALIZING SCRIPT', d_rn, d_cn)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                             INTERACTIVE CLASSES/MODULES                                              #
 # -------------------------------------------------------------------------------------------------------------------- #
 def get_account_info(title):
-    global user_id, dragon_heart, session_id
-    while not user_id:
+    global d_ui, d_dh, d_si
+    while not d_ui:
         screen_update(title, 'Fill In The Relevant Account Information To Proceed')
         d_select = input(' Enter your USER ID number : ')
         if len(d_select) >= 1:
             if d_select.isnumeric():
-                user_id = int(d_select)
+                d_ui = int(d_select)
 
-    while not dragon_heart:
+    while not d_dh:
         screen_update(title, 'Fill In The Relevant Account Information To Proceed')
-        ctr_it('User ID: {0}'.format(user_id))
+        ctr_it('User ID: {0}'.format(d_ui))
         div_line()
         d_select = input(' Enter your DRAGON HEART code : ')
         if len(d_select) >= 3:
             if d_select.isalnum():
-                dragon_heart = d_select
+                d_dh = d_select
 
 
 def get_realm_info(title):
-    global realm_number, c_number
-    while not realm_number:
+    global d_rn, d_cn
+    while not d_rn:
         screen_update(title, 'Fill In The Relevant Realm Information To Proceed')
-        ctr_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
+        ctr_it('User ID: {0}   Dragon Heart: {1}'.format(d_ui, d_dh))
         ctr_it(' ')
         div_line()
         d_select = input(' Enter the REALM number : ')
         if len(d_select) >= 1:
             if d_select.isnumeric():
-                realm_number = int(d_select)
+                d_rn = int(d_select)
 
-    while not c_number:
+    while not d_cn:
         screen_update(title, 'Fill In The Relevant Realm Information To Proceed')
-        ctr_it('User ID: {0}   Dragon Heart: {1}'.format(user_id, dragon_heart))
-        ctr_it('Realm Number: {0}'.format(realm_number))
+        ctr_it('User ID: {0}   Dragon Heart: {1}'.format(d_ui, d_dh))
+        ctr_it('Realm Number: {0}'.format(d_rn))
         div_line()
         d_select = input(' Enter the Cluster Server number (known as C number) : ')
         if len(d_select) >= 1:
             if d_select.isnumeric():
-                c_number = int(d_select)
+                d_cn = int(d_select)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3379,17 +3380,17 @@ def revive_soul(title):
 # -------------------------------------------------------------------------------------------------------------------- #
 
 def switch_realm(title, realm_no=0, c_no=0):
-    global realm_number, c_number, realm, cookie, std_param, session_id
-    realm_number = realm_no
-    c_number = c_no
+    global d_rn, d_cn, realm, cookie, std_param, d_si
+    d_rn = realm_no
+    d_cn = c_no
     get_realm_info(title)
 
     # Fixed Variables
-    session_id = b2a_hex(os.urandom(16))
-    realm = 'realm{0}.c{1}.castle.rykaiju.com'.format(realm_number, c_number)
-    cookie = 'dragons={0}'.format(session_id)
+    d_si = b2a_hex(os.urandom(16))
+    realm = 'realm{0}.c{1}.castle.rykaiju.com'.format(d_rn, d_cn)
+    cookie = 'dragons={0}'.format(d_si)
     std_param = 'dragon%5Fheart={0}&user%5Fid={1}&version=overarch&%5Fsession%5Fid={2}'.format(
-            dragon_heart, user_id, session_id)
+            d_dh, d_ui, d_si)
 
     # Refresh Data Files
     refresh_data(title)
@@ -3440,13 +3441,11 @@ def menu():
 # -------------------------------------------------------------------------------------------------------------------- #
 
 # Initialize Global Variables
-user_id = realm_number = c_number = 0
-dragon_heart = session_id = realm = cookie = std_param = ''
+d_ui = d_rn = d_cn = 0
+d_dh = d_si = realm = cookie = std_param = ''
 p_data = m_data = f_data = p_f_data = c_data = t_data = {}
-
-# Load Account
-enter_script('INITIALIZING SCRIPT')
 
 # Launch Menu
 if __name__ == '__main__':
+    enter_script('INITIALIZING SCRIPT')
     menu()
