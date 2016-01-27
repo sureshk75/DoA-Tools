@@ -852,7 +852,7 @@ def enter_script(title):
 
     get_account_info(title)
     get_realm_info(title)
-    switch_realm('INITIALIZING SCRIPT', d_rn, d_cn)
+    switch_realm(title, d_rn, d_cn)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -1330,6 +1330,7 @@ def farm_mission(title):
     d_conn.close()
     if claimed:
         get_server_data(title, player=True, unmute=False)
+        adventurers = p_data['forge']['adventurers']
     ingredients = {}
     for x in range(len(p_data['forge']['items']['ingredients'])):
         ingredients[p_data['forge']['items']['ingredients'][x]['name']] = p_data['forge']['items']['ingredients'][x][
@@ -1376,7 +1377,6 @@ def farm_mission(title):
                     d_list.append(my_dict)
 
     if not d_list:
-        screen_update(title, 'Select Adventurer For Mission')
         nothing_to_do('Adventurers')
         return
     else:
@@ -1435,24 +1435,18 @@ def farm_mission(title):
 
     # Select Speed Items
     selection = list()
-    len_a = 4
-    len_b = 11
-    len_c = 9
-    len_d = 9
+    a, b, c, d, len_a, len_b, len_c, len_d = ['Item', 'Description', 'Available', 'Exceeding', 4, 11, 9, 9]
     for key in range(len(speed_items_dict)):
         look_up = speed_items_dict[key]
         if look_up['item'] in p_data['items'] and p_data['items'][look_up['item']] > 0:
             if len(look_up['item']) > len_a:
                 len_a = len(look_up['item'])
-            b = cvt_time(look_up['time'], show_seconds=False)
-            if len(b) > len_b:
-                len_b = len(b)
-            c = '{0:,}'.format(p_data['items'][look_up['item']])
-            if len(c) > len_c:
-                len_c = len(c)
-            d = cvt_time(look_up['exceed'], show_seconds=False)
-            if len(d) > len_d:
-                len_d = len(d)
+            if len(cvt_time(look_up['time'], show_seconds=False)) > len_b:
+                len_b = len(cvt_time(look_up['time'], show_seconds=False))
+            if len('{0:,}'.format(p_data['items'][look_up['item']])) > len_c:
+                len_c = len('{0:,}'.format(p_data['items'][look_up['item']]))
+            if len(cvt_time(look_up['exceed'], show_seconds=False)) > len_d:
+                len_d = len(cvt_time(look_up['exceed'], show_seconds=False))
             my_dict = {'item': look_up['item'], 'exceed': look_up['exceed'], 'time': look_up['time'],
                        'quantity': p_data['items'][look_up['item']], 'use': False}
             selection.append(my_dict)
@@ -1463,11 +1457,8 @@ def farm_mission(title):
                     d_list[0]['time'], show_seconds=False), t(d_adventurer)))
             ctr_it(' ')
             div_line('-')
-            a = '{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(
-                    'Item', len_a, 'Description', len_b, 'Available', len_c, 'Exceeding', len_d)
-            b = '{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d)
-            ctr_it(a)
-            ctr_it(b)
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(a, len_a, b, len_b, c, len_c, d, len_d))
+            ctr_it('{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
@@ -1698,13 +1689,13 @@ def open_chest(title):
     d_list = list()
     selection = {}
     max_len = 0
-    max_use_quantity = 0
     for key, value in p_data['items'].items():
-        for manifest in range(len(m_data['store']['chest'])):
-            if key in m_data['store']['chest'][manifest]['type']:
-                max_use_quantity = m_data['store']['chest'][manifest]['max_use_quantity']
-                break
         if 'ConfigurableChest' in key and value != 0:
+            max_use_quantity = 0
+            for manifest in range(len(m_data['store']['chest'])):
+                if key in m_data['store']['chest'][manifest]['type']:
+                    max_use_quantity = m_data['store']['chest'][manifest]['max_use_quantity']
+                    break
             max_len = len(str(value)) if max_len < len(str(value)) else max_len
             my_dict = {'chest': key, 'quantity': value, 'max_use': max_use_quantity}
             d_chest.append(my_dict)
@@ -1923,51 +1914,45 @@ def unpack_arsenal(title):
             for x in range(len(m_data['units'])):
                 if m_data['units'][x]['type'] in key:
                     if '50TroopPrizeItem' in key:
-                        bin_desc = 'Fifty'
-                        bin_type = 50
+                        bin_desc, bin_type = ['Fifty', 50]
                     elif '500TroopPrizeItem' in key:
-                        bin_desc = 'Five Hundred'
-                        bin_type = 500
+                        bin_desc, bin_type = ['Five Hundred', 500]
                     elif '1000TroopPrizeItem' in key:
-                        bin_desc = 'One Thousand'
-                        bin_type = 1000
+                        bin_desc, bin_type = ['One Thousand', 1000]
                     elif '10kTroopPrizeItem' in key:
-                        bin_desc = 'Ten Thousand'
-                        bin_type = 10000
+                        bin_desc, bin_type = ['Ten Thousand', 10000]
                     elif '50kTroopPrizeItem' in key:
-                        bin_desc = 'Fifty Thousand'
-                        bin_type = 50000
+                        bin_desc, bin_type = ['Fifty Thousand', 50000]
                     else:
                         continue
                     my_dict = {'troop': m_data['units'][x]['type'], 'bin': key, 'quantity': value,
                                'power': m_data['units'][x]['stats']['power'], 'bin_desc': bin_desc,
                                'bin_type': bin_type, 'max_use': max_use_quantity, 'use': False}
                     d_list.append(my_dict)
-    d_troop = None
     if not d_list:
         nothing_to_do('no bins')
-    elif len(d_list) == 1:
+    if len(d_list) == 1:
         d_troop = d_list[0]['troop']
     else:
+        d_troop = None
         for x in range(len(d_list)):
             if d_list[x]['troop'] not in selection.keys():
                 selection[d_list[x]['troop']] = t(d_list[x]['troop'])
-
-    # Select Troop Type
-    while not d_troop:
-        screen_update(title, 'Select Troop Type')
-        ctr_it('~~~ Available Troop Bins ~~~')
-        display_it(selection)
-        div_line()
-        d_select = input(' Enter selection : ')
-        if len(d_select) >= 3:
-            if all(i.isalpha() or i == ' ' for i in d_select):
-                if d_select.lower() == 'exit':
-                    return
-                else:
-                    for key, value in selection.items():
-                        if d_select.lower() in value.lower() or d_select.lower() == value.lower():
-                            d_troop = key
+        # Select Troop Type
+        while not d_troop:
+            screen_update(title, 'Select Troop Type')
+            ctr_it('~~~ Available Troop Bins ~~~')
+            display_it(selection)
+            div_line()
+            d_select = input(' Enter selection : ')
+            if len(d_select) >= 3:
+                if all(i.isalpha() or i == ' ' for i in d_select):
+                    if d_select.lower() == 'exit':
+                        return
+                    else:
+                        for key, value in selection.items():
+                            if d_select.lower() in value.lower() or d_select.lower() == value.lower():
+                                d_troop = key
     d_list[:] = [d for d in d_list if d.get('troop') == d_troop]
     d_bin_type = None
     if len(d_list) == 1:
@@ -2339,24 +2324,18 @@ def fill_building(title):
 
     # Select Speed Items
     selection = list()
-    len_a = 4
-    len_b = 11
-    len_c = 9
-    len_d = 9
+    a, b, c, d, len_a, len_b, len_c, len_d = ['Item', 'Description', 'Available', 'Exceeding', 4, 11, 9, 9]
     for key in range(len(speed_items_dict)):
         look_up = speed_items_dict[key]
         if look_up['item'] in p_data['items'] and p_data['items'][look_up['item']] > 0:
             if len(look_up['item']) > len_a:
                 len_a = len(look_up['item'])
-            b = cvt_time(look_up['time'], show_seconds=False)
-            if len(b) > len_b:
-                len_b = len(b)
-            c = '{0:,}'.format(p_data['items'][look_up['item']])
-            if len(c) > len_c:
-                len_c = len(c)
-            d = cvt_time(look_up['exceed'], show_seconds=False)
-            if len(d) > len_d:
-                len_d = len(d)
+            if len(cvt_time(look_up['time'], show_seconds=False)) > len_b:
+                len_b = len(cvt_time(look_up['time'], show_seconds=False))
+            if len('{0:,}'.format(p_data['items'][look_up['item']])) > len_c:
+                len_c = len('{0:,}'.format(p_data['items'][look_up['item']]))
+            if len(cvt_time(look_up['exceed'], show_seconds=False)) > len_d:
+                len_d = len(cvt_time(look_up['exceed'], show_seconds=False))
             my_dict = {'item': look_up['item'], 'exceed': look_up['exceed'], 'time': look_up['time'],
                        'quantity': p_data['items'][look_up['item']], 'use': False}
             selection.append(my_dict)
@@ -2366,11 +2345,8 @@ def fill_building(title):
             ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
             ctr_it('Slots To Fill: {0}'.format(d_slots))
             div_line('-')
-            a = '{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(
-                    'Item', len_a, 'Description', len_b, 'Available', len_c, 'Exceeding', len_d)
-            b = '{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d)
-            ctr_it(a)
-            ctr_it(b)
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(a, len_a, b, len_b, c, len_c, d, len_d))
+            ctr_it('{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
@@ -2576,32 +2552,32 @@ def upgrade_building(title):
                                    'location_id': c_data[key]['city']['id']}
                         d_list.append(my_dict)
                         break
-    d_location = None
+
     if not d_list:
         nothing_to_do('Buildings')
-    elif len(d_list) == 1:
+    if len(d_list) == 1:
         d_location = d_list[0]['city']
     else:
+        d_location = None
         for x in range(len(d_list)):
             if d_list[x]['city'] not in selection.keys():
                 selection[d_list[x]['city']] = t(d_list[x]['city'])
-
-    # Select Location
-    while d_location is None:
-        screen_update(title, 'Choose A Location To Upgrade')
-        ctr_it('~~~ Available Locations ~~~')
-        display_it(selection)
-        div_line()
-        d_select = input(' Enter selection : ')
-        if len(d_select) >= 3:
-            if all(i.isalpha() or i == ' ' for i in d_select):
-                if d_select.lower() == 'exit':
-                    return
-                else:
-                    for key, value in selection.items():
-                        if d_select.lower() in value.lower() or d_select.lower() == value.lower():
-                            d_location = key
-                            break
+        # Select Location
+        while d_location is None:
+            screen_update(title, 'Choose A Location To Upgrade')
+            ctr_it('~~~ Available Locations ~~~')
+            display_it(selection)
+            div_line()
+            d_select = input(' Enter selection : ')
+            if len(d_select) >= 3:
+                if all(i.isalpha() or i == ' ' for i in d_select):
+                    if d_select.lower() == 'exit':
+                        return
+                    else:
+                        for key, value in selection.items():
+                            if d_select.lower() in value.lower() or d_select.lower() == value.lower():
+                                d_location = key
+                                break
     d_list[:] = [d for d in d_list if d.get('city') == d_location]
     d_building = None
     selection.clear()
@@ -2748,24 +2724,18 @@ def upgrade_building(title):
 
     # Select Speed Items
     selection = list()
-    len_a = 4
-    len_b = 11
-    len_c = 9
-    len_d = 9
+    a, b, c, d, len_a, len_b, len_c, len_d = ['Item', 'Description', 'Available', 'Exceeding', 4, 11, 9, 9]
     for key in range(len(speed_items_dict)):
         look_up = speed_items_dict[key]
         if look_up['item'] in p_data['items'] and p_data['items'][look_up['item']] > 0:
             if len(look_up['item']) > len_a:
                 len_a = len(look_up['item'])
-            b = cvt_time(look_up['time'], show_seconds=False)
-            if len(b) > len_b:
-                len_b = len(b)
-            c = '{0:,}'.format(p_data['items'][look_up['item']])
-            if len(c) > len_c:
-                len_c = len(c)
-            d = cvt_time(look_up['exceed'], show_seconds=False)
-            if len(d) > len_d:
-                len_d = len(d)
+            if len(cvt_time(look_up['time'], show_seconds=False)) > len_b:
+                len_b = len(cvt_time(look_up['time'], show_seconds=False))
+            if len('{0:,}'.format(p_data['items'][look_up['item']])) > len_c:
+                len_c = len('{0:,}'.format(p_data['items'][look_up['item']]))
+            if len(cvt_time(look_up['exceed'], show_seconds=False)) > len_d:
+                len_d = len(cvt_time(look_up['exceed'], show_seconds=False))
             my_dict = {'item': look_up['item'], 'exceed': look_up['exceed'], 'time': look_up['time'],
                        'quantity': p_data['items'][look_up['item']], 'use': False}
             selection.append(my_dict)
@@ -2774,11 +2744,8 @@ def upgrade_building(title):
             screen_update(title, 'Select Speed Items To Use')
             ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
             div_line('-')
-            a = '{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(
-                    'Item', len_a, 'Description', len_b, 'Available', len_c, 'Exceeding', len_d)
-            b = '{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d)
-            ctr_it(a)
-            ctr_it(b)
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(a, len_a, b, len_b, c, len_c, d, len_d))
+            ctr_it('{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
@@ -2963,9 +2930,7 @@ def train_troop(title):
     selection = {}
     pseudo_tc = ('Garrison', 'TrainingCamp', 'CaveTrainingCamp')
     for x in c_data:
-        tc_level = 0
-        tc_total = 0
-        tc_combo = 0
+        tc_level, tc_total, tc_combo = [0, 0, 0]
         for y in range(len(c_data[x]['city']['buildings'])):
             if c_data[x]['city']['buildings'][y]['type'] in pseudo_tc:
                 tc_level = c_data[x]['city']['buildings'][y]['level'] if tc_level < c_data[x]['city']['buildings'][y][
@@ -3088,11 +3053,11 @@ def train_troop(title):
                         if d_select.lower() in value.lower() or d_select.lower() == value.lower():
                             d_troop = key
     d_list[:] = [d for d in d_list if d.get('troop') == d_troop]
-    d_location = None
     selection.clear()
     if len(d_list) == 1:
         d_location = d_list[0]['location']
     else:
+        d_location = None
         for x in range(len(d_list)):
             if t(d_list[x]['location']) not in selection.keys():
                 my_dict = {'location': d_list[x]['location'],
@@ -3101,45 +3066,38 @@ def train_troop(title):
                            'time': int(d_list[x]['time'] / d_list[x]['multiplier'])}
                 selection[t(d_list[x]['location'])] = my_dict
 
-    # Select Location To Train
-    a = 'Location'
-    len_a = len(a)
-    b = 'Level'
-    len_b = len(b)
-    c = 'Total'
-    len_c = len(c)
-    d = 'Time'
-    len_d = len(d)
-    for x in selection.keys():
-        if len(x) > len_a:
-            len_a = len(x)
-        if len('{0}'.format(selection[x]['tc_level'])) > len_b:
-            len_b = len('{0}'.format(selection[x]['tc_level']))
-        if len('{0}'.format(selection[x]['tc_total'])) > len_c:
-            len_c = len('{0}'.format(selection[x]['tc_total']))
-        if len(cvt_time(selection[x]['time'])) > len_d:
-            len_d = len(cvt_time(selection[x]['time']))
-    while d_location is None:
-        screen_update(title, 'Select Location To Train')
-        ctr_it('Troop: {0}'.format(t(d_troop)))
-        ctr_it(' ')
-        div_line('-')
-        ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
-        ctr_it('{0}  {1}  {2}  {3}'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
-        for x in sorted(selection.keys()):
-            ctr_it('{0:<{1}}  {2:^{3}}  {4:^{5}}  {6:>{7}}'.format(
-                    x, len_a, selection[x]['tc_level'], len_b, selection[x]['tc_total'], len_c,
-                    cvt_time(selection[x]['time']), len_d))
-        div_line()
-        d_select = input(' Enter selection : ')
-        if len(d_select) >= 3:
-            if all(i.isalpha() or i == ' ' for i in d_select):
-                if d_select.lower() == 'exit':
-                    return
-                else:
-                    for x in sorted(selection.keys()):
-                        if d_select.lower() in x.lower() or d_select.lower() == x.lower():
-                            d_location = selection[x]['location']
+        # Select Location To Train
+        a, b, c, d, len_a, len_b, len_c, len_d = ['Location', 'Level', 'Total', 'Time', 8, 5, 5, 4]
+        for x in selection.keys():
+            if len(x) > len_a:
+                len_a = len(x)
+            if len('{0}'.format(selection[x]['tc_level'])) > len_b:
+                len_b = len('{0}'.format(selection[x]['tc_level']))
+            if len('{0}'.format(selection[x]['tc_total'])) > len_c:
+                len_c = len('{0}'.format(selection[x]['tc_total']))
+            if len(cvt_time(selection[x]['time'])) > len_d:
+                len_d = len(cvt_time(selection[x]['time']))
+        while d_location is None:
+            screen_update(title, 'Select Location To Train')
+            ctr_it('Troop: {0}'.format(t(d_troop)))
+            ctr_it(' ')
+            div_line('-')
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
+            ctr_it('{0}  {1}  {2}  {3}'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
+            for x in sorted(selection.keys()):
+                ctr_it('{0:<{1}}  {2:^{3}}  {4:^{5}}  {6:>{7}}'.format(
+                        x, len_a, selection[x]['tc_level'], len_b, selection[x]['tc_total'], len_c,
+                        cvt_time(selection[x]['time']), len_d))
+            div_line()
+            d_select = input(' Enter selection : ')
+            if len(d_select) >= 3:
+                if all(i.isalpha() or i == ' ' for i in d_select):
+                    if d_select.lower() == 'exit':
+                        return
+                    else:
+                        for x in sorted(selection.keys()):
+                            if d_select.lower() in x.lower() or d_select.lower() == x.lower():
+                                d_location = selection[x]['location']
     d_list[:] = [d for d in d_list if d.get('location') == d_location]
     d_max_queue = 1 if d_list[0]['quantity'] == 1 else 0
 
@@ -3166,14 +3124,7 @@ def train_troop(title):
     selection.clear()
 
     # Set Speed Items
-    a = 'Speed Item'
-    len_a = len(a)
-    b = 'Description'
-    len_b = len(b)
-    c = 'Available'
-    len_c = len(c)
-    d = 'Use'
-    len_d = len(d)
+    a, b, c, d, len_a, len_b, len_c, len_d = ['Speed Item', 'Description', 'Available', 'Use', 10, 11, 9, 3]
     selection = [{'item': 'TestroniusInfusion', 'time': 0.99}, {'item': 'TestroniusDeluxe', 'time': 0.5},
                  {'item': 'TestroniusPowder', 'time': 0.3}, {'item': 'Blitz', 'time': 345600},
                  {'item': 'Blast', 'time': 216000}, {'item': 'Bolt', 'time': 86400}, {'item': 'Bore', 'time': 54000},
@@ -3374,7 +3325,68 @@ def train_troop(title):
 
 
 def revive_soul(title):
-    print(title)
+    # Initialize
+    screen_update(title, 'Select Souls To Revive')
+    ctr_it(' Initializing...')
+    d_list = list()
+    dp_level, dp_total, dp_combo = [0, 0, 0]
+    try:
+        spec = c_data['spectral']['city']['buildings']
+    except KeyError:
+        spec = None
+    if spec:
+        be = c_data['capital']['city']['resources']['blue_energy']
+        for x in range(len(spec)):
+            if spec[x]['type'] == 'DarkPortal':
+                if dp_level < spec[x]['level']:
+                    dp_level = spec[x]['level']
+                dp_total += 1
+                dp_combo += spec[x]['level']
+        for key, value in c_data['capital']['city']['souls'].items():
+            for x in range(len(m_data['units'])):
+                if key == m_data['units'][x]['type']:
+                    if dp_level >= m_data['units'][x]['requirements']['spectral']['buildings']['DarkPortal'] and be >= \
+                            m_data['units'][x]['requirements']['spectral']['resources']['blue_energy']:
+                        y = int(be / m_data['units'][x]['requirements']['spectral']['resources']['blue_energy'])
+                        if y > value:
+                            y = value
+                        my_dict = {'troop': key, 'total': value, 'max': y}
+                        d_list.append(my_dict)
+    if not d_list:
+        nothing_to_do('no souls')
+    if len(d_list) == 1:
+        d_troop = d_list[0]['troop']
+    else:
+        d_troop = None
+        a, b, c, len_a, len_b, len_c = ['Souls', 'Total', 'Revivable', 5, 5, 9]
+        for x in range(len(d_list)):
+            if len(t(d_list[x]['troop'])) > len_a:
+                len_a = len(t(d_list[x]['troop']))
+            if len('{0:,}'.format(d_list[x]['total'])) > len_b:
+                len_b = len('{0:,}'.format(d_list[x]['total']))
+            if len('{0:,}'.format(d_list[x]['max'])) > len_c:
+                len_c = len('{0:,}'.format(d_list[x]['max']))
+        while d_troop is None:
+            screen_update(title, 'Select Souls To Revive')
+            ctr_it('~~~ Available Souls ~~~')
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, len_a, b, len_b, c, len_c))
+            ctr_it('{0}  {1}  {2}'.format('~' * len_a, '~' * len_b, '~' * len_c))
+            for x in range(len(d_list)):
+                ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5},}'.format(
+                        t(d_list[x]['troop']), len_a, d_list[x]['total'], len_b, d_list[x]['max'], len_c))
+            div_line()
+            d_select = input(' Enter selection : ')
+            if len(d_select) >= 3:
+                if d_select.lower() == 'exit':
+                    return
+                else:
+                    for x in range(len(d_list)):
+                        if d_select.lower() in t(d_list[x]['troop']).lower() or d_select.lower() == t(
+                                d_list[x]['troop']).lower():
+                            d_troop = d_list[x]['troop']
+                            break
+    d_list[:] = [d for d in d_list if d.get('troop') == d_troop]
+    print(d_list)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3441,9 +3453,9 @@ def menu():
 # -------------------------------------------------------------------------------------------------------------------- #
 
 # Initialize Global Variables
-d_ui = d_rn = d_cn = 0
-d_dh = d_si = realm = cookie = std_param = ''
-p_data = m_data = f_data = p_f_data = c_data = t_data = {}
+d_ui, d_rn, d_cn = [0, 0, 0]
+d_dh, d_si, realm, cookie, std_param = ['', '', '', '', '']
+p_data, m_data, f_data, p_f_data, c_data, t_data = ['', '', '', '', '', '']
 
 # Launch Menu
 if __name__ == '__main__':
