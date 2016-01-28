@@ -414,21 +414,12 @@ def web_ops(conn, operation, param_add_on, method='POST', post=True):
     if post:
         cmd = 'Draoumculiasis' + params + 'LandCrocodile' + url + 'Bevar-Asp'
         cmd_str = sha1(cmd.encode('utf-8')).hexdigest()
-        headers = {'Accept': '*/*',
-                   'Accept-Encoding': 'gzip, deflate, sdch',
-                   'Accept-Language': 'en-US,en;q=0.8',
-                   'Connection': 'keep-alive',
-                   'Content-Length': len(params),
-                   'Content-Type': 'application/x-www-form-urlencoded',
-                   'Cookie': cookie,
-                   'DNT': 1,
-                   'Host': realm,
-                   'Origin': 'http://' + realm,
+        headers = {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate, sdch', 'Accept-Language': 'en-US,en;q=0.8',
+                   'Connection': 'keep-alive', 'Content-Length': len(params), 'Origin': 'http://' + realm,
+                   'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': cookie, 'DNT': 1, 'Host': realm,
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like'
                                  ' Gecko Chrome/45.0.2454.101 Safari/537.36)',
-                   'X-Requested-With': 'ShockwaveFlash/19.0.0.226',
-                   'X-S3-AWS': cmd_str}
-
+                   'X-Requested-With': 'ShockwaveFlash/19.0.0.226', 'X-S3-AWS': cmd_str}
         conn.request(method, url, params, headers)
     else:
         conn.request(method, url + params)
@@ -459,8 +450,10 @@ def web_ops(conn, operation, param_add_on, method='POST', post=True):
             ctr_it('Please try again later...')
             os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
             quit()
-    except (http.client.IncompleteRead, http.client.ResponseNotReady, http.client.RemoteDisconnected):
+    except http.client.HTTPException:
         sleep(2)
+    # except (http.client.IncompleteRead, http.client.ResponseNotReady, http.client.RemoteDisconnected):
+    #     sleep(2)
     except http.client.CannotSendRequest:
         div_line('#')
         ctr_it('SERVER ERROR: HTTP Connection Failed!')
@@ -484,7 +477,7 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
     title_text = 'Refreshing' if p_data or m_data or f_data or p_f_data or c_data or t_data else 'Retrieving'
     sub_header = '{0} Game Files. Please Wait...'.format(title_text)
     tw_data = None
-    max_count = count = 0
+    max_count, count = [0, 0]
     for check in (manifest, forge, player, player_forge, translation):
         if check:
             max_count += 1
@@ -501,9 +494,9 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
             name = req[x]['1']
             if unmute:
                 screen_update(title, sub_header)
-                progress(count, max_count, 'Retrieving {0}...'.format(name))
+                progress(count, max_count, 'Retrieving {0}'.format(name))
             url = 'http://wackoscripts.com/sanctuary/{0}.json'.format(req[x]['2'])
-            for retry_server in range(2):
+            for web_retry in range(2):
                 try:
                     d_conn.request('GET', url)
                     conn_resp = d_conn.getresponse()
@@ -516,15 +509,15 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                 except (KeyError, TypeError):
                     if unmute:
                         screen_update(title, sub_header)
-                        progress(count, max_count, 'Retrieving {0}...'.format(name),
-                                 'Retrying {0} of 5'.format(retry_server + 1))
+                        progress(count, max_count, 'Retrieving {0}'.format(name),
+                                 'Retrying {0} of 5'.format(web_retry + 1))
                     sleep(1)
                     continue
             if m_data or tw_data:
                 count += 1
                 if unmute:
                     screen_update(title, sub_header)
-                    progress(count, max_count, '{0} Retrieved!'.format(name))
+                    progress(count, max_count, 'Retrieving {0}'.format(name))
             else:
                 div_line('#')
                 ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(name))
@@ -534,14 +527,12 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                 quit()
             if req[x]['2'] == 'chest':
                 translate = (troop_dict, game_dict, forge_dict, tw_data)
-                txt_count = 1
                 for lookup in translate:
                     for key, value in lookup.items():
                         if key not in t_data and value != '':
                             t_data[key] = value
                         if key not in t_data and value == '':
                             t_data[key] = key
-                    txt_count += 1
     d_conn.close()
 
     # Get Forge and Player
@@ -554,8 +545,8 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
             name = req[x]['1']
             if unmute:
                 screen_update(title, sub_header)
-                progress(count, max_count, 'Retrieving {0}...'.format(name))
-            for retry_server in range(2):
+                progress(count, max_count, 'Retrieving {0}'.format(name))
+            for web_retry in range(2):
                 try:
                     conn_data = web_ops(d_conn, req[x]['2'], req[x]['3'], req[x]['4'], req[x]['5'])
                     if req[x]['2'] == 'forge/forge':
@@ -568,15 +559,15 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
                 except (KeyError, TypeError):
                     if unmute:
                         screen_update(title, sub_header)
-                        progress(count, max_count, 'Retrieving {0}...'.format(name),
-                                 'Retrying {0} of 5'.format(retry_server + 1))
+                        progress(count, max_count, 'Retrieving {0}'.format(name),
+                                 'Retrying {0} of 5'.format(web_retry + 1))
                     sleep(1)
                     continue
             if m_data or tw_data:
                 count += 1
                 if unmute:
                     screen_update(title, sub_header)
-                    progress(count, max_count, '{0} Retrieved!'.format(name))
+                    progress(count, max_count, 'Retrieving {0}'.format(name))
             else:
                 div_line('#')
                 ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(name))
@@ -587,38 +578,33 @@ def get_server_data(title, manifest=False, forge=False, player=False, player_for
 
     # Process City Data
     if cities:
-        prefix = 'City/Outpost Data'
         if unmute:
             screen_update(title, sub_header)
-            progress(count, max_count, 'Retrieving {0}...'.format(prefix))
+            progress(1, 1, 'Retrieving City/Outpost Data')
         c_data = {}
         for loc_key in sorted(p_data['cities']):
             if unmute:
                 screen_update(title, sub_header)
-                progress(count, max_count, 'Retrieving {0}...'.format(prefix),
-                         'Processing {0}'.format(t(loc_key)))
+                progress(1, 1, 'Processing {0}'.format(t(loc_key)))
             current_location = None
-            for retry_server in range(5):
+            for web_retry in range(5):
                 try:
                     current_location = web_ops(d_conn, 'cities/{0}'.format(p_data['cities'][loc_key]['id']), '')
                     break
                 except (KeyError, TypeError):
                     if unmute:
                         screen_update(title, sub_header)
-                        progress(count, max_count, 'Retrieving {0}...'.format(prefix),
-                                 'Retrying {0} of 5'.format(retry_server + 1))
+                        progress(1, 1, 'Processing {0}'.format(t(loc_key)), 'Retrying {0} of 5'.format(web_retry + 1))
                     sleep(1)
                     continue
             if current_location:
                 c_data[loc_key] = current_location
                 if unmute:
-                    # count += 1 / len(p_data['cities'])
                     screen_update(title, sub_header)
-                    progress(count, max_count, 'Retrieving {0}...'.format(
-                            prefix), '{0} Processed'.format(t(loc_key)))
+                    progress(1, 1, 'Processing {0}'.format(t(loc_key)))
         if not c_data:
             div_line('#')
-            ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(prefix))
+            ctr_it('SERVER ERROR: Failed To Process City/Outpost Data')
             ctr_it('Please Try Again Later...')
             div_line('#')
             quit()
@@ -651,18 +637,18 @@ def cvt_time(time_value=0, show_seconds=True):
     d, h = divmod(h, 24)
     if show_seconds:
         if d > 0:
-            return '{0:,}d {1}h {2}m {3}s'.format(int(d), int(h), int(m), int(s))
+            return '{0:,}d {1:0>2}h {2:0>2}m {3:0>2}s'.format(int(d), int(h), int(m), int(s))
         elif h > 0:
-            return '{0}h {1}m {2}s'.format(int(h), int(m), int(s))
+            return '{0}h {1:0>2}m {2:0>2}s'.format(int(h), int(m), int(s))
         elif m > 0:
-            return '{0}m {1}s'.format(int(m), int(s))
+            return '{0}m {1:0>2}s'.format(int(m), int(s))
         else:
             return '{0}s'.format(int(s))
     else:
         if d > 0:
-            return '{0:,}d {1}h {2}m'.format(int(d), int(h), int(m))
+            return '{0:,}d {1:0>2}h {2:0>2}m'.format(int(d), int(h), int(m))
         elif h > 0:
-            return '{0}h {1}m'.format(int(h), int(m))
+            return '{0}h {1:0>2}m'.format(int(h), int(m))
         else:
             return '{0}m'.format(int(m))
 
@@ -777,12 +763,12 @@ def proceed_run(exec_string):
                 return 'exit'
 
 
-def nothing_to_do(text):
+def nothing_to_do(title, subtitle, text):
+    screen_update(title, subtitle)
     div_line('*')
     ctr_it('There Are No {0} Available For Now'.format(text), suffix=True)
     div_line('*')
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-    return
 
 
 def result_error(text):
@@ -939,10 +925,8 @@ def create_equipment(title):
                                'item': key, 'craftable': d_max_queue,
                                'tier': f_data['forge']['items'][key]['tier_value']}
                     d_list.insert(x, my_dict)
-
     if not d_list:
-        screen_update(title, 'Create Troop Equipment')
-        nothing_to_do('Craftable Troop Items')
+        nothing_to_do(title, 'Create Troop Equipment', 'Craftable Troop Items')
         return
     else:
         for x in range(len(d_list)):
@@ -1095,7 +1079,7 @@ def create_equipment(title):
             display_it(crushed_items, single=False)
         crush_it = False
         x_param = 'output%5Fname={0}&'.format(d_item)  # item=StrengthOfHephaestusCommon&output%5Fname={0}&
-        for retry_server in range(5):
+        for web_retry in range(5):
             sleep(d_delay)
             try:
                 main_json = web_ops(d_conn, 'forge/forge_item', x_param)
@@ -1116,7 +1100,7 @@ def create_equipment(title):
                 sleep(1)
                 continue
         if crush_it:
-            for retry_server in range(5):
+            for web_retry in range(5):
                 sleep(d_delay)
                 try:
                     crush_json = web_ops(d_conn, 'forge/disenchant_equipment', x_param)
@@ -1198,8 +1182,7 @@ def forge_ingredient(title):
                         d_list.insert(x, my_dict)
 
     if not d_list:
-        screen_update(title, 'Create Forge Ingredient')
-        nothing_to_do('Forgeable Ingrediants')
+        nothing_to_do(title, 'Create Forge Ingredient', 'Forgeable Ingrediants')
         return
     else:
         for x in range(len(d_list)):
@@ -1274,7 +1257,7 @@ def forge_ingredient(title):
         if selection:
             ctr_it('~~~ Items Used ~~~')
             display_it(selection, single=False)
-        for retry_server in range(5):
+        for web_retry in range(5):
             sleep(d_delay)
             try:
                 x_param = 'output%5Fname={0}&'.format(d_item)
@@ -1377,7 +1360,7 @@ def farm_mission(title):
                     d_list.append(my_dict)
 
     if not d_list:
-        nothing_to_do('Adventurers')
+        nothing_to_do(title, 'Select Adventurer For Mission', 'Adventurers')
         return
     else:
         selection.clear()
@@ -1580,7 +1563,7 @@ def farm_mission(title):
                 ctr_it('~~~ Items Gained ~~~')
                 display_it(items_gained, single=False)
             if duration == -1:
-                for retry_server in range(5):
+                for web_retry in range(5):
                     sleep(d_delay)
                     x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
                     try:
@@ -1610,7 +1593,7 @@ def farm_mission(title):
                             if duration <= d_speed[z]['time'] and d_speed[z]['quantity'] != 0:
                                 speed_item = d_speed[z]['item']
                                 break
-                for retry_server in range(5):
+                for web_retry in range(5):
                     sleep(d_delay)
                     x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(job_id)
                     try:
@@ -1641,7 +1624,7 @@ def farm_mission(title):
                 sleep(1)
         if restart_http:
             d_conn = http.client.HTTPConnection(realm, 80)
-        for retry_server in range(5):
+        for web_retry in range(5):
             sleep(d_delay)
             x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
             try:
@@ -1701,8 +1684,7 @@ def open_chest(title):
             d_chest.append(my_dict)
 
     if not d_chest:
-        screen_update(title, 'Open Chests')
-        nothing_to_do('Chests')
+        nothing_to_do(title, 'Open Chests', 'Chests')
         return
     elif len(d_chest) == 1:
         my_dict = {'chest': d_chest[0]['chest'], 'quantity': d_chest[0]['quantity'], 'max_use': d_chest[0]['max_use']}
@@ -1829,7 +1811,7 @@ def open_chest(title):
                     print(' ')
             if opened < open_quantity:
                 open_quantity = opened
-            for retry_server in range(5):
+            for web_retry in range(5):
                 sleep(d_delay)
                 try:
                     x_param = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
@@ -1930,7 +1912,8 @@ def unpack_arsenal(title):
                                'bin_type': bin_type, 'max_use': max_use_quantity, 'use': False}
                     d_list.append(my_dict)
     if not d_list:
-        nothing_to_do('no bins')
+        nothing_to_do(title, 'Select Troop Type', 'no bins')
+        return
     if len(d_list) == 1:
         d_troop = d_list[0]['troop']
     else:
@@ -2078,7 +2061,7 @@ def unpack_arsenal(title):
             ctr_it('{0:,}'.format(d_power))
             if d_quantity < open_quantity:
                 open_quantity = d_quantity
-            for retry_server in range(5):
+            for web_retry in range(5):
                 sleep(d_delay)
                 try:
                     x_param = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
@@ -2167,7 +2150,8 @@ def fill_building(title):
                                     break
     d_location = None
     if not d_list:
-        nothing_to_do('no buildings')
+        nothing_to_do(title, 'Fills Slots With Buildings', 'no buildings')
+        return
     else:
         if len(selection) == 1:
             d_location = selection[0]
@@ -2442,7 +2426,7 @@ def fill_building(title):
             if duration == -1:
                 x_param = 'city%5F{0}%5B{0}%5Ftype%5D={1}&%5Fmethod=post&city%5F{0}%5Bslot%5D={2}&'.format(
                         'building', d_building, slots[x])
-                for retry_server in range(5):
+                for web_retry in range(5):
                     try:
                         sleep(d_delay)
                         json_data = web_ops(d_conn, 'cities/{0}/buildings'.format(
@@ -2471,7 +2455,7 @@ def fill_building(title):
                                 speed_item = d_speed[y]['item']
                                 break
                 x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(jobid)
-                for retry_server in range(5):
+                for web_retry in range(5):
                     try:
                         sleep(d_delay)
                         json_data = web_ops(d_conn, 'player_items/{0}'.format(speed_item), x_param)
@@ -2554,7 +2538,8 @@ def upgrade_building(title):
                         break
 
     if not d_list:
-        nothing_to_do('Buildings')
+        nothing_to_do(title, 'Choose A Location To Upgrade', 'Buildings')
+        return
     if len(d_list) == 1:
         d_location = d_list[0]['city']
     else:
@@ -3029,7 +3014,8 @@ def train_troop(title):
     d_troop = None
     selection.clear()
     if not d_list:
-        nothing_to_do('Trainable Troops')
+        nothing_to_do(title, 'Select Troop To Train', 'Trainable Troops')
+        return
     elif len(d_list) == 1:
         d_troop = d_list[0]['troop']
     else:
@@ -3135,7 +3121,7 @@ def train_troop(title):
         if selection[x]['item'] in p_data['items']:
             if p_data['items'][selection[x]['item']] > 0:
                 if selection[x]['time'] < 1:
-                    y = '{0}% Reduction'.format(int(selection[x]['time'] * 100))
+                    y = '{0}% Reduced'.format(int(selection[x]['time'] * 100))
                 else:
                     y = '{0}'.format(cvt_time(selection[x]['time'], show_seconds=False))
                 my_dict = {'item': selection[x]['item'], 'qty': p_data['items'][selection[x]['item']],
@@ -3353,7 +3339,8 @@ def revive_soul(title):
                         my_dict = {'troop': key, 'total': value, 'max': y}
                         d_list.append(my_dict)
     if not d_list:
-        nothing_to_do('no souls')
+        nothing_to_do(title, 'Select Souls To Revive', 'no souls')
+        return
     if len(d_list) == 1:
         d_troop = d_list[0]['troop']
     else:
