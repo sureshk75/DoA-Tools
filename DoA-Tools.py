@@ -8,7 +8,7 @@ from time import time, sleep
 
 __author__ = 'AlphaQ2 (Suresh Kumar)'
 __credits__ = 'Lucifa & Temprid'
-__version__ = '1.3.0'
+__version__ = '1.3.4'
 __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
 
 ########################################################################################################################
@@ -303,8 +303,8 @@ building_dict = {'capital': {'buildings': {'Farm', 'Lumbermill', 'Mine', 'Quarry
                                            'DragonKeep', 'Fortress', 'Garrison', 'OfficerQuarter', 'StorageVault',
                                            'Metalsmith', 'MusterPoint', 'Wall', 'Sentinel', 'Theater', 'Factory'},
                              'f_slots': {1: 11, 2: 14, 3: 17, 4: 20, 5: 23, 6: 26, 7: 29, 8: 32, 9: 35, 10: 38, 11: 39},
-                             'c_slots': {1: 28, 2: 28, 3: 28, 4: 28, 5: 28, 6: 28, 7: 28, 8: 28, 9: 28, 10: 28,
-                                         11: 29}},
+                             'c_slots': {1: 31, 2: 31, 3: 31, 4: 31, 5: 31, 6: 31, 7: 31, 8: 31, 9: 31, 10: 31,
+                                         11: 32}},
                  'cave': {'buildings': {'CaveDragonKeep', 'CaveCathedral', 'CaveDepot', 'CaveForge', 'CaveGreenhouse',
                                         'CaveLibrary', 'CaveTrainingCamp', 'CaveWorkshop'},
                           'f_slots': {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0},
@@ -1972,16 +1972,17 @@ def unpack_arsenal(title):
                     return
                 elif d_select.lower() == 'all':
                     for x in range(len(d_list)):
-                            d_list[x]['use'] = True
-                            break
+                        d_list[x]['use'] = True
+                        break
                 else:
                     for x in range(len(d_list)):
                         if d_select.lower() == d_list[x]['bin_desc'].lower():
                             d_list[x]['use'] = True if d_list[x]['use'] else False
                             break
                     else:
-                        if d_select.lower() in d_list[x]['bin_desc'].lower():
-                            d_list[x]['use'] = True if d_list[x]['use'] else False
+                        for x in range(len(d_list)):
+                            if d_select.lower() in d_list[x]['bin_desc'].lower():
+                                d_list[x]['use'] = True if d_list[x]['use'] else False
     d_list[:] = [d for d in d_list if d.get('use') == True]
     d_batch = None
     if len(d_list) > 1:
@@ -2055,8 +2056,8 @@ def unpack_arsenal(title):
                 sleep(d_delay)
                 try:
                     x_param = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
-                    json_data = web_ops(d_conn, 'player_items/{0}'.format(d_list[x]['bin']), x_param)
-                    result = json_data['result']['success']
+                    main_json = web_ops(d_conn, 'player_items/{0}'.format(d_list[x]['bin']), x_param)
+                    result = main_json['result']['success']
                     if result:
                         total_opened += open_quantity
                         current_opened += open_quantity
@@ -2066,13 +2067,12 @@ def unpack_arsenal(title):
                 except (KeyError, TypeError):
                     sleep(1)
                     continue
+    d_conn.close()
     screen_update(title, 'Summary Report')
     ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-    ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(
-        d_batch, d_delay))
+    ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
-    progress(total_opened, d_batch, 'Unpacking Troop Bins Completed!'.format(total_opened, d_batch),
-             'Process completed in {0}'.format(cvt_time(time() - d_start)))
+    progress(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)))
     ctr_it('~~~ Power Gained ~~~', prefix=True)
     ctr_it('{0:,}'.format(d_power))
     div_line()
@@ -2093,9 +2093,9 @@ def fill_building(title):
     built = list()
     capital_buildings = {}
     for x in range(len(cData['capital']['city']['buildings'])):
-        if cData['capital']['city']['buildings'][x]['type'] not in capital_buildings:
-            capital_buildings[cData['capital']['city']['buildings'][x]['type']] = \
-                cData['capital']['city']['buildings'][x]['level']
+        building = cData['capital']['city']['buildings'][x]
+        if building['type'] not in capital_buildings:
+            capital_buildings[building['type']] = building['level']
     for key in cData.keys():
         city_busy = False
         built.clear()
@@ -2130,68 +2130,95 @@ def fill_building(title):
                             for z in range(len(manifest['levels'])):
                                 if manifest['levels'][z]['level'] == 1:
                                     level = manifest['levels'][z]
-                                    my_dict = {'city': key, 'location': manifest['location'], 'type': manifest['type'],
-                                               'per_city': manifest['per_city'], 'levels': level, 'c_slot': city_slot,
-                                               'c_slot_max': c_slot, 'f_slot': field_slot, 'f_slot_max': f_slot,
-                                               'location_id': cData[key]['city']['id']}
+                                    my_dict = {'city': key, 'location': manifest['location'], 'f_slot': field_slot,
+                                               'type': t(manifest['type']), 'f_slot_max': f_slot, 'c_slot_max': c_slot,
+                                               'levels': level, 'per_city': manifest['per_city'], 'c_slot': city_slot,
+                                               'location_id': cData[key]['city']['id'], 'desc': t(key),
+                                               'time': manifest['levels'][z]['time']}
                                     d_list.append(my_dict)
-                                    if key not in selection:
-                                        selection[key] = t(key)
-                                    break
-    d_location = None
+
     if not d_list:
         nothing_to_do(title, 'Fills Slots With Buildings', 'no buildings')
         return
+    elif len(d_list) == 1:
+        d_location = d_list[0]['city']
     else:
-        if len(selection) == 1:
-            d_location = selection[0]
-
-    # Select Location
-    while d_location is None:
-        screen_update(title, 'Select Location')
-        ctr_it('~~~ Available Locations ~~~')
-        display_it(selection)
-        div_line()
-        d_select = input(' Enter selection : ')
-        if len(d_select) >= 2:
-            if not d_select.isalpha():
-                sleep(1)
-            else:
+        d_list = sorted(d_list, key=itemgetter('desc'))
+        d_location = None
+        # Select Location
+        a, b, c = ['Location', 'City', 'Field']
+        a1, b1, c1 = [len(a), len(b), len(c)]
+        for x in range(len(d_list)):
+            if len(d_list[x]['desc']) > a1:
+                a1 = len(d_list[x]['desc'])
+        while d_location is None:
+            screen_update(title, 'Select Location')
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
+            ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
+            for x in range(len(d_list)):
+                d1, d2 = [d_list[x]['c_slot_max'] - len(d_list[x]['c_slot']),
+                          d_list[x]['f_slot_max'] - len(d_list[x]['f_slot'])]
+                if d_list[x]['city'] not in selection:
+                    selection[d_list[x]['city']] = d_list[x]['city']
+                    ctr_it('{0:<{1}}  {2:^{3}}  {4:^{5}}'.format(d_list[x]['desc'], a1, d1, b1, d2, c1))
+            div_line()
+            d_select = input(' Enter selection : ')
+            if len(d_select) >= 2:
                 if d_select.lower() == 'exit':
                     return
                 else:
-                    for key, value in selection.items():
-                        if d_select.lower() in value.lower():
-                            d_location = key
+                    for x in range(len(d_list)):
+                        if d_select.lower() == d_list[x]['desc'].lower():
+                            d_location = d_list[x]['city']
+                            break
+                    else:
+                        for x in range(len(d_list)):
+                            if d_select.lower() in d_list[x]['desc'].lower():
+                                d_location = d_list[x]['city']
+                                break
     d_list[:] = [d for d in d_list if d.get('city') == d_location]
-    selection.clear()
-    d_building = None
+    d_list = sorted(d_list, key=itemgetter('type'))
     if len(d_list) == 1:
         d_building = d_list[0]['type']
     else:
+        d_building = None
+        # Select Building
+        a, b, c = ['Building', 'Time', 'Slots']
+        a1, b1, c1 = [len(a), len(b), len(c)]
         for x in range(len(d_list)):
-            if d_list[x]['type'] not in selection:
-                selection[d_list[x]['type']] = t(d_list[x]['type'])
-
-    # Select Building
-    while d_building is None:
-        screen_update(title, 'Choose Building For Location')
-        ctr_it('Location: {0}'.format(t(d_location)))
-        ctr_it(' ')
-        div_line('-')
-        ctr_it('~~~ Available Buildings ~~~')
-        display_it(selection)
-        div_line()
-        d_select = input(' Enter selection : ')
-        if len(d_select) >= 3:
-            if all(i.isalpha() or i == ' ' for i in d_select):
+            if len(d_list[x]['type']) > a1:
+                a1 = len(d_list[x]['type'])
+            if len('{0}'.format(cvt_time(d_list[x]['time']))) > b1:
+                b1 = len('{0}'.format(cvt_time(d_list[x]['time'])))
+        while d_building is None:
+            screen_update(title, 'Choose Building For Location')
+            ctr_it('Location: {0}'.format(t(d_location)))
+            ctr_it(' ')
+            div_line('-')
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
+            ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
+            for x in range(len(d_list)):
+                if d_list[x]['location'] == 'city':
+                    d = d_list[x]['c_slot_max'] - len(d_list[x]['c_slot'])
+                else:
+                    d = d_list[x]['f_slot_max'] - len(d_list[x]['f_slot'])
+                ctr_it('{0:<{1}}  {2:>{3}}  {4:^{5}}'.format(
+                    d_list[x]['type'], a1, cvt_time(d_list[x]['time']), b1, d, c1))
+            div_line()
+            d_select = input(' Enter selection : ')
+            if len(d_select) >= 3:
                 if d_select.lower() == 'exit':
                     return
                 else:
-                    for key, value in selection.items():
-                        if d_select.lower() in value.lower() or d_select.lower() == value.lower():
-                            d_building = key
+                    for x in range(len(d_list)):
+                        if d_select.lower() == t(d_list[x]['type'].lower()):
+                            d_building = d_list[x]['type']
                             break
+                    else:
+                        for x in range(len(d_list)):
+                            if d_select.lower() in t(d_list[x]['type'].lower()):
+                                d_building = d_list[x]['type']
+                                break
     d_list[:] = [d for d in d_list if d.get('type') == d_building]
     if d_list[0]['location'] == 'city':
         max_slot = d_list[0]['c_slot_max'] - len(d_list[0]['c_slot'])
