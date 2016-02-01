@@ -1,7 +1,161 @@
 [
   {
-    "en": {
+    "type": "Dansk",
+    "locale": {
       "type": "English",
+      "01": "DoA Tools"
+    }
+  },
+  {
+    "type": "Deutsch",
+    "locale": {
+      "type": "French",
+      "01": "DoA Tools"
+    }
+  },
+  {
+    "type": "Español",
+    "locale": {
+      "type": "French",
+      "01": "DoA Tools"
+    }
+  },
+  {
+    "type": "English",
+    "locale": {
+      "01": "INITIALIZING SCRIPT",
+      "02": "Interrupted by User",
+      "03": "Select Game Account",
+      "04": "Saved Accounts",
+      "05": "NOTE: Enter NEW for a new account entry",
+      "06": "Enter selection",
+      "07": "Fill In The Relevant Account Information To Proceed",
+      "08": "Enter your USER ID number",
+      "09": "User ID",
+      "10": "Enter your DRAGON HEART code",
+      "11": "Fill In The Relevant Realm Information To Proceed",
+      "12": "Dragon Heart",
+      "13": "Enter the REALM number",
+      "14": "Realm Number",
+      "15": "Enter the Cluster Server number",
+      "16": "Refreshing Game Files. Please Wait...",
+      "17": "Retrieving Game Files. Please Wait...",
+      "18": "Initializing...",
+      "19": "Game Manifest",
+      "20": "Chests Matrix",
+      "21": "Translation Matrix",
+      "22": "Retrieving",
+      "23": "Retrying",
+      "24": "SERVER ERROR: Failed To Retrieve The",
+      "25": "Please Try Again Later...",
+      "26": "Player Data",
+      "27": "Forge Manifest",
+      "28": "Forge Data",
+      "29": "Processing",
+      "30": "SERVER ERROR: Failed To Process City/Outpost Data",
+      "31": "Craft Equipment",
+      "32": "Forge Ingredients",
+      "33": "Farm Mission",
+      "34": "Open Chests",
+      "35": "Unpack Arsenal",
+      "36": "Upgrade Buildings",
+      "37": "Fill Building Slots",
+      "38": "Train Troops",
+      "39": "Revive Souls",
+      "40": "Switch Realm",
+      "41": "Refresh Game",
+      "42": "Load Account",
+      "43": "Choose Language",
+      "44": "MAIN MENU",
+      "45": "What Would You Like To Do?",
+      "46": "Available Modules",
+      "47": "System Modules",
+      "48": "Select from the list or enter QUIT to exit script",
+      "49": "",
+      "50": "",
+      "51": "",
+      "52": "",
+      "53": "",
+      "54": "",
+      "55": "",
+      "56": "",
+      "57": "",
+      "58": "",
+      "59": "",
+      "60": "",
+      "61": "",
+      "62": "",
+      "63": "",
+      "64": "",
+      "65": "",
+      "66": "",
+      "67": "",
+      "68": "",
+      "69": "",
+      "70": "",
+      "71": "",
+      "72": "",
+      "73": "",
+      "74": "",
+      "75": "",
+      "76": "",
+      "77": "",
+      "78": "",
+      "79": "",
+      "80": "",
+      "81": "",
+      "82": "",
+      "83": "",
+      "84": "",
+      "85": "",
+      "86": "",
+      "87": "",
+      "88": "",
+      "89": "",
+      "90": "",
+      "91": "",
+      "92": "",
+      "93": "",
+      "94": "",
+      "95": "",
+      "96": "",
+      "97": "",
+      "98": "",
+      "99": " "
+    }
+  },
+  {
+    "type": "Français",
+    "locale": {
+      "01": "INITIALIZING SCRIPT",
+      "02": "DoA Tools"
+    }
+  },
+  {
+    "type": "Italiano",
+    "locale": {
+      "type": "French",
+      "01": "DoA Tools"
+    }
+  },
+  {
+    "type": "Nederlands",
+    "locale": {
+      "type": "French",
+      "01": "DoA Tools"
+    }
+  },
+  {
+    "type": "Svenska",
+    "locale": {
+      "type": "French",
+      "01": "DoA Tools"
+    }
+  },
+  {
+    "type": "Türkçe",
+    "locale": {
+      "type": "French",
       "01": "DoA Tools"
     }
   }

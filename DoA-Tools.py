@@ -8,7 +8,7 @@ from time import time, sleep
 
 __author__ = 'AlphaQ2 (Suresh Kumar)'
 __credits__ = 'Lucifa & Temprid'
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
 
 ########################################################################################################################
@@ -200,38 +200,34 @@ def prog(p_count, p_total, prefix, suffix=None):
 
 def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, unmute=True):
     global pData, mData, fData, pfData, cData, tData, d_conn
-    title_text = 'Refreshing' if pData or mData or fData or pfData or cData or tData else 'Retrieving'
-    sub_header = '{0} Game Files. Please Wait...'.format(title_text)
+    sub_hdr = '{0}'.format(lo['16']) if pData or mData or fData or pfData or cData or tData else '{0}'.format(lo['17'])
     w1_data, w2_data = [None, None]
     max_count, count = [0, 0]
     for check in (w1, w2, w3, pl, fm, pf):
         if check:
             max_count += 1
     if unmute:
-        screen_update(title, sub_header)
-        prog(count, max_count, 'Initializing...')
+        screen_update(title, sub_hdr)
+        prog(count, max_count, '{0}'.format(lo['18']))
 
     # Get Manifest and Translation
     conn = http.client.HTTPConnection('wackoscripts.com', 80)
-    req = [{'0': w1, '1': 'Game Manifest', '2': 'manifest'},
-           {'0': w2, '1': 'Chests Matrix', '2': 'chest'},
-           {'0': w3, '1': 'Translation Matrix', '2': 'translation'}]
+    req = [{'0': w1, '1': '{0}'.format(lo['19']), '2': 'manifest'},
+           {'0': w2, '1': '{0}'.format(lo['20']), '2': 'chest'},
+           {'0': w3, '1': '{0}'.format(lo['21']), '2': 'translation'}]
     for x in range(len(req)):
         if req[x]['0']:
             name = req[x]['1']
-            if unmute:
-                screen_update(title, sub_header)
-                prog(count, max_count, 'Retrieving {0}'.format(name))
             url = 'http://wackoscripts.com/sanctuary/{0}.json'.format(req[x]['2'])
+            if unmute:
+                screen_update(title, sub_hdr)
+                prog(count, max_count, '{0} {1}'.format(lo['22'], name))
             for web_retry in range(2):
                 try:
                     conn.request('GET', url)
                     conn_resp = conn.getresponse()
                     conn_data = json.loads(conn_resp.read().decode('utf-8'))
                     count += 1
-                    if unmute:
-                        screen_update(title, sub_header)
-                        prog(count, max_count, 'Retrieving {0}'.format(name))
                     if req[x]['2'] == 'manifest':
                         mData = conn_data
                     elif req[x]['2'] == 'chest':
@@ -241,14 +237,15 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
                     break
                 except (KeyError, TypeError):
                     if unmute:
-                        screen_update(title, sub_header)
-                        prog(count, max_count, 'Retrieving {0}'.format(name), 'Retrying {0} of 2'.format(web_retry + 1))
+                        screen_update(title, sub_hdr)
+                        prog(count, max_count, '{0} {1}'.format(lo['22'], name),
+                             '{0}: {1}/2'.format(lo['23'], web_retry + 1))
                     sleep(1)
                     continue
             else:
                 div_line('#')
-                ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(name))
-                ctr_it('Please Try Again Later...')
+                ctr_it('{0} {1}'.format(lo['24'], name))
+                ctr_it('{0}'.format(lo['25']))
                 div_line('#')
                 sleep(5)
                 quit()
@@ -270,22 +267,19 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
 
     # Get Forge and Player
     d_conn.connect()
-    req = [{'0': pl, '1': 'Player Data', '2': 'player', '3': '?', '4': 'GET', '5': False},
-           {'0': fm, '1': 'Forge Manifest', '2': 'forge/forge', '3': '', '4': 'GET', '5': True},
-           {'0': pf, '1': 'Forge Data', '2': 'forge/player_forge_info', '3': '', '4': 'GET', '5': True}]
+    req = [{'0': pl, '1': '{0}'.format(lo['26']), '2': 'player', '3': '?', '4': 'GET', '5': False},
+           {'0': fm, '1': '{0}'.format(lo['27']), '2': 'forge/forge', '3': '', '4': 'GET', '5': True},
+           {'0': pf, '1': '{0}'.format(lo['28']), '2': 'forge/player_forge_info', '3': '', '4': 'GET', '5': True}]
     for x in range(len(req)):
         if req[x]['0']:
             name = req[x]['1']
             if unmute:
-                screen_update(title, sub_header)
-                prog(count, max_count, 'Retrieving {0}'.format(name))
+                screen_update(title, sub_hdr)
+                prog(count, max_count, '{0} {1}'.format(lo['22'], name))
             for web_retry in range(2):
                 try:
                     conn_data = web_ops(d_conn, req[x]['2'], req[x]['3'], req[x]['4'], req[x]['5'])
                     count += 1
-                    if unmute:
-                        screen_update(title, sub_header)
-                        prog(count, max_count, 'Retrieving {0}'.format(name))
                     if req[x]['2'] == 'forge/forge':
                         fData = conn_data
                     elif req[x]['2'] == 'player':
@@ -295,43 +289,42 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
                     break
                 except (KeyError, TypeError):
                     if unmute:
-                        screen_update(title, sub_header)
-                        prog(count, max_count, 'Retrieving {0}'.format(name), 'Retrying {0} of 2'.format(web_retry + 1))
+                        screen_update(title, sub_hdr)
+                        prog(count, max_count, '{0} {1}'.format(lo['22'], name),
+                             '{0}: {1}/2'.format(lo['23'], web_retry + 1))
                     sleep(1)
                     continue
             else:
                 div_line('#')
-                ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(name))
-                ctr_it('Please Try Again Later...')
+                ctr_it('{0} {1}'.format(lo['24'], name))
+                ctr_it('{0}'.format(lo['25']))
                 div_line('#')
                 sleep(5)
                 quit()
 
     # Process City Data
     if op:
-        if unmute:
-            screen_update(title, sub_header)
-            prog(1, 1, 'Retrieving City/Outpost Data')
         cData = {}
         for loc_key in sorted(pData['cities']):
+            if unmute:
+                screen_update(title, sub_hdr)
+                prog(1, 1, '{0} {1}'.format(lo['29'], t(loc_key)))
             for web_retry in range(5):
                 try:
                     current_location = web_ops(d_conn, 'cities/{0}'.format(pData['cities'][loc_key]['id']), '')
                     cData[loc_key] = current_location
-                    if unmute:
-                        screen_update(title, sub_header)
-                        prog(1, 1, 'Processing {0}'.format(t(loc_key)))
                     break
                 except (KeyError, TypeError):
                     if unmute:
-                        screen_update(title, sub_header)
-                        prog(1, 1, 'Processing {0}'.format(t(loc_key)), 'Retrying {0} of 5'.format(web_retry + 1))
+                        screen_update(title, sub_hdr)
+                        prog(1, 1, '{0} {1}'.format(lo['29'], t(loc_key)),
+                             '{0}: {1}/5'.format(lo['23'], web_retry + 1))
                     sleep(1)
                     continue
             else:
                 div_line('#')
-                ctr_it('SERVER ERROR: Failed To Process City/Outpost Data')
-                ctr_it('Please Try Again Later...')
+                ctr_it('{0}'.format(lo['30']))
+                ctr_it('{0}'.format(lo['25']))
                 div_line('#')
                 quit()
     d_conn.close()
@@ -393,15 +386,19 @@ def ctr_it(string, prefix=False, suffix=False):
 def choose_language():
     global lo
     os.system('cls' if os.name == 'nt' else 'clear')
-    conn = http.client.HTTPConnection('wackoscripts.com', 80)
-    url = 'http://wackoscripts.com/sanctuary/locale.json'
+    # conn = http.client.HTTPConnection('wackoscripts.com', 80)
+    # url = 'http://wackoscripts.com/sanctuary/locale.json'
+    conn = http.client.HTTPSConnection('dl.dropboxusercontent.com', 443)
+    url = 'https://dl.dropboxusercontent.com/u/83643256/locale.json'
+    conn_data = None
     for web_retry in range(2):
         try:
             conn.request('GET', url)
             conn_resp = conn.getresponse()
             conn_data = json.loads(conn_resp.read().decode('utf-8'))
             break
-        except (KeyError, TypeError):
+        except (KeyError, TypeError) as err:
+            print(err)
             sleep(1)
             continue
     else:
@@ -411,6 +408,27 @@ def choose_language():
         div_line('#')
         sleep(5)
         quit()
+    if conn_data:
+        d_lang = None
+        while d_lang is None:
+            ctr_it('~~~ Sprog/Sprache/Language/Idioma/Langue/Lingua/Taal/Språk/Dil ~~~', prefix=True)
+            for x in range(len(conn_data)):
+                ctr_it(conn_data[x]['type'])
+            d_select = input('\n Vælge/Auswählen/Select/Seleccionar/Sélectionner/Selezionare/Välj/Seçin : ')
+            if len(d_select) >= 3:
+                for x in range(len(conn_data)):
+                    if d_select.lower() == conn_data[x]['type'].lower():
+                        d_lang = conn_data[x]['type']
+                        lo = conn_data[x]['locale']
+                        break
+                else:
+                    for x in range(len(conn_data)):
+                        if d_select.lower() in conn_data[x]['type'].lower():
+                            d_lang = conn_data[x]['type']
+                            lo = conn_data[x]['locale']
+                            break
+        with open('locale.json', 'w') as create_file:
+            json.dump(lo, create_file)
 
 
 def t(string):
@@ -567,12 +585,12 @@ def enter_script(title):
     if selection:
         selected = False
         while not selected:
-            screen_update(title, 'Select Game Account')
-            ctr_it('~~~ Saved Accounts ~~~', suffix=True)
+            screen_update(title, '{0}'.format(lo['03']))
+            ctr_it('~~~ {0} ~~~'.format(lo['04']), suffix=True)
             display_it(selection)
-            print('\n\n NOTE: Enter NEW for a new account entry')
+            print('\n\n {0}'.format(lo['05']))
             div_line()
-            i = input(' Enter selection : ')
+            i = input(' {0} : '.format(lo['06']))
             if len(i) >= 1:
                 if i.lower() in 'new':
                     break
@@ -610,17 +628,17 @@ def check_input(entry, input_list):
 def get_account_info(title):
     global d_ui, d_dh, d_si
     while not d_ui:
-        screen_update(title, 'Fill In The Relevant Account Information To Proceed')
-        d_select = input(' Enter your USER ID number : ')
+        screen_update(title, '{0}'.format(lo['07']))
+        d_select = input(' {0} : '.format(lo['08']))
         if len(d_select) >= 1:
             if d_select.isnumeric():
                 d_ui = int(d_select)
 
     while not d_dh:
-        screen_update(title, 'Fill In The Relevant Account Information To Proceed')
-        ctr_it('User ID: {0}'.format(d_ui))
+        screen_update(title, '{0}'.format(lo['07']))
+        ctr_it('{0}: {1}'.format(lo['09'], d_ui))
         div_line()
-        d_select = input(' Enter your DRAGON HEART code : ')
+        d_select = input(' {0} : '.format(lo['10']))
         if len(d_select) >= 3:
             if d_select.isalnum():
                 d_dh = d_select
@@ -629,21 +647,21 @@ def get_account_info(title):
 def get_realm_info(title):
     global d_rn, d_cn
     while not d_rn:
-        screen_update(title, 'Fill In The Relevant Realm Information To Proceed')
-        ctr_it('User ID: {0}   Dragon Heart: {1}'.format(d_ui, d_dh))
+        screen_update(title, '{0}'.format(lo['11']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['09'], d_ui, lo['12'], d_dh))
         ctr_it(' ')
         div_line()
-        d_select = input(' Enter the REALM number : ')
+        d_select = input(' {0} : '.format(lo['13']))
         if len(d_select) >= 1:
             if d_select.isnumeric():
                 d_rn = int(d_select)
 
     while not d_cn:
-        screen_update(title, 'Fill In The Relevant Realm Information To Proceed')
-        ctr_it('User ID: {0}   Dragon Heart: {1}'.format(d_ui, d_dh))
-        ctr_it('Realm Number: {0}'.format(d_rn))
+        screen_update(title, '{0}'.format(lo['11']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['09'], d_ui, lo['12'], d_dh))
+        ctr_it('{0}: {1}'.format(lo['14'], d_rn))
         div_line()
-        d_select = input(' Enter the Cluster Server number (known as C number) : ')
+        d_select = input(' {0} : '.format(lo['15']))
         if len(d_select) >= 1:
             if d_select.isnumeric():
                 d_cn = int(d_select)
@@ -755,13 +773,14 @@ def create_equipment(title):
         ctr_it(' ')
         div_line('-')
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}} {6:^{7}} {8:^{9}} {10:^{11}} {12:^{13}} {14:^{15}}'.format(
-            a, a1, b, b1, c, c1, d, d1, e, e1, f, f1, g, g1, h, h1))
+                a, a1, b, b1, c, c1, d, d1, e, e1, f, f1, g, g1, h, h1))
         ctr_it('{0}  {1}  {2} {3} {4} {5} {6} {7}'.format(
-            '~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1, '~' * f1, '~' * g1, '~' * h1))
+                '~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1, '~' * f1, '~' * g1, '~' * h1))
         for x in range(len(d_list)):
             ctr_it('{0:<{1}}  {2:^{3},}  {4:>{5},} {6:>{7},} {8:>{9},} {10:>{11},} {12:>{13},} {14:>{15},}'.format(
-                t(d_list[x]['item']), a1, d_list[x]['craftable'], b1, d_list[x]['defense'], c1, d_list[x]['life'], d1,
-                d_list[x]['melee'], e1, d_list[x]['range'], f1, d_list[x]['range'], g1, d_list[x]['speed'], h1))
+                    t(d_list[x]['item']), a1, d_list[x]['craftable'], b1, d_list[x]['defense'], c1, d_list[x]['life'],
+                    d1,
+                    d_list[x]['melee'], e1, d_list[x]['range'], f1, d_list[x]['range'], g1, d_list[x]['speed'], h1))
         div_line()
         d_select = input(' Enter selection : ')
         if len(d_select) >= 3:
@@ -780,12 +799,12 @@ def create_equipment(title):
         ctr_it(' ')
         div_line('-')
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}  {10:^{11}}'.format(
-            c, c1, d, d1, e, e1, f, f1, g, g1, h, h1))
+                c, c1, d, d1, e, e1, f, f1, g, g1, h, h1))
         ctr_it('{0}  {1}  {2}  {3}  {4}  {5}'.format('~' * c1, '~' * d1, '~' * e1, '~' * f1, '~' * g1, '~' * h1))
         for x in range(len(d_list)):
             ctr_it('{0:<{1},}  {2:^{3},}  {4:>{5},}  {6:>{7},}  {8:>{9},}  {10:>{11},}'.format(
-                d_list[x]['defense'], c1, d_list[x]['life'], d1, d_list[x]['melee'], e1, d_list[x]['range'], f1,
-                d_list[x]['range'], g1, d_list[x]['speed'], h1))
+                    d_list[x]['defense'], c1, d_list[x]['life'], d1, d_list[x]['melee'], e1, d_list[x]['range'], f1,
+                    d_list[x]['range'], g1, d_list[x]['speed'], h1))
         print('\n NOTE: Enter ATTRIBUTE@REQUIREMENT (e.g. speed@300)')
         div_line()
         d_select = input(' Enter selection : ')
@@ -820,7 +839,7 @@ def create_equipment(title):
         screen_update(title, 'Set Delay Between Equipment Crafting')
         ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
         ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}'.format(
-            d_stat, d_attrib.title(), d_batch))
+                d_stat, d_attrib.title(), d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -831,7 +850,7 @@ def create_equipment(title):
         screen_update(title, 'Ready To Begin Crafting')
         ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
         ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s'.format(
-            d_stat, d_attrib.title(), d_batch, d_delay))
+                d_stat, d_attrib.title(), d_batch, d_delay))
         d_proceed = proceed_run('equipment crafting')
         if d_proceed == 'exit':
             return
@@ -848,16 +867,16 @@ def create_equipment(title):
         screen_update(title, 'Progress Report...')
         ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
         ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s   Elapsed Time: {4}'.format(
-            d_stat, d_attrib.title(), d_batch, d_delay, cvt_time(time() - d_start)))
+                d_stat, d_attrib.title(), d_batch, d_delay, cvt_time(time() - d_start)))
         div_line('-')
         prog(x, d_batch, 'Crafting {0} Of {1}'.format(x, d_batch),
              'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}\n'.format(
-                 forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
+                     forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
         if kept_items:
             ctr_it('~~~ Kept Items ~~~')
             for y in range(len(kept_items)):
                 k_item = 'Item {0}: '.format(y + 1) + ', '.join('{0} {1}'.format(
-                    k_i.title(), v_i) for k_i, v_i in kept_items[y].items())
+                        k_i.title(), v_i) for k_i, v_i in kept_items[y].items())
                 if len(k_item) > len_item:
                     len_item = len(k_item)
                 ctr_it('{0:<{1}}'.format(k_item, len_item))
@@ -910,12 +929,12 @@ def create_equipment(title):
     div_line('-')
     prog(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)),
          'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}'.format(
-             forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
+                 forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
     if kept_items:
         ctr_it('~~~ Kept Items ~~~', prefix=True)
         for y in range(len(kept_items)):
             k_item = 'Item {0}: '.format(y + 1) + ', '.join('{0} {1}'.format(
-                k_i.title(), v_i) for k_i, v_i in kept_items[y].items())
+                    k_i.title(), v_i) for k_i, v_i in kept_items[y].items())
             ctr_it('{0:<{1}}'.format(k_item, len_item))
     if crushed_items:
         ctr_it('~~~ Crushed Items Received ~~~', prefix=True)
@@ -992,7 +1011,7 @@ def forge_ingredient(title):
         ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
         for x in range(len(d_list)):
             ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5},}'.format(
-                t(d_list[x]['item']), a1, d_list[x]['available'], b1, d_list[x]['craftable'], c1))
+                    t(d_list[x]['item']), a1, d_list[x]['available'], b1, d_list[x]['craftable'], c1))
         div_line()
         d_select = input(' Enter selection : ')
         if len(d_select) >= 3:
@@ -1045,7 +1064,7 @@ def forge_ingredient(title):
         screen_update(title, 'Progress Report...')
         ctr_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
         ctr_it('Delay: {0}s   Elapsed Time: {1}'.format(
-            d_delay, cvt_time(time() - d_start)))
+                d_delay, cvt_time(time() - d_start)))
         div_line('-')
         prog(x, d_batch, 'Forging {0} of {1}'.format(x, d_batch), ' ')
         if selection:
@@ -1098,7 +1117,7 @@ def farm_mission(title):
     for x in range(len(adventurers)):
         if adventurers[x]['current_mission'] is not None:
             x_param = 'adventurer_id={0}&mission_type={1}&'.format(
-                adventurers[x]['adventurer_id'], adventurers[x]['current_mission'])
+                    adventurers[x]['adventurer_id'], adventurers[x]['current_mission'])
             item_json = web_ops(d_conn, 'player_missions/claim_mission', x_param)
             if item_json['result']['success']:
                 claimed = True
@@ -1177,7 +1196,7 @@ def farm_mission(title):
                 selection[d_list[x]['mission']] = d_list[x]['desc']
                 c = 'No Limit' if d_list[x]['batch'] == 9999999 else '{0:,}'.format(d_list[x]['batch'])
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5}}'.format(
-                    d_list[x]['desc'], a1, cvt_time(d_list[x]['time'], show_seconds=False), b1, c, c1))
+                        d_list[x]['desc'], a1, cvt_time(d_list[x]['time'], show_seconds=False), b1, c, c1))
         div_line()
         d_select = input(' Enter selection : ')
         if len(d_select) >= 3:
@@ -1241,7 +1260,7 @@ def farm_mission(title):
     while True:
         screen_update(title, 'Select Speed Items To Use')
         ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(
-            t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), t(d_adventurer)))
+                t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), t(d_adventurer)))
         ctr_it(' ')
         div_line('-')
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, a1, b, b1, c, c1, d, d1))
@@ -1249,8 +1268,8 @@ def farm_mission(title):
         reduced_time = d_list[0]['time']
         for key in range(len(d_speed)):
             ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}'.format(
-                d_speed[key]['item'], a1, cvt_time(d_speed[key]['time'], show_seconds=False), b1,
-                d_speed[key]['quantity'], c1, d_speed[key]['use'], d1))
+                    d_speed[key]['item'], a1, cvt_time(d_speed[key]['time'], show_seconds=False), b1,
+                    d_speed[key]['quantity'], c1, d_speed[key]['use'], d1))
             if d_speed[key]['use']:
                 reduced_time -= d_speed[key]['time'] * d_speed[key]['use']
                 reduced_time = 0 if reduced_time <= 0 else reduced_time
@@ -1289,7 +1308,7 @@ def farm_mission(title):
     while d_batch is None:
         screen_update(title, 'Number Of Times To Farm Mission')
         ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), cvt_time(
-            d_list[0]['time'], show_seconds=False), t(d_adventurer)))
+                d_list[0]['time'], show_seconds=False), t(d_adventurer)))
         ctr_it(' ')
         d_batch = set_batch(d_max_queue + 1, 'times would you like to farm the mission')
         if d_batch == 'exit':
@@ -1300,7 +1319,7 @@ def farm_mission(title):
     while d_delay is None:
         screen_update(title, 'Set Delay Between Game Requests')
         ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), cvt_time(
-            d_list[0]['time'], show_seconds=False), t(d_adventurer)))
+                d_list[0]['time'], show_seconds=False), t(d_adventurer)))
         ctr_it('Batches: {0:,}'.format(d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
@@ -1331,7 +1350,7 @@ def farm_mission(title):
                 screen_update(title, 'Progress Report...')
                 ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
                 ctr_it('Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                    d_batch, d_delay, cvt_time(time() - d_start)))
+                        d_batch, d_delay, cvt_time(time() - d_start)))
                 div_line('-')
                 if dur == -1:
                     prog(x, d_batch, 'Farming {0} of {1}'.format(x, d_batch), 'Initializing...')
@@ -1489,7 +1508,7 @@ def open_chest(title):
                                 d_list[x]['open'] = False if d_list[x]['open'] else True
     d_list[:] = [d for d in d_list if d.get('open') == True]
     d_chest = 'Chest: {0}'.format(t(d_list[0]['chest'])) if len(d_list) == 1 else 'Types Of Chest: {0}'.format(
-        len(d_list))
+            len(d_list))
     d_total, max_chest = [0, 0]
     for x in range(len(d_list)):
         d_total += d_list[x]['qty']
@@ -1591,7 +1610,7 @@ def open_chest(title):
                         screen_update(title, 'Progress Report...')
                         ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
                         ctr_it('Open in Batches: {0}   Delay: {1}s   Elapsed Time: {2}'.format(
-                            d_batch, d_delay, cvt_time(time() - d_start)))
+                                d_batch, d_delay, cvt_time(time() - d_start)))
                         div_line('-')
                         if len(d_list) > 1:
                             prog(ttl_open, d_total, 'Overall Opened: {0:,} of {1:,}'.format(ttl_open, d_total))
@@ -1621,7 +1640,7 @@ def open_chest(title):
     ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
     prog(1, 1, 'Chest Opening Completed!', 'Process completed in {0}'.format(
-        cvt_time(time() - d_start)))
+            cvt_time(time() - d_start)))
     for category in ('Chests', 'Arsenal', 'Speeds', 'Grants & Seals', 'Others'):
         if len(overall_received[category]) > 0:
             selection = overall_received[category]
@@ -1717,7 +1736,7 @@ def unpack_arsenal(title):
                 e = '{0:,}'.format(d_list[x]['bin_type'] * d_list[x]['quantity'] * d_list[x]['power'])
                 f = 'Yes' if d_list[x]['use'] == True else 'No'
                 ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5}}  {6:>{7}}'.format(
-                    d_list[x]['bin_desc'], a1, d_list[x]['quantity'], b1, e, c1, f, d1))
+                        d_list[x]['bin_desc'], a1, d_list[x]['quantity'], b1, e, c1, f, d1))
             print('\n Note: ALL = Unpacks all troop bins listed above')
             div_line()
             d_select = input(' Enter selection : ')
@@ -1797,7 +1816,7 @@ def unpack_arsenal(title):
             screen_update(title, 'Progress Report...')
             ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
             ctr_it('Bins Selected: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                d_batch, d_delay, cvt_time(time() - d_start)))
+                    d_batch, d_delay, cvt_time(time() - d_start)))
             div_line('-')
             prog(total_opened, d_batch, 'Unpacking {0:,} of {1:,}'.format(total_opened, d_batch))
             if len(d_list) > 1:
@@ -1957,7 +1976,7 @@ def fill_building(title):
                 else:
                     d = d_list[x]['f_slot_max'] - len(d_list[x]['f_slot'])
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:^{5}}'.format(
-                    d_list[x]['type'], a1, cvt_time(d_list[x]['time']), b1, d, c1))
+                        d_list[x]['type'], a1, cvt_time(d_list[x]['time']), b1, d, c1))
             div_line()
             d_select = input(' Enter selection : ')
             if len(d_select) >= 3:
@@ -2024,7 +2043,7 @@ def fill_building(title):
                             if c_key in capital_buildings.keys():
                                 if c_value > capital_buildings[c_key]:
                                     req = '{0} Level {1} Required. Yours is level {2}'.format(
-                                        c_key, c_value, capital_buildings[c_key])
+                                            c_key, c_value, capital_buildings[c_key])
                                     req_check.append(req)
                             else:
                                 req = '{0} Level {1} Required. Yours is not built'.format(c_key, c_value)
@@ -2034,7 +2053,7 @@ def fill_building(title):
                             if c_key in pData['items']:
                                 if pData['items'][c_key] < c_value:
                                     req = '{0:,} {1} Required. You have {2:,}'.format(
-                                        c_value, c_key, pData['items'][c_key])
+                                            c_value, c_key, pData['items'][c_key])
                                     req_check.append(req)
                             else:
                                 req = '{0:,} {1} Required. You have none'.format(c_value, c_key)
@@ -2044,7 +2063,7 @@ def fill_building(title):
                             if c_key in cData['capital']['city']['resources']:
                                 if cData['capital']['city']['resources'][c_key] < c_value:
                                     req = '{0:,} {1} Required. You have {2:,}'.format(
-                                        c_value, c_key, cData['capital']['city']['resources'][c_key])
+                                            c_value, c_key, cData['capital']['city']['resources'][c_key])
                                     req_check.append(req)
                             else:
                                 req = '{0:,} {1} Required. You have none'.format(c_value, c_key)
@@ -2106,9 +2125,9 @@ def fill_building(title):
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>{9}}'.format(
-                    selection[key]['item'], a1, cvt_time(selection[key]['time'], show_seconds=False), b1,
-                    selection[key]['quantity'], c1, cvt_time(selection[key]['exceed'], show_seconds=False),
-                    d1, use_item, e1))
+                        selection[key]['item'], a1, cvt_time(selection[key]['time'], show_seconds=False), b1,
+                        selection[key]['quantity'], c1, cvt_time(selection[key]['exceed'], show_seconds=False),
+                        d1, use_item, e1))
             print('\n Exceeding - Item used when duration exceeds the displayed time')
             div_line('-')
             print(' Selection options available:')
@@ -2182,7 +2201,7 @@ def fill_building(title):
             screen_update(title, 'Progress Report')
             ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
             ctr_it('Slots To Fill: {0}   Delay: {1}   Elapsed Time: {2}'.format(
-                d_slots, d_delay, cvt_time(time() - d_start)))
+                    d_slots, d_delay, cvt_time(time() - d_start)))
             div_line('-')
             if speeds_used:
                 prog(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots))
@@ -2196,12 +2215,12 @@ def fill_building(title):
                 prog(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots), 'Initializing...')
             if duration == -1:
                 x_param = 'city%5F{0}%5B{0}%5Ftype%5D={1}&%5Fmethod=post&city%5F{0}%5Bslot%5D={2}&'.format(
-                    'building', d_building, slots[x])
+                        'building', d_building, slots[x])
                 for web_retry in range(5):
                     try:
                         sleep(d_delay)
                         json_data = web_ops(d_conn, 'cities/{0}/buildings'.format(
-                            d_list[0]['location_id']), x_param)
+                                d_list[0]['location_id']), x_param)
                         result = json_data['result']['success']
                         if result:
                             duration = json_data['result']['job']['duration']
@@ -2416,7 +2435,7 @@ def upgrade_building(title):
                         if c_key in capital_buildings.keys():
                             if c_value > capital_buildings[c_key]:
                                 req = '{0} Level {1} Required. Yours is level {2}'.format(
-                                    c_key, c_value, capital_buildings[c_key])
+                                        c_key, c_value, capital_buildings[c_key])
                                 req_check.append(req)
                         else:
                             req = '{0} Level {1} Required. Yours is not built'.format(c_key, c_value)
@@ -2426,7 +2445,7 @@ def upgrade_building(title):
                         if c_key in pData['items']:
                             if pData['items'][c_key] < c_value:
                                 req = '{0:,} {1} Required. You have {2:,}'.format(
-                                    c_value, c_key, pData['items'][c_key])
+                                        c_value, c_key, pData['items'][c_key])
                                 req_check.append(req)
                         else:
                             req = '{0:,} {1} Required. You have none'.format(c_value, c_key)
@@ -2436,7 +2455,7 @@ def upgrade_building(title):
                         if c_key in pData['research']:
                             if pData['research'][c_key] < c_value:
                                 req = '{1} Level {0} Required. Your {1} is at {2}'.format(
-                                    c_value, c_key, pData['research'][c_key])
+                                        c_value, c_key, pData['research'][c_key])
                                 req_check.append(req)
                         else:
                             req = '{1} Level {0} Required. You are yet to start on {1}'.format(c_value, c_key)
@@ -2446,7 +2465,7 @@ def upgrade_building(title):
                         if c_key in cData['capital']['city']['resources']:
                             if cData['capital']['city']['resources'][c_key] < c_value:
                                 req = '{0:,} {1} Required. You have {2:,}'.format(
-                                    c_value, c_key, cData['capital']['city']['resources'][c_key])
+                                        c_value, c_key, cData['capital']['city']['resources'][c_key])
                                 req_check.append(req)
         screen_update(title, 'Select Level To Upgrade')
         ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
@@ -2503,9 +2522,9 @@ def upgrade_building(title):
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
-                    selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
-                    selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
-                    len_d, use_item))
+                        selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
+                        selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
+                        len_d, use_item))
             print('\n Exceeding - Item used when duration exceeds the displayed time')
             div_line('-')
             print(' Selection options available:')
@@ -2574,7 +2593,7 @@ def upgrade_building(title):
                 while duration != 0:
                     screen_update('UPGRADE BUILDING', 'Progress Report...')
                     ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(
-                        t(d_location), t(d_building), d_level))
+                            t(d_location), t(d_building), d_level))
                     ctr_it('Delay: {0}s   Elapsed Time: {1}'.format(d_delay, cvt_time(time() - d_start)))
                     div_line('-')
                     if (d_level - min_level) > 1:
@@ -2596,7 +2615,7 @@ def upgrade_building(title):
                             sleep(d_delay + 1)
                             try:
                                 main_json = web_ops(d_conn, 'cities/{0}/buildings/{1}'.format(
-                                    d_list[x]['location_id'], d_list[x]['building_id']), x_param)
+                                        d_list[x]['location_id'], d_list[x]['building_id']), x_param)
                                 result = main_json['result']['success']
                                 if result:
                                     duration = int(main_json['result']['job']['duration'])
@@ -2636,7 +2655,7 @@ def upgrade_building(title):
                                     else:
                                         speeds_used[speed_item] = 1
                                     duration = int(
-                                        item_json['result']['item_response']['run_at'] - item_json['timestamp'])
+                                            item_json['result']['item_response']['run_at'] - item_json['timestamp'])
                                     if duration < 1:
                                         duration = 0
                                         d_list[x]['level'] = item_json['result']['item_response']['level']
@@ -2806,8 +2825,9 @@ def train_troop(title):
                 if d_list[x]['desc'] not in selection:
                     selection[d_list[x]['desc']] = d_list[x]['desc']
                     ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5},}'.format(
-                        d_list[x]['desc'], a1, d_list[x]['trainable'], b1, d_list[x]['trainable'] * d_list[x]['power'],
-                        c1))
+                            d_list[x]['desc'], a1, d_list[x]['trainable'], b1,
+                            d_list[x]['trainable'] * d_list[x]['power'],
+                            c1))
             div_line()
             d_select = input(' Enter selection : ')
             if len(d_select) >= 3:
@@ -2851,8 +2871,8 @@ def train_troop(title):
             ctr_it('{0}  {1}  {2}  {3}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1))
             for x in range(len(d_list)):
                 ctr_it('{0:<{1}}  {2:^{3}}  {4:^{5}}  {6:>{7}}'.format(
-                    d_list[x]['loc_desc'], a1, d_list[x]['tc_level'], b1, d_list[x]['tc_total'], c1,
-                    cvt_time(d_list[x]['time'] / d_list[x]['multiplier']), d1))
+                        d_list[x]['loc_desc'], a1, d_list[x]['tc_level'], b1, d_list[x]['tc_total'], c1,
+                        cvt_time(d_list[x]['time'] / d_list[x]['multiplier']), d1))
             div_line()
             d_select = input(' Enter selection : ')
             if len(d_select) >= 3:
@@ -2921,7 +2941,7 @@ def train_troop(title):
     while True:
         screen_update(title, 'Set Speed Items To Use For Each Queue')
         ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-            t(d_troop), t(d_location), d_list[0]['quantity']))
+                t(d_troop), t(d_location), d_list[0]['quantity']))
         ctr_it(' ')
         div_line('-')
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, a1, b, b1, c, c1, d, d1))
@@ -2929,8 +2949,8 @@ def train_troop(title):
         reduced_time = (d_list[0]['time'] / d_list[0]['multiplier']) * d_list[0]['quantity']
         for x in range(len(d_speed)):
             ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}'.format(
-                t(d_speed[x]['item']), a1, d_speed[x]['desc'], b1, d_speed[x]['qty'], c1,
-                d_speed[x]['use'], d1))
+                    t(d_speed[x]['item']), a1, d_speed[x]['desc'], b1, d_speed[x]['qty'], c1,
+                    d_speed[x]['use'], d1))
             if d_speed[x]['use'] != 0:
                 if d_speed[x]['time'] < 1:
                     for y in range(d_speed[x]['use']):
@@ -2981,7 +3001,7 @@ def train_troop(title):
     while d_batch is None:
         screen_update(title, 'Set Training Batches')
         ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-            t(d_troop), t(d_location), d_list[0]['quantity']))
+                t(d_troop), t(d_location), d_list[0]['quantity']))
         ctr_it(' ')
         d_batch = set_batch(d_max_queue + 1, 'batches to train?')
         if d_batch == 'exit':
@@ -2992,7 +3012,7 @@ def train_troop(title):
     while d_delay is None:
         screen_update(title, 'Set Delay Between Game Requests')
         ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-            t(d_troop), t(d_location), d_list[0]['quantity']))
+                t(d_troop), t(d_location), d_list[0]['quantity']))
         ctr_it('Target Batches: {0:,}'.format(d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
@@ -3003,7 +3023,7 @@ def train_troop(title):
     while not d_proceed:
         screen_update(title, 'Proceed With Troop Training?')
         ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-            t(d_troop), t(d_location), d_list[0]['quantity']))
+                t(d_troop), t(d_location), d_list[0]['quantity']))
         ctr_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
         d_proceed = proceed_run('training of troops?')
         if d_proceed == 'exit':
@@ -3022,9 +3042,9 @@ def train_troop(title):
                     break
                 screen_update(title, 'Progress Report...')
                 ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-                    t(d_troop), t(d_location), d_list[0]['quantity']))
+                        t(d_troop), t(d_location), d_list[0]['quantity']))
                 ctr_it('Target Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                    d_batch, d_delay, cvt_time(time() - d_start)))
+                        d_batch, d_delay, cvt_time(time() - d_start)))
                 div_line('-')
                 prog(x + 1, d_batch, 'Training Batch {0:,} of {1:,}'.format(x + 1, d_batch))
                 if speeds_used or powders_used:
@@ -3045,7 +3065,7 @@ def train_troop(title):
                     prog(0, 1, 'Initializing...')
                 if dur == -1:
                     x_param = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
-                        d_list[0]['quantity'], d_troop)
+                            d_list[0]['quantity'], d_troop)
                     for server_retry in range(5):
                         sleep(d_delay)
                         try:
@@ -3157,7 +3177,7 @@ def revive_soul(title):
             ctr_it('{0}  {1}  {2}'.format('~' * len_a, '~' * len_b, '~' * len_c))
             for x in range(len(d_list)):
                 ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5},}'.format(
-                    t(d_list[x]['troop']), len_a, d_list[x]['total'], len_b, d_list[x]['max'], len_c))
+                        t(d_list[x]['troop']), len_a, d_list[x]['total'], len_b, d_list[x]['max'], len_c))
             div_line()
             d_select = input(' Enter selection : ')
             if len(d_select) >= 3:
@@ -3203,22 +3223,22 @@ def refresh_data(title):
 #                                                      MENU CLASS                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 def menu():
-    module_dict = {create_equipment: 'Craft Equipment', forge_ingredient: 'Forge Ingredients',
-                   farm_mission: 'Farm Mission', open_chest: 'Open Chests', unpack_arsenal: 'Unpack Arsenal',
-                   upgrade_building: 'Upgrade Buildings', fill_building: 'Fill Building Slots',
-                   train_troop: 'Train Troops', revive_soul: 'Revive Souls'}
-    system_dict = {switch_realm: 'Switch Realm', refresh_data: 'Refresh Game', enter_script: 'Switch Account'}
-
+    module_dict = {create_equipment: '{0}'.format(lo['31']), forge_ingredient: '{0}'.format(lo['32']),
+                   farm_mission: '{0}'.format(lo['33']), open_chest: '{0}'.format(lo['34']),
+                   unpack_arsenal: '{0}'.format(lo['35']), upgrade_building: '{0}'.format(lo['36']),
+                   fill_building: '{0}'.format(lo['37']), train_troop: '{0}'.format(lo['38']),
+                   revive_soul: '{0}'.format(lo['39'])}
+    system_dict = {switch_realm: '{0}'.format(lo['40']), refresh_data: '{0}'.format(lo['41']),
+                   enter_script: '{0}'.format(lo['42']), choose_language: '{0}'.format(lo['43'])}
     while True:
-        screen_update('MAIN MENU', 'What Would You Like To Do?')
-        ctr_it('~~~ Available Modules ~~~')
+        screen_update('{0}'.format(lo['44']), '{0}'.format(lo['45']))
+        ctr_it('~~~ {0} ~~~'.format(lo['46']))
         display_it(module_dict)
-        print(' ')
-        ctr_it('~~~ System Modules ~~~')
+        ctr_it('~~~ {0} ~~~'.format(lo['47']), prefix=True)
         display_it(system_dict)
-        print('\n Select from the list or enter QUIT to exit script')
+        print('\n {0}'.format(lo['48']))
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 2:
             if all(x.isalpha() or x == ' ' for x in d_select):
                 if d_select.lower() == 'quit':
@@ -3244,18 +3264,16 @@ pData, mData, fData, pfData, cData, tData = ['', '', '', '', '', '']
 lo = {}
 try:
     with open('locale.json', 'r') as load_file:
-        l_file = json.load(load_file)
-        for lo_k, lo_v in range(len(l_file)):
-            lo[lo_k] = lo_v
+        lo = json.load(load_file)
 except FileNotFoundError:
     choose_language()
 
 # Launch Menu
 if __name__ == '__main__':
     try:
-        enter_script('INITIALIZING SCRIPT')
+        enter_script(lo['01'])
         menu()
     except KeyboardInterrupt:
-        print('\n Interrupted by User')
+        print('\n {0}'.format(lo['02']))
         sleep(3)
         quit()
