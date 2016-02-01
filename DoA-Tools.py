@@ -8,7 +8,7 @@ from time import time, sleep
 
 __author__ = 'AlphaQ2 (Suresh Kumar)'
 __credits__ = 'Lucifa & Temprid'
-__version__ = '1.3.4'
+__version__ = '1.5.0'
 __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
 
 ########################################################################################################################
@@ -17,277 +17,6 @@ __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                   GAME DICTIONARIES                                                  #
 # -------------------------------------------------------------------------------------------------------------------- #
-troop_dict = {'AbyssalRavager': 'Abyssal Ravager', 'AquaTroop': 'Fangtooth', 'ArcticLeviathan': 'Arctic Leviathan',
-              'ArmoredTransport': 'Armored Transport', 'BattleDragon': 'Battle Dragon', 'ChargeTroop': 'Storm Drake',
-              'ColossalMite': 'Colossal Mite', 'Conscript': 'Conscript', 'DarkSlayer': 'Dark Slayer',
-              'Defendo': 'Thunder Golem', 'DesertTroop': 'Sand Strider', 'DimensionalRuiner': 'Dimensional Ruiner',
-              'DragonRider': 'Dragon Rider', 'FireMirror': 'Fire Mirror', 'FireTroop': 'Lava Jaw',
-              'ForestTroop': 'Petrified Titan', 'FrostGiant': 'Frost Giant', 'Giant': 'Giant',
-              'Halberdsman': 'Halberdsman', 'Harrier': 'Steelshard Harrier', 'IceTroop': 'Soul Reaper',
-              'LightningCannon': 'Lightning Cannon', 'Longbowman': 'Longbowman', 'Minotaur': 'Minotaur',
-              'PackDragon': 'Pack Dragon', 'Porter': 'Porter', 'SeaSiren': 'Sea Siren',
-              'ShadowStalker': 'Shadow Stalker', 'Shaman': 'Shaman', 'Spy': 'Spy', 'StoneTroop': 'Granite Ogre',
-              'SwampTroop': 'Venom Dweller', 'SwiftStrikeDragon': 'Swift Strike Dragon', 'VengeWyrm': 'Venge Wyrm',
-              'VoltRanger': 'Volt Ranger', 'WarScarab': 'War Scarab', 'WindTroop': 'Banshee'}
-
-game_dict = {'Silo': 'Silo', 'Farm': 'Farm', 'Lumbermill': 'Lumbermill', 'Mine': 'Mine', 'Quarry': 'Quarry',
-             'EnergyCollector': 'Reaping Stones', 'Factory': 'Factory', 'DragonKeep': 'Dragon Keep', 'Wall': 'Wall',
-             'Fortress': 'Fortress', 'Garrison': 'Garrison', 'Home': 'Home', 'OfficerQuarter': 'Officer Quarter',
-             'Rookery': 'Rookery', 'Metalsmith': 'Metalsmith', 'MusterPoint': 'Muster Point', 'Cathedral': 'Cathedral',
-             'ScienceCenter': 'Science Center', 'Sentinel': 'Sentinel', 'StorageVault': 'Storage Vault',
-             'Theater': 'Theater', 'TrainingCamp': 'Training Camp', 'SpectralDragonKeep': 'Dragon Keep',
-             'DarkPortal': 'Dark Portal', 'Mausoleum': 'Mausoleum', 'KaiserDragonKeep': 'Dragon Keep', 'Forge': 'Forge',
-             'Greenhouse': 'Greenhouse', 'Library': 'Library', 'Workshop': 'Academy', 'CaveDragonKeep': 'Dragon Keep',
-             'CaveCathedral': 'Cathedral', 'CaveDepot': 'Depot', 'CaveForge': 'Forge', 'CaveGreenhouse': 'Greenhouse',
-             'CaveLibrary': 'Library', 'CaveTrainingCamp': 'Training Camp', 'CaveWorkshop': 'Academy',
-             'LunaShrine': 'Shrine', 'LunaDepot': 'Depot', 'LunaCathedral': 'Cathedral', 'LunaForge': 'Forge',
-             'LunaGreenhouse': 'Greenhouse', 'LunaLibrary': 'Library', 'LunaWorkshop': 'Academy',
-             'ColossusDragonKeep': 'Dragon Keep', 'ColossusWall': 'Wall', 'Warehouse': 'Warehouse',
-             'TroopQuarters': 'Troop Quarters', 'WarpGate': 'Warp Gate', 'WarpPortal': 'Warp Portal',
-             'LeviathanDragonKeep': 'Dragon Keep', 'LeviathanWall': 'Wall', 'LeviathanWarehouse': 'Warehouse',
-             'LeviathanTroopQuarters': 'Troop Quarters', 'LeviathanMarketplace': 'Marketplace', 'capital': 'Capital',
-             'cave': 'Steelshard Caverns', 'chrono': 'Cliffs of Chronos', 'colossus': 'The Lost City',
-             'desert': 'Solarian Highlands', 'fire': 'Fire Outpost', 'forest': 'Gaea Spring', 'ice': 'Ice Outpost',
-             'leviathan': 'The Abyssal Palace', 'luna': 'Luna Plains', 'skythrone': 'Skythrone',
-             'spectral': 'Spectral Ruins', 'stone': 'Stone Outpost', 'swamp': 'Sunken Temple', 'water': 'Water Outpost',
-             'wind': 'Wind Outpost'}
-
-forge_dict = {'AbyssalRavagerAmuletOfRenewal': 'Amulet Of Renewal', 'AbyssalRavagerChameleonPotion': 'Chameleon Potion',
-              'AbyssalRavagerEagleEyePotion': 'Eagle Eye Potion', 'AbyssalRavagerFarShotPotion': 'Far Shot Potion',
-              'AbyssalRavagerFuryPotion': 'Fury Potion', 'AbyssalRavagerIronskinPotion': 'Ironskin Potion',
-              'AbyssalRavagerQuicksilverPotion': 'Quicksilver Potion', 'AbyssalRavagerStasisPotion': 'Stasis Potion',
-              'AbyssalRavagerSunFireBreath': 'Sun Fire Breath', 'AbyssalRavagerVitalityPotion': 'Vitality Potion',
-              'ArcticLeviathanAmulet': 'Amulet', 'ArcticLeviathanChameleonPotion': 'Chameleon Potion',
-              'ArcticLeviathanEagleEyePotion': 'Eagle Eye Potion', 'ArcticLeviathanFarShotPotion': 'Far Shot Potion',
-              'ArcticLeviathanFuryPotion': 'Fury Potion', 'ArcticLeviathanGrimArrows': 'Grim Arrows',
-              'ArcticLeviathanIronskinPotion': 'Ironskin Potion', 'ArcticLeviathanPlating': 'Plating',
-              'ArcticLeviathanQuicksilverPotion': 'Quicksilver Potion', 'ArcticLeviathanShadowHelm': 'Shadow Helm',
-              'ArcticLeviathanStasisPotion': 'Stasis Potion', 'ArcticLeviathanVitalityPotion': 'Vitality Potion',
-              'ArmoredTransportChameleonPotion': 'Chameleon Potion', 'ArmoredTransportClaws': 'Claws',
-              'ArmoredTransportFuryPotion': 'Fury Potion', 'ArmoredTransportIronskinPotion': 'Ironskin Potion',
-              'ArmoredTransportPlating': 'Plating', 'ArmoredTransportQuicksilverPotion': 'Quicksilver Potion',
-              'ArmoredTransportStasisPotion': 'Stasis Potion', 'ArmoredTransportVitalityPotion': 'Vitality Potion',
-              'BansheeChameleonPotion': 'Chameleon Potion', 'BansheeClaws': 'Claws', 'BansheeCloak': 'Cloak',
-              'BansheeFuryPotion': 'Fury Potion', 'BansheeGrimScythe': 'Grim Scythe',
-              'BansheeIronskinPotion': 'Ironskin Potion', 'BansheeQuicksilverPotion': 'Quicksilver Potion',
-              'BansheeShadowHelm': 'Shadow Helm', 'BansheeStasisPotion': 'Stasis Potion',
-              'BansheeVitalityPotion': 'Vitality Potion', 'BattleDragonChameleonPotion': 'Chameleon Potion',
-              'BattleDragonClaws': 'Claws', 'BattleDragonFuryPotion': 'Fury Potion',
-              'BattleDragonGrimScythe': 'Grim Scythe', 'BattleDragonIronskinPotion': 'Ironskin Potion',
-              'BattleDragonPlating': 'Plating', 'BattleDragonQuicksilverPotion': 'Quicksilver Potion',
-              'BattleDragonShadowHelm': 'Shadow Helm', 'BattleDragonStasisPotion': 'Stasis Potion',
-              'BattleDragonVitalityPotion': 'Vitality Potion', 'BlackPowder': 'Black Powder',
-              'BluePowder': 'Blue Powder', 'ColossalMiteChameleonPotion': 'Chameleon Potion',
-              'ColossalMiteClaws': 'Claws', 'ColossalMiteEagleEyePotion': 'Eagle Eye Potion',
-              'ColossalMiteFarShotPotion': 'Far Shot Potion', 'ColossalMiteFuryPotion': 'Fury Potion',
-              'ColossalMiteGrimArrows': 'Grim Arrows', 'ColossalMiteIronskinPotion': 'Ironskin Potion',
-              'ColossalMitePlating': 'Plating', 'ColossalMiteQuicksilverPotion': 'Quicksilver Potion',
-              'ColossalMiteShadowHelm': 'Shadow Helm', 'ColossalMiteStasisPotion': 'Stasis Potion',
-              'ColossalMiteVitalityPotion': 'Vitality Potion', 'ConscriptAmulet': 'Amulet',
-              'ConscriptChameleonPotion': 'Chameleon Potion', 'ConscriptFuryPotion': 'Fury Potion',
-              'ConscriptHammer': 'Hammer', 'ConscriptIronskinPotion': 'Ironskin Potion',
-              'ConscriptQuicksilverPotion': 'Quicksilver Potion', 'ConscriptSolarMace': 'Solar Mace',
-              'ConscriptStarCirclet': 'Star Circlet', 'ConscriptStasisPotion': 'Stasis Potion',
-              'ConscriptVitalityPotion': 'Vitality Potion', 'CrackedCog': 'Cracked Cog',
-              'DarkSlayerChameleonPotion': 'Chameleon Potion', 'DarkSlayerFuryPotion': 'Fury Potion',
-              'DarkSlayerIronskinPotion': 'Ironskin Potion', 'DarkSlayerQuicksilverPotion': 'Quicksilver Potion',
-              'DarkSlayerRobes': 'Robes', 'DarkSlayerSolarMace': 'Solar Mace', 'DarkSlayerStaff': 'Staff',
-              'DarkSlayerStarCirclet': 'Star Circlet', 'DarkSlayerStasisPotion': 'Stasis Potion',
-              'DarkSlayerVitalityPotion': 'Vitality Potion', 'DimensionalRuinerChameleonPotion': 'Chameleon Potion',
-              'DimensionalRuinerFuryPotion': 'Fury Potion', 'DimensionalRuinerHammer': 'Hammer',
-              'DimensionalRuinerHelm': 'Helm', 'DimensionalRuinerIronskinPotion': 'Ironskin Potion',
-              'DimensionalRuinerQuicksilverPotion': 'Quicksilver Potion', 'DimensionalRuinerSolarMace': 'Solar Mace',
-              'DimensionalRuinerStarCirclet': 'Star Circlet', 'DimensionalRuinerStasisPotion': 'Stasis Potion',
-              'DimensionalRuinerVitalityPotion': 'Vitality Potion', 'DragonRiderBow': 'Bow',
-              'DragonRiderChameleonPotion': 'Chameleon Potion', 'DragonRiderEagleEyePotion': 'Eagle Eye Potion',
-              'DragonRiderFarShotPotion': 'Far Shot Potion', 'DragonRiderFuryPotion': 'Fury Potion',
-              'DragonRiderHelm': 'Helm', 'DragonRiderHelmOfAdoration': 'Helm Of Adoration',
-              'DragonRiderIronskinPotion': 'Ironskin Potion', 'DragonRiderQuicksilverPotion': 'Quicksilver Potion',
-              'DragonRiderScythe': 'Scythe', 'DragonRiderSeekingArrow': 'Seeking Arrow',
-              'DragonRiderStasisPotion': 'Stasis Potion', 'DragonRiderVitalityPotion': 'Vitality Potion',
-              'DullScale': 'Dull Scale', 'ElementalAir': 'Elemental Air', 'ElementalEarth': 'Elemental Earth',
-              'ElementalFire': 'Elemental Fire', 'ElementalSpirit': 'Elemental Spirit',
-              'ElementalWater': 'Elemental Water', 'EliteAbyssalRavagerAmuletOfRenewal': 'Elite Amulet Of Renewal',
-              'EliteAbyssalRavagerSunFireBreath': 'Elite Sun Fire Breath', 'EliteArcticLeviathanAmulet': 'Elite Amulet',
-              'EliteArcticLeviathanPlating': 'Elite Plating', 'EliteColossalMiteClaws': 'Elite Claws',
-              'EliteColossalMitePlating': 'Elite Plating', 'EliteDimensionalRuinerHammer': 'Elite Hammer',
-              'EliteDimensionalRuinerHelm': 'Elite Helm', 'EliteDragonRiderBow': 'Elite Bow',
-              'EliteDragonRiderHelm': 'Elite Helm', 'EliteLightningCannonPlating': 'Elite Plating',
-              'EliteLightningCannonRune': 'Elite Rune', 'EliteSeaSirenScales': 'Elite Scales',
-              'EliteSeaSirenTalons': 'Elite Talons', 'EliteShadowStalkerClaws': 'Elite Claws',
-              'EliteShadowStalkerPlating': 'Elite Plating', 'EliteShamanHelm': 'Elite Helm',
-              'EliteShamanStaff': 'Elite Staff', 'EliteSteelshardHarrierClaws': 'Elite Claws',
-              'EliteSteelshardHarrierPlating': 'Elite Plating', 'EliteStormDrakeHelm': 'Elite Helm',
-              'EliteStormDrakeSpear': 'Elite Spear', 'EliteThunderGolemHammer': 'Elite Hammer',
-              'EliteThunderGolemPlating': 'Elite Plating', 'EliteVengeWyrmPlating': 'Elite Plating',
-              'EliteVengeWyrmStaff': 'Elite Staff', 'EliteVoltRangerCloak': 'Elite Cloak',
-              'EliteVoltRangerRune': 'Elite Rune', 'EliteWarScarabAmulet': 'Elite Amulet',
-              'EliteWarScarabPlating': 'Elite Plating', 'EmeraldTablet': 'Emerald Tablet',
-              'EnameledCog': 'Enameled Cog', 'EnchantedIronBar': 'Enchanted Iron Bar',
-              'FangtoothChameleonPotion': 'Chameleon Potion', 'FangtoothEagleEyePotion': 'Eagle Eye Potion',
-              'FangtoothFarShotPotion': 'Far Shot Potion', 'FangtoothFuryPotion': 'Fury Potion',
-              'FangtoothHelm': 'Helm', 'FangtoothIronskinPotion': 'Ironskin Potion',
-              'FangtoothQuicksilverPotion': 'Quicksilver Potion', 'FangtoothSpear': 'Spear',
-              'FangtoothStasisPotion': 'Stasis Potion', 'FangtoothVitalityPotion': 'Vitality Potion',
-              'FineToothedCog': 'Fine Toothed Cog', 'FireMirrorAmuletOfRenewal': 'Amulet Of Renewal',
-              'FireMirrorChameleonPotion': 'Chameleon Potion', 'FireMirrorClaws': 'Claws',
-              'FireMirrorEagleEyePotion': 'Eagle Eye Potion', 'FireMirrorFarShotPotion': 'Far Shot Potion',
-              'FireMirrorFuryPotion': 'Fury Potion', 'FireMirrorHelm': 'Helm',
-              'FireMirrorIronskinPotion': 'Ironskin Potion', 'FireMirrorQuicksilverPotion': 'Quicksilver Potion',
-              'FireMirrorStasisPotion': 'Stasis Potion', 'FireMirrorSunFireBreath': 'Sun Fire Breath',
-              'FireMirrorVitalityPotion': 'Vitality Potion', 'FragileScale': 'Fragile Scale',
-              'FrostGiantAmulet': 'Amulet', 'FrostGiantChameleonPotion': 'Chameleon Potion',
-              'FrostGiantFuryPotion': 'Fury Potion', 'FrostGiantHammer': 'Hammer',
-              'FrostGiantIronskinPotion': 'Ironskin Potion', 'FrostGiantQuicksilverPotion': 'Quicksilver Potion',
-              'FrostGiantSolarMace': 'Solar Mace', 'FrostGiantStarCirclet': 'Star Circlet',
-              'FrostGiantStasisPotion': 'Stasis Potion', 'FrostGiantVitalityPotion': 'Vitality Potion',
-              'GiantAmulet': 'Amulet', 'GiantChameleonPotion': 'Chameleon Potion',
-              'GiantCircleOfThorns': 'Circle Of Thorns', 'GiantDawnHammer': 'Dawn Hammer',
-              'GiantFuryPotion': 'Fury Potion', 'GiantIronskinPotion': 'Ironskin Potion',
-              'GiantQuicksilverPotion': 'Quicksilver Potion', 'GiantStaff': 'Staff',
-              'GiantStasisPotion': 'Stasis Potion', 'GiantVitalityPotion': 'Vitality Potion',
-              'GraniteOgreChameleonPotion': 'Chameleon Potion', 'GraniteOgreCircleOfThorns': 'Circle Of Thorns',
-              'GraniteOgreDawnHammer': 'Dawn Hammer', 'GraniteOgreFuryPotion': 'Fury Potion',
-              'GraniteOgreIronskinPotion': 'Ironskin Potion', 'GraniteOgrePlating': 'Plating',
-              'GraniteOgreQuicksilverPotion': 'Quicksilver Potion', 'GraniteOgreStaff': 'Staff',
-              'GraniteOgreStasisPotion': 'Stasis Potion', 'GraniteOgreVitalityPotion': 'Vitality Potion',
-              'GrayPowder': 'Gray Powder', 'GreenPowder': 'Green Powder',
-              'HalberdsmanChameleonPotion': 'Chameleon Potion', 'HalberdsmanFuryPotion': 'Fury Potion',
-              'HalberdsmanHelmOfAdoration': 'Helm Of Adoration', 'HalberdsmanIronskinPotion': 'Ironskin Potion',
-              'HalberdsmanQuicksilverPotion': 'Quicksilver Potion', 'HalberdsmanScythe': 'Scythe',
-              'HalberdsmanSeekingArrow': 'Seeking Arrow', 'HalberdsmanShield': 'Shield', 'HalberdsmanSpear': 'Spear',
-              'HalberdsmanStasisPotion': 'Stasis Potion', 'HalberdsmanVitalityPotion': 'Vitality Potion',
-              'HardenedScale': 'Hardened Scale', 'IdolOfTheNorthWind:': 'Idol Of The North Wind:',
-              'IronDust': 'Iron Dust', 'LavaJawAmulet': 'Amulet',
-              'LavaJawAmuletOfRenewal': 'Amulet Of Renewal', 'LavaJawChameleonPotion': 'Chameleon Potion',
-              'LavaJawClaws': 'Claws', 'LavaJawEagleEyePotion': 'Eagle Eye Potion',
-              'LavaJawFarShotPotion': 'Far Shot Potion', 'LavaJawFuryPotion': 'Fury Potion',
-              'LavaJawIronskinPotion': 'Ironskin Potion', 'LavaJawQuicksilverPotion': 'Quicksilver Potion',
-              'LavaJawStasisPotion': 'Stasis Potion', 'LavaJawSunFireBreath': 'Sun Fire Breath',
-              'LavaJawVitalityPotion': 'Vitality Potion', 'LightningCannonChameleonPotion': 'Chameleon Potion',
-              'LightningCannonEagleEyePotion': 'Eagle Eye Potion', 'LightningCannonFarShotPotion': 'Far Shot Potion',
-              'LightningCannonFuryPotion': 'Fury Potion', 'LightningCannonIronskinPotion': 'Ironskin Potion',
-              'LightningCannonPlating': 'Plating', 'LightningCannonQuicksilverPotion': 'Quicksilver Potion',
-              'LightningCannonRune': 'Rune', 'LightningCannonSolarMace': 'Solar Mace',
-              'LightningCannonStarCirclet': 'Star Circlet', 'LightningCannonStasisPotion': 'Stasis Potion',
-              'LightningCannonVitalityPotion': 'Vitality Potion', 'LongbowmanBow': 'Bow',
-              'LongbowmanChameleonPotion': 'Chameleon Potion', 'LongbowmanCloak': 'Cloak',
-              'LongbowmanEagleEyePotion': 'Eagle Eye Potion', 'LongbowmanFarShotPotion': 'Far Shot Potion',
-              'LongbowmanFuryPotion': 'Fury Potion', 'LongbowmanHelmOfAdoration': 'Helm Of Adoration',
-              'LongbowmanIronskinPotion': 'Ironskin Potion', 'LongbowmanQuicksilverPotion': 'Quicksilver Potion',
-              'LongbowmanSeekingArrows': 'Seeking Arrows', 'LongbowmanStasisPotion': 'Stasis Potion',
-              'LongbowmanVitalityPotion': 'Vitality Potion', 'MagicInfusedScale': 'Magic Infused Scale',
-              'MetamorphicStone': 'Metamorphic Stone', 'MillenniumSeed': 'Millennium Seed', 'MinotaurAmulet': 'Amulet',
-              'MinotaurChameleonPotion': 'Chameleon Potion', 'MinotaurFuryPotion': 'Fury Potion',
-              'MinotaurGrimScythe': 'Grim Scythe', 'MinotaurHammer': 'Hammer',
-              'MinotaurIronskinPotion': 'Ironskin Potion', 'MinotaurQuicksilverPotion': 'Quicksilver Potion',
-              'MinotaurShadowHelm': 'Shadow Helm', 'MinotaurStasisPotion': 'Stasis Potion',
-              'MinotaurVitalityPotion': 'Vitality Potion', 'PackDragonChameleonPotion': 'Chameleon Potion',
-              'PackDragonClaws': 'Claws', 'PackDragonFuryPotion': 'Fury Potion', 'PackDragonGrimScythe': 'Grim Scythe',
-              'PackDragonIronskinPotion': 'Ironskin Potion', 'PackDragonPlating': 'Plating',
-              'PackDragonQuicksilverPotion': 'Quicksilver Potion', 'PackDragonShadowHelm': 'Shadow Helm',
-              'PackDragonStasisPotion': 'Stasis Potion', 'PackDragonVitalityPotion': 'Vitality Potion',
-              'PetrifiedTitanChameleonPotion': 'Chameleon Potion', 'PetrifiedTitanFuryPotion': 'Fury Potion',
-              'PetrifiedTitanHammer': 'Hammer', 'PetrifiedTitanHelmOfAdoration': 'Helm Of Adoration',
-              'PetrifiedTitanIronskinPotion': 'Ironskin Potion', 'PetrifiedTitanPlating': 'Plating',
-              'PetrifiedTitanQuicksilverPotion': 'Quicksilver Potion', 'PetrifiedTitanSeekingArrows': 'Seeking Arrows',
-              'PetrifiedTitanStasisPotion': 'Stasis Potion', 'PetrifiedTitanVitalityPotion': 'Vitality Potion',
-              'PhilosophersStone': 'Philosophers Stone', 'PorterChameleonPotion': 'Chameleon Potion',
-              'PorterFuryPotion': 'Fury Potion', 'PorterIronskinPotion': 'Ironskin Potion',
-              'PorterQuicksilverPotion': 'Quicksilver Potion', 'PorterRobes': 'Robes', 'PorterStaff': 'Staff',
-              'PorterStasisPotion': 'Stasis Potion', 'PorterVitalityPotion': 'Vitality Potion',
-              'PrimalFrost': 'Primal Frost', 'PrimalMagma': 'Primal Magma', 'PrimalOoze': 'Primal Ooze',
-              'PrimalSand': 'Primal Sand', 'PrimalSmoke': 'Primal Smoke', 'PrimalStorm': 'Primal Storm',
-              'PristineHide': 'Pristine Hide', 'PurplePowder': 'Purple Powder', 'RawIronOre': 'Raw Iron Ore',
-              'RefinedIronBar': 'Refined Iron Bar', 'RubyRelic': 'Ruby Relic',
-              'SandStriderChameleonPotion': 'Chameleon Potion', 'SandStriderEagleEyePotion': 'Eagle Eye Potion',
-              'SandStriderFarShotPotion': 'Far Shot Potion', 'SandStriderFuryPotion': 'Fury Potion',
-              'SandStriderHelm': 'Helm', 'SandStriderIronskinPotion': 'Ironskin Potion',
-              'SandStriderQuicksilverPotion': 'Quicksilver Potion', 'SandStriderScythe': 'Scythe',
-              'SandStriderSpear': 'Spear', 'SandStriderStasisPotion': 'Stasis Potion',
-              'SandStriderVitalityPotion': 'Vitality Potion', 'SandstriderHelmOfAdoration': 'Helm Of Adoration',
-              'SandstriderSeekingArrow': 'Seeking Arrow', 'SeaSirenChameleonPotion': 'Chameleon Potion',
-              'SeaSirenFuryPotion': 'Fury Potion', 'SeaSirenIronskinPotion': 'Ironskin Potion',
-              'SeaSirenQuicksilverPotion': 'Quicksilver Potion', 'SeaSirenScales': 'Scales',
-              'SeaSirenSolarMace': 'Solar Mace', 'SeaSirenStarCirclet': 'Star Circlet',
-              'SeaSirenStasisPotion': 'Stasis Potion', 'SeaSirenTalons': 'Talons',
-              'SeaSirenVitalityPotion': 'Vitality Potion', 'ShadowOrb': 'Shadow Orb',
-              'ShadowStalkerChameleonPotion': 'Chameleon Potion', 'ShadowStalkerClaws': 'Claws',
-              'ShadowStalkerFuryPotion': 'Fury Potion', 'ShadowStalkerGrimScythe': 'Grim Scythe',
-              'ShadowStalkerIronskinPotion': 'Ironskin Potion', 'ShadowStalkerPlating': 'Plating',
-              'ShadowStalkerQuicksilverPotion': 'Quicksilver Potion', 'ShadowStalkerShadowHelm': 'Shadow Helm',
-              'ShadowStalkerStasisPotion': 'Stasis Potion', 'ShadowStalkerVitalityPotion': 'Vitality Potion',
-              'ShamanChameleonPotion': 'Chameleon Potion', 'ShamanFuryPotion': 'Fury Potion', 'ShamanHelm': 'Helm',
-              'ShamanIronskinPotion': 'Ironskin Potion', 'ShamanQuicksilverPotion': 'Quicksilver Potion',
-              'ShamanStaff': 'Staff', 'ShamanStasisPotion': 'Stasis Potion', 'ShamanVitalityPotion': 'Vitality Potion',
-              'SilverPowder': 'Silver Powder', 'SolarNectar': 'Solar Nectar', 'SoulReaperAmulet': 'Amulet',
-              'SoulReaperChameleonPotion': 'Chameleon Potion', 'SoulReaperClaws': 'Claws',
-              'SoulReaperFuryPotion': 'Fury Potion', 'SoulReaperGrimScythe': 'Grim Scythe',
-              'SoulReaperIronskinPotion': 'Ironskin Potion', 'SoulReaperQuicksilverPotion': 'Quicksilver Potion',
-              'SoulReaperShadowHelm': 'Shadow Helm', 'SoulReaperStasisPotion': 'Stasis Potion',
-              'SoulReaperVitalityPotion': 'Vitality Potion', 'SpyChameleonPotion': 'Chameleon Potion',
-              'SpyDagger': 'Dagger', 'SpyFuryPotion': 'Fury Potion', 'SpyIronskinPotion': 'Ironskin Potion',
-              'SpyQuicksilverPotion': 'Quicksilver Potion', 'SpyRobes': 'Robes', 'SpySolarMace': 'Solar Mace',
-              'SpyStarCirclet': 'Star Circlet', 'SpyStasisPotion': 'Stasis Potion',
-              'SpyVitalityPotion': 'Vitality Potion', 'SteelshardHarrierChameleonPotion': 'Chameleon Potion',
-              'SteelshardHarrierClaws': 'Claws', 'SteelshardHarrierFuryPotion': 'Fury Potion',
-              'SteelshardHarrierIronskinPotion': 'Ironskin Potion', 'SteelshardHarrierPlating': 'Plating',
-              'SteelshardHarrierQuicksilverPotion': 'Quicksilver Potion', 'SteelshardHarrierSolarMace': 'Solar Mace',
-              'SteelshardHarrierStarCirclet': 'Star Circlet', 'SteelshardHarrierStasisPotion': 'Stasis Potion',
-              'SteelshardHarrierVitalityPotion': 'Vitality Potion', 'StitchedHide': 'Stitched Hide',
-              'StormDrakeChameleonPotion': 'Chameleon Potion', 'StormDrakeFuryPotion': 'Fury Potion',
-              'StormDrakeHelm': 'Helm', 'StormDrakeIronskinPotion': 'Ironskin Potion',
-              'StormDrakeQuicksilverPotion': 'Quicksilver Potion', 'StormDrakeSpear': 'Spear',
-              'StormDrakeStasisPotion': 'Stasis Potion', 'StormDrakeVitalityPotion': 'Vitality Potion',
-              'SturdyCog': 'Sturdy Cog', 'SwiftStrikeDragonChameleonPotion': 'Chameleon Potion',
-              'SwiftStrikeDragonClaws': 'Claws', 'SwiftStrikeDragonFuryPotion': 'Fury Potion',
-              'SwiftStrikeDragonGrimScythe': 'Grim Scythe', 'SwiftStrikeDragonIronskinPotion': 'Ironskin Potion',
-              'SwiftStrikeDragonPlating': 'Plating', 'SwiftStrikeDragonQuicksilverPotion': 'Quicksilver Potion',
-              'SwiftStrikeDragonShadowHelm': 'Shadow Helm', 'SwiftStrikeDragonStasisPotion': 'Stasis Potion',
-              'SwiftStrikeDragonVitalityPotion': 'Vitality Potion', 'TannedHide': 'Tanned Hide',
-              'TatteredHide': 'Tattered Hide', 'ThunderGolemChameleonPotion': 'Chameleon Potion',
-              'ThunderGolemEagleEyePotion': 'Eagle Eye Potion', 'ThunderGolemFarShotPotion': 'Far Shot Potion',
-              'ThunderGolemFuryPotion': 'Fury Potion', 'ThunderGolemHammer': 'Hammer',
-              'ThunderGolemIronskinPotion': 'Ironskin Potion', 'ThunderGolemPlating': 'Plating',
-              'ThunderGolemQuicksilverPotion': 'Quicksilver Potion', 'ThunderGolemSolarMace': 'Solar Mace',
-              'ThunderGolemStarCirclet': 'Star Circlet', 'ThunderGolemStasisPotion': 'Stasis Potion',
-              'ThunderGolemVitalityPotion': 'Vitality Potion', 'TransmutationStone': 'Transmutation Stone',
-              'TrueChaos': 'True Chaos', 'TrueDarkness': 'True Darkness', 'TrueLife': 'True Life',
-              'TrueTime': 'True Time', 'VengeWyrmChameleonPotion': 'Chameleon Potion',
-              'VengeWyrmFuryPotion': 'Fury Potion', 'VengeWyrmIronskinPotion': 'Ironskin Potion',
-              'VengeWyrmPlating': 'Plating', 'VengeWyrmQuicksilverPotion': 'Quicksilver Potion',
-              'VengeWyrmStaff': 'Staff', 'VengeWyrmStasisPotion': 'Stasis Potion',
-              'VengeWyrmVitalityPotion': 'Vitality Potion', 'VenomDwellerChameleonPotion': 'Chameleon Potion',
-              'VenomDwellerEagleEyePotion': 'Eagle Eye Potion', 'VenomDwellerFarShotPotion': 'Far Shot Potion',
-              'VenomDwellerFuryPotion': 'Fury Potion', 'VenomDwellerIronskinPotion': 'Ironskin Potion',
-              'VenomDwellerQuicksilverPotion': 'Quicksilver Potion', 'VenomDwellerShield': 'Shield',
-              'VenomDwellerStaff': 'Staff', 'VenomDwellerStasisPotion': 'Stasis Potion',
-              'VenomDwellerVitalityPotion': 'Vitality Potion', 'VoltRangerChameleonPotion': 'Chameleon Potion',
-              'VoltRangerCloak': 'Cloak', 'VoltRangerEagleEyePotion': 'Eagle Eye Potion',
-              'VoltRangerFarShotPotion': 'Far Shot Potion', 'VoltRangerFuryPotion': 'Fury Potion',
-              'VoltRangerHelmOfAdoration': 'Helm Of Adoration', 'VoltRangerIronskinPotion': 'Ironskin Potion',
-              'VoltRangerQuicksilverPotion': 'Quicksilver Potion', 'VoltRangerRune': 'Rune',
-              'VoltRangerSeekingArrows': 'Seeking Arrows', 'VoltRangerStasisPotion': 'Stasis Potion',
-              'VoltRangerVitalityPotion': 'Vitality Potion', 'WarScarabAmulet': 'Amulet',
-              'WarScarabChameleonPotion': 'Chameleon Potion', 'WarScarabCircleOfThorns': 'Circle Of Thorns',
-              'WarScarabDawnHammer': 'Dawn Hammer', 'WarScarabFuryPotion': 'Fury Potion',
-              'WarScarabIronskinPotion': 'Ironskin Potion', 'WarScarabPlating': 'Plating',
-              'WarScarabQuicksilverPotion': 'Quicksilver Potion', 'WarScarabStasisPotion': 'Stasis Potion',
-              'WarScarabVitalityPotion': 'Vitality Potion', 'Wheat': 'Wheat', 'YellowPowder': 'Yellow Powder',
-              'collect_information_on_the_waste': 'Collect Information on the Waste',
-              'consult_the_ancients': 'Consult the Ancients', 'defeat_a_challenger': 'Defeat a Challenger',
-              'defeat_the_boss': 'Defeat Thanatos', 'defend_the_villagers': 'Defend the Villagers',
-              'escort_cassandra_into_the_waste': 'Escort Cassandra into the Waste', 'find_cassandra': 'Find Cassandra',
-              'harvest_in_atlantis': 'Reap What Has Been Sown',
-              'house_of_the_rising_sun': 'Discover the House of the Rising Sun',
-              'investigate_the_sky_temples': 'Investigate the Sky Temples', 'keeping_the_peace': 'Keeping the Peace',
-              'mountain_of_treasures': 'Mountain of Treasures', 'protect_dragon_eggs': 'Protect Dragon Eggs',
-              'purple_powder': 'Venture into the Moral Mire', 'scouting_the_anthropus': 'Scouting the Anthropus',
-              'seek_the_millennium_seed': 'Seek the Millennium Seed', 'searchtheshadows': 'Search the Shadows',
-              'the_lost_cult_of_aphrodite': 'Find the Lost Cult of Aphrodite',
-              'train_newly_hatched_dragons': 'Train Newly Hatched Dragons',
-              'CapitalAdventurer': 'Tyche', 'WaterOutpostAdventurer': 'Nereus', 'WindAdventurer': 'Galia'}
-
 speed_items_dict = [{'item': 'Blitz', 'exceed': 216000, 'time': 345600},
                     {'item': 'Blast', 'exceed': 86400, 'time': 216000},
                     {'item': 'Bolt', 'exceed': 54000, 'time': 86400},
@@ -432,14 +161,14 @@ def web_ops(conn, operation, param_add_on, method='POST', post=True):
             conn.close()
             for ban_countdown in range(3660):
                 screen_update('TOO MANY REQUESTS ERROR', 'Your Recent Activities Has Triggered A Temporary Ban')
-                progress(ban_countdown, 3660, 'Ban duration left {0}'.format(cvt_time(3660 - ban_countdown)))
+                prog(ban_countdown, 3660, 'Ban duration left {0}'.format(cvt_time(3660 - ban_countdown)))
                 sleep(1)
             conn.connect()
         elif conn_resp.status == 509:
             conn.close()
             for ban_countdown in range(60):
                 screen_update('TOO MANY REQUESTS ERROR', 'Your Recent Activities Has Triggered A Warning')
-                progress(ban_countdown, 60, 'Script paused for {0}'.format(cvt_time(60 - ban_countdown)))
+                prog(ban_countdown, 60, 'Script paused for {0}'.format(cvt_time(60 - ban_countdown)))
                 sleep(1)
             conn.connect()
         elif conn_resp.status == 502:
@@ -460,7 +189,7 @@ def web_ops(conn, operation, param_add_on, method='POST', post=True):
         quit()
 
 
-def progress(p_count, p_total, prefix, suffix=None):
+def prog(p_count, p_total, prefix, suffix=None):
     filled_len = int(round(50 * p_count / float(p_total)))
     bar = ('▓' * filled_len) + ('░' * (50 - filled_len))
     print(prefix.center(78))
@@ -469,52 +198,53 @@ def progress(p_count, p_total, prefix, suffix=None):
         print(suffix.center(78))
 
 
-def get_data(title, data1=False, data2=False, data3=False, data4=False, data5=False, data6=False, unmute=True):
+def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, unmute=True):
     global pData, mData, fData, pfData, cData, tData, d_conn
     title_text = 'Refreshing' if pData or mData or fData or pfData or cData or tData else 'Retrieving'
     sub_header = '{0} Game Files. Please Wait...'.format(title_text)
-    tw_data = None
+    w1_data, w2_data = [None, None]
     max_count, count = [0, 0]
-    for check in (data1, data2, data3, data4, data6):
+    for check in (w1, w2, w3, pl, fm, pf):
         if check:
             max_count += 1
     if unmute:
         screen_update(title, sub_header)
-        progress(count, max_count, 'Initializing...')
+        prog(count, max_count, 'Initializing...')
 
     # Get Manifest and Translation
     conn = http.client.HTTPConnection('wackoscripts.com', 80)
-    req = [{'0': data1, '1': 'Game Manifest', '2': 'manifest'},
-           {'0': data6, '1': 'Chests Matrix', '2': 'chest'}]
+    req = [{'0': w1, '1': 'Game Manifest', '2': 'manifest'},
+           {'0': w2, '1': 'Chests Matrix', '2': 'chest'},
+           {'0': w3, '1': 'Translation Matrix', '2': 'translation'}]
     for x in range(len(req)):
         if req[x]['0']:
             name = req[x]['1']
             if unmute:
                 screen_update(title, sub_header)
-                progress(count, max_count, 'Retrieving {0}'.format(name))
+                prog(count, max_count, 'Retrieving {0}'.format(name))
             url = 'http://wackoscripts.com/sanctuary/{0}.json'.format(req[x]['2'])
             for web_retry in range(2):
                 try:
                     conn.request('GET', url)
                     conn_resp = conn.getresponse()
                     conn_data = json.loads(conn_resp.read().decode('utf-8'))
+                    count += 1
+                    if unmute:
+                        screen_update(title, sub_header)
+                        prog(count, max_count, 'Retrieving {0}'.format(name))
                     if req[x]['2'] == 'manifest':
                         mData = conn_data
                     elif req[x]['2'] == 'chest':
-                        tw_data = conn_data
+                        w1_data = conn_data
+                    elif req[x]['2'] == 'translation':
+                        w2_data = conn_data
                     break
                 except (KeyError, TypeError):
                     if unmute:
                         screen_update(title, sub_header)
-                        progress(count, max_count, 'Retrieving {0}'.format(name),
-                                 'Retrying {0} of 5'.format(web_retry + 1))
+                        prog(count, max_count, 'Retrieving {0}'.format(name), 'Retrying {0} of 2'.format(web_retry + 1))
                     sleep(1)
                     continue
-            if mData or tw_data:
-                count += 1
-                if unmute:
-                    screen_update(title, sub_header)
-                    progress(count, max_count, 'Retrieving {0}'.format(name))
             else:
                 div_line('#')
                 ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(name))
@@ -522,30 +252,40 @@ def get_data(title, data1=False, data2=False, data3=False, data4=False, data5=Fa
                 div_line('#')
                 sleep(5)
                 quit()
-            if req[x]['2'] == 'chest':
-                translate = (troop_dict, game_dict, forge_dict, tw_data)
-                for lookup in translate:
-                    for key, value in lookup.items():
-                        if key not in tData and value != '':
-                            tData[key] = value
-                        if key not in tData and value == '':
-                            tData[key] = key
+            if w1_data:
+                for key, value in w1_data.items():
+                    if key not in tData and value != '':
+                        tData[key] = value
+                    if key not in tData and value == '':
+                        tData[key] = key
+            if w2_data:
+                for y in range(len(w2_data)):
+                    for lookup in w2_data[y].keys():
+                        for key, value in w2_data[y][lookup].items():
+                            if key not in tData and value != '':
+                                tData[key] = value
+                            if key not in tData and value == '':
+                                tData[key] = key
     conn.close()
 
     # Get Forge and Player
     d_conn.connect()
-    req = [{'0': data2, '1': 'Forge Manifest', '2': 'forge/forge', '3': '', '4': 'GET', '5': True},
-           {'0': data3, '1': 'Player Data', '2': 'player', '3': '?', '4': 'GET', '5': False},
-           {'0': data4, '1': 'Forge Data', '2': 'forge/player_forge_info', '3': '', '4': 'GET', '5': True}]
+    req = [{'0': pl, '1': 'Player Data', '2': 'player', '3': '?', '4': 'GET', '5': False},
+           {'0': fm, '1': 'Forge Manifest', '2': 'forge/forge', '3': '', '4': 'GET', '5': True},
+           {'0': pf, '1': 'Forge Data', '2': 'forge/player_forge_info', '3': '', '4': 'GET', '5': True}]
     for x in range(len(req)):
         if req[x]['0']:
             name = req[x]['1']
             if unmute:
                 screen_update(title, sub_header)
-                progress(count, max_count, 'Retrieving {0}'.format(name))
+                prog(count, max_count, 'Retrieving {0}'.format(name))
             for web_retry in range(2):
                 try:
                     conn_data = web_ops(d_conn, req[x]['2'], req[x]['3'], req[x]['4'], req[x]['5'])
+                    count += 1
+                    if unmute:
+                        screen_update(title, sub_header)
+                        prog(count, max_count, 'Retrieving {0}'.format(name))
                     if req[x]['2'] == 'forge/forge':
                         fData = conn_data
                     elif req[x]['2'] == 'player':
@@ -556,15 +296,9 @@ def get_data(title, data1=False, data2=False, data3=False, data4=False, data5=Fa
                 except (KeyError, TypeError):
                     if unmute:
                         screen_update(title, sub_header)
-                        progress(count, max_count, 'Retrieving {0}'.format(name),
-                                 'Retrying {0} of 5'.format(web_retry + 1))
+                        prog(count, max_count, 'Retrieving {0}'.format(name), 'Retrying {0} of 2'.format(web_retry + 1))
                     sleep(1)
                     continue
-            if mData or tw_data:
-                count += 1
-                if unmute:
-                    screen_update(title, sub_header)
-                    progress(count, max_count, 'Retrieving {0}'.format(name))
             else:
                 div_line('#')
                 ctr_it('SERVER ERROR: Failed To Retrieve The {0}'.format(name))
@@ -574,34 +308,32 @@ def get_data(title, data1=False, data2=False, data3=False, data4=False, data5=Fa
                 quit()
 
     # Process City Data
-    if data5:
+    if op:
         if unmute:
             screen_update(title, sub_header)
-            progress(1, 1, 'Retrieving City/Outpost Data')
+            prog(1, 1, 'Retrieving City/Outpost Data')
         cData = {}
         for loc_key in sorted(pData['cities']):
-            current_location = None
-            if unmute:
-                screen_update(title, sub_header)
-                progress(1, 1, 'Processing {0}'.format(t(loc_key)))
             for web_retry in range(5):
                 try:
                     current_location = web_ops(d_conn, 'cities/{0}'.format(pData['cities'][loc_key]['id']), '')
+                    cData[loc_key] = current_location
+                    if unmute:
+                        screen_update(title, sub_header)
+                        prog(1, 1, 'Processing {0}'.format(t(loc_key)))
                     break
                 except (KeyError, TypeError):
                     if unmute:
                         screen_update(title, sub_header)
-                        progress(1, 1, 'Processing {0}'.format(t(loc_key)), 'Retrying {0} of 5'.format(web_retry + 1))
+                        prog(1, 1, 'Processing {0}'.format(t(loc_key)), 'Retrying {0} of 5'.format(web_retry + 1))
                     sleep(1)
                     continue
-            if current_location:
-                cData[loc_key] = current_location
-        if not cData:
-            div_line('#')
-            ctr_it('SERVER ERROR: Failed To Process City/Outpost Data')
-            ctr_it('Please Try Again Later...')
-            div_line('#')
-            quit()
+            else:
+                div_line('#')
+                ctr_it('SERVER ERROR: Failed To Process City/Outpost Data')
+                ctr_it('Please Try Again Later...')
+                div_line('#')
+                quit()
     d_conn.close()
 
     # Save Entry If Loading Went Well...
@@ -656,6 +388,29 @@ def ctr_it(string, prefix=False, suffix=False):
     print(string.center(78))
     if suffix:
         print('')
+
+
+def choose_language():
+    global lo
+    os.system('cls' if os.name == 'nt' else 'clear')
+    conn = http.client.HTTPConnection('wackoscripts.com', 80)
+    url = 'http://wackoscripts.com/sanctuary/locale.json'
+    for web_retry in range(2):
+        try:
+            conn.request('GET', url)
+            conn_resp = conn.getresponse()
+            conn_data = json.loads(conn_resp.read().decode('utf-8'))
+            break
+        except (KeyError, TypeError):
+            sleep(1)
+            continue
+    else:
+        div_line('#')
+        ctr_it('SERVER ERROR: Failed To Retrieve The Language File')
+        ctr_it('Please Try Again Later...')
+        div_line('#')
+        sleep(5)
+        quit()
 
 
 def t(string):
@@ -1095,9 +850,9 @@ def create_equipment(title):
         ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s   Elapsed Time: {4}'.format(
             d_stat, d_attrib.title(), d_batch, d_delay, cvt_time(time() - d_start)))
         div_line('-')
-        progress(x, d_batch, 'Crafting {0} Of {1}'.format(x, d_batch),
-                 'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}\n'.format(
-                     forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
+        prog(x, d_batch, 'Crafting {0} Of {1}'.format(x, d_batch),
+             'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}\n'.format(
+                 forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
         if kept_items:
             ctr_it('~~~ Kept Items ~~~')
             for y in range(len(kept_items)):
@@ -1153,9 +908,9 @@ def create_equipment(title):
     ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
     ctr_it('Requirement: {0:,} {1}   Crafted: {2:,}   Delay: {3}s'.format(d_stat, d_attrib.title(), d_batch, d_delay))
     div_line('-')
-    progress(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)),
-             'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}'.format(
-                 forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
+    prog(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)),
+         'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}'.format(
+             forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
     if kept_items:
         ctr_it('~~~ Kept Items ~~~', prefix=True)
         for y in range(len(kept_items)):
@@ -1168,7 +923,7 @@ def create_equipment(title):
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     print('Refreshing... Please wait!')
-    get_data(title, data3=True, data4=True, unmute=False)
+    get_data(title, pf=True, op=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -1292,7 +1047,7 @@ def forge_ingredient(title):
         ctr_it('Delay: {0}s   Elapsed Time: {1}'.format(
             d_delay, cvt_time(time() - d_start)))
         div_line('-')
-        progress(x, d_batch, 'Forging {0} of {1}'.format(x, d_batch), ' ')
+        prog(x, d_batch, 'Forging {0} of {1}'.format(x, d_batch), ' ')
         if selection:
             ctr_it('~~~ Items Used ~~~')
             display_it(selection, single=False)
@@ -1317,14 +1072,14 @@ def forge_ingredient(title):
     ctr_it('Ingredient: {0}   Crafted: {1:,}'.format(t(d_item), d_batch))
     ctr_it('Delay: {0}s'.format(d_delay))
     div_line('-')
-    progress(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)))
     if selection:
         ctr_it('~~~ Items Used ~~~', prefix=True)
         display_it(selection, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     print('Refreshing... Please wait!')
-    get_data(title, data3=True, data4=True, unmute=False)
+    get_data(title, pf=True, op=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -1351,7 +1106,7 @@ def farm_mission(title):
                 selection[adventurers[x]['current_mission']] = adventurers[x]['current_mission']
     d_conn.close()
     if claimed:
-        get_data(title, data3=True, unmute=False)
+        get_data(title, pf=True, unmute=False)
         adventurers = pData['forge']['adventurers']
     ingredients = {}
     for x in range(len(pData['forge']['items']['ingredients'])):
@@ -1579,9 +1334,9 @@ def farm_mission(title):
                     d_batch, d_delay, cvt_time(time() - d_start)))
                 div_line('-')
                 if dur == -1:
-                    progress(x, d_batch, 'Farming {0} of {1}'.format(x, d_batch), 'Initializing...')
+                    prog(x, d_batch, 'Farming {0} of {1}'.format(x, d_batch), 'Initializing...')
                 else:
-                    progress(x + 1, d_batch, 'Farming {0} of {1}'.format(x + 1, d_batch))
+                    prog(x + 1, d_batch, 'Farming {0} of {1}'.format(x + 1, d_batch))
                 if speeds_used:
                     ctr_it('~~~ Speed Items Used ~~~', prefix=True)
                     display_it(speeds_used, single=False)
@@ -1644,7 +1399,7 @@ def farm_mission(title):
     ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
     ctr_it('Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
-    progress(1, 1, 'Process Completed in {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, 'Process Completed in {0}'.format(cvt_time(time() - d_start)))
     if speeds_used:
         ctr_it('~~~ Speed Items Used ~~~', prefix=True)
         display_it(speeds_used, single=False)
@@ -1654,7 +1409,7 @@ def farm_mission(title):
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
     print('Refreshing... Please wait!')
-    get_data(title, data3=True, unmute=False)
+    get_data(title, pf=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -1778,7 +1533,7 @@ def open_chest(title):
     ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
     ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
-    progress(0, 1, 'Initializing...')
+    prog(0, 1, 'Initializing...')
     selection.clear()
     d_start = time()
     look_up = pData['items']
@@ -1839,12 +1594,11 @@ def open_chest(title):
                             d_batch, d_delay, cvt_time(time() - d_start)))
                         div_line('-')
                         if len(d_list) > 1:
-                            progress(ttl_open, d_total, 'Overall Opened: {0:,} of {1:,}'.format(ttl_open, d_total))
-                            progress(count, d_list[x]['qty'], 'Current chest: {0}'.format(t(d_list[x]['chest'])),
-                                     'Opened {0:,} of {1:,}\n'.format(count, d_list[x]['qty']))
+                            prog(ttl_open, d_total, 'Overall Opened: {0:,} of {1:,}'.format(ttl_open, d_total))
+                            prog(count, d_list[x]['qty'], 'Current chest: {0}'.format(t(d_list[x]['chest'])),
+                                 'Opened {0:,} of {1:,}'.format(count, d_list[x]['qty']))
                         else:
-                            progress(count, d_list[x]['qty'], 'Opened {0:,} of {1:,}'.format(
-                                count, d_list[x]['qty']), '\n')
+                            prog(count, d_list[x]['qty'], 'Opened {0:,} of {1:,}'.format(count, d_list[x]['qty']))
                         for category in ('Chests', 'Arsenal', 'Speeds', 'Grants & Seals', 'Others'):
                             if len(received_items[category]) > 0:
                                 selection = received_items[category]
@@ -1866,7 +1620,7 @@ def open_chest(title):
     ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
     ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
-    progress(1, 1, 'Chest Opening Completed!', 'Process completed in {0}'.format(
+    prog(1, 1, 'Chest Opening Completed!', 'Process completed in {0}'.format(
         cvt_time(time() - d_start)))
     for category in ('Chests', 'Arsenal', 'Speeds', 'Grants & Seals', 'Others'):
         if len(overall_received[category]) > 0:
@@ -1876,7 +1630,7 @@ def open_chest(title):
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
     print('Refreshing... Please wait!')
-    get_data(title, data3=True, unmute=False)
+    get_data(title, pf=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -2027,7 +1781,7 @@ def unpack_arsenal(title):
     ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
     ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
-    progress(0, 1, 'Initializing...')
+    prog(0, 1, 'Initializing...')
     d_start = time()
     total_opened = 0
     d_power = 0
@@ -2045,9 +1799,9 @@ def unpack_arsenal(title):
             ctr_it('Bins Selected: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
                 d_batch, d_delay, cvt_time(time() - d_start)))
             div_line('-')
-            progress(total_opened, d_batch, 'Unpacking {0:,} of {1:,}'.format(total_opened, d_batch))
+            prog(total_opened, d_batch, 'Unpacking {0:,} of {1:,}'.format(total_opened, d_batch))
             if len(d_list) > 1:
-                progress(current_opened, d_list[x]['quantity'], 'Unpacking {0}'.format(t(d_list[x]['bin'])))
+                prog(current_opened, d_list[x]['quantity'], 'Unpacking {0}'.format(t(d_list[x]['bin'])))
             ctr_it('~~~ Power Gained ~~~', prefix=True)
             ctr_it('{0:,}'.format(d_power))
             if d_quantity < open_quantity:
@@ -2072,13 +1826,13 @@ def unpack_arsenal(title):
     ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
     ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
-    progress(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)))
     ctr_it('~~~ Power Gained ~~~', prefix=True)
     ctr_it('{0:,}'.format(d_power))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
     print('Refreshing... Please wait!')
-    get_data(title, data3=True, unmute=False)
+    get_data(title, pf=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -2325,18 +2079,19 @@ def fill_building(title):
 
     # Select Speed Items
     selection = list()
-    a, b, c, d, len_a, len_b, len_c, len_d = ['Item', 'Description', 'Available', 'Exceeding', 4, 11, 9, 9]
+    a, b, c, d, e = ['Item', 'Description', 'Available', 'Exceeding', 'Use']
+    a1, b1, c1, d1, e1 = [len(a), len(b), len(c), len(d), len(e)]
     for key in range(len(speed_items_dict)):
         look_up = speed_items_dict[key]
         if look_up['item'] in pData['items'] and pData['items'][look_up['item']] > 0:
-            if len(look_up['item']) > len_a:
-                len_a = len(look_up['item'])
-            if len(cvt_time(look_up['time'], show_seconds=False)) > len_b:
-                len_b = len(cvt_time(look_up['time'], show_seconds=False))
-            if len('{0:,}'.format(pData['items'][look_up['item']])) > len_c:
-                len_c = len('{0:,}'.format(pData['items'][look_up['item']]))
-            if len(cvt_time(look_up['exceed'], show_seconds=False)) > len_d:
-                len_d = len(cvt_time(look_up['exceed'], show_seconds=False))
+            if len(look_up['item']) > a1:
+                a1 = len(look_up['item'])
+            if len(cvt_time(look_up['time'], show_seconds=False)) > b1:
+                b1 = len(cvt_time(look_up['time'], show_seconds=False))
+            if len('{0:,}'.format(pData['items'][look_up['item']])) > c1:
+                c1 = len('{0:,}'.format(pData['items'][look_up['item']]))
+            if len(cvt_time(look_up['exceed'], show_seconds=False)) > d1:
+                d1 = len(cvt_time(look_up['exceed'], show_seconds=False))
             my_dict = {'item': look_up['item'], 'exceed': look_up['exceed'], 'time': look_up['time'],
                        'quantity': pData['items'][look_up['item']], 'use': False}
             selection.append(my_dict)
@@ -2346,14 +2101,14 @@ def fill_building(title):
             ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
             ctr_it('Slots To Fill: {0}'.format(d_slots))
             div_line('-')
-            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(a, len_a, b, len_b, c, len_c, d, len_d))
-            ctr_it('{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}'.format(a, a1, b, b1, c, c1, d, d1, e, e1))
+            ctr_it('{0}  {1}  {2}  {3}  {4}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1))
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
-                ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
-                    selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
-                    selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
-                    len_d, use_item))
+                ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>{9}}'.format(
+                    selection[key]['item'], a1, cvt_time(selection[key]['time'], show_seconds=False), b1,
+                    selection[key]['quantity'], c1, cvt_time(selection[key]['exceed'], show_seconds=False),
+                    d1, use_item, e1))
             print('\n Exceeding - Item used when duration exceeds the displayed time')
             div_line('-')
             print(' Selection options available:')
@@ -2406,7 +2161,7 @@ def fill_building(title):
     ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
     ctr_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
     div_line('-')
-    progress(0, 1, 'Initializing...')
+    prog(0, 1, 'Initializing...')
     d_start = time()
     speeds_used = {}
     d_conn.connect()
@@ -2430,15 +2185,15 @@ def fill_building(title):
                 d_slots, d_delay, cvt_time(time() - d_start)))
             div_line('-')
             if speeds_used:
-                progress(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots))
+                prog(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots))
                 ctr_it(' ')
                 ctr_it('~~~ Speed Items Used ~~~')
                 display_it(speeds_used, single=False)
             elif duration != -1:
-                progress(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots),
-                         'Waiting {0} for job to finish...'.format(cvt_time(duration)))
+                prog(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots),
+                     'Waiting {0} for job to finish...'.format(cvt_time(duration)))
             else:
-                progress(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots), 'Initializing...')
+                prog(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots), 'Initializing...')
             if duration == -1:
                 x_param = 'city%5F{0}%5B{0}%5Ftype%5D={1}&%5Fmethod=post&city%5F{0}%5Bslot%5D={2}&'.format(
                     'building', d_building, slots[x])
@@ -2497,8 +2252,7 @@ def fill_building(title):
     ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
     ctr_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
     div_line('-')
-    progress(1, 1, 'Filling Completed Successfully!', 'Process completed in {0}'.format(
-        cvt_time(time() - d_start)))
+    prog(1, 1, 'Process Completed in {0}'.format(cvt_time(time() - d_start)))
     if speeds_used:
         ctr_it('~~~ Speed Items Used ~~~', prefix=True)
         display_it(speeds_used, single=False)
@@ -2513,7 +2267,7 @@ def fill_building(title):
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     print('Refreshing... Please wait!')
-    get_data(title, data3=True, data5=True, unmute=False)
+    get_data(title, op=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -2549,7 +2303,7 @@ def upgrade_building(title):
                                     levels.append(manifest['levels'][lvl])
                         my_dict = {'city': key, 'max_level': manifest['city_max'][key], 'building_id': city['id'],
                                    'type': city['type'], 'level': city['level'], 'levels': levels,
-                                   'location_id': cData[key]['city']['id']}
+                                   'location_id': cData[key]['city']['id'], 'desc': t(key)}
                         d_list.append(my_dict)
                         break
 
@@ -2580,7 +2334,6 @@ def upgrade_building(title):
                                 d_location = key
                                 break
     d_list[:] = [d for d in d_list if d.get('city') == d_location]
-    d_building = None
     selection.clear()
     if len(d_list) == 1:
         d_building = d_list[0]['type']
@@ -2588,26 +2341,26 @@ def upgrade_building(title):
         for x in range(len(d_list)):
             if d_list[x]['type'] not in selection:
                 selection[d_list[x]['type']] = t(d_list[x]['type'])
-
-    # Select Building
-    while d_building is None:
-        screen_update(title, 'Choose Building For Location')
-        ctr_it('Location: {0}'.format(t(d_location)))
-        ctr_it(' ')
-        div_line('-')
-        ctr_it('~~~ Available Buildings ~~~')
-        display_it(selection)
-        div_line()
-        d_select = input(' Enter selection : ')
-        if len(d_select) >= 3:
-            if all(i.isalpha() or i == ' ' for i in d_select):
-                if d_select.lower() == 'exit':
-                    return
-                else:
-                    for key, value in selection.items():
-                        if d_select.lower() in value.lower() or d_select.lower() == value.lower():
-                            d_building = key
-                            break
+        # Select Building
+        d_building = None
+        while d_building is None:
+            screen_update(title, 'Choose Building For Location')
+            ctr_it('Location: {0}'.format(t(d_location)))
+            ctr_it(' ')
+            div_line('-')
+            ctr_it('~~~ Available Buildings ~~~')
+            display_it(selection)
+            div_line()
+            d_select = input(' Enter selection : ')
+            if len(d_select) >= 3:
+                if all(i.isalpha() or i == ' ' for i in d_select):
+                    if d_select.lower() == 'exit':
+                        return
+                    else:
+                        for key, value in selection.items():
+                            if d_select.lower() in value.lower() or d_select.lower() == value.lower():
+                                d_building = key
+                                break
     d_list[:] = [d for d in d_list if d.get('type') == d_building]
     max_level = d_list[0]['max_level']
     min_level = max_level
@@ -2805,7 +2558,7 @@ def upgrade_building(title):
     ctr_it('Delay: {0}'.format(d_delay))
     ctr_it('')
     div_line('-')
-    progress(0, 1, 'Initializing...')
+    prog(0, 1, 'Initializing...')
     d_start = time()
     speeds_used = {}
     d_conn.connect()
@@ -2825,12 +2578,12 @@ def upgrade_building(title):
                     ctr_it('Delay: {0}s   Elapsed Time: {1}'.format(d_delay, cvt_time(time() - d_start)))
                     div_line('-')
                     if (d_level - min_level) > 1:
-                        progress((d_level - min_level) - (d_level - y) + 1, d_level - min_level,
-                                 'Upgrading From Level {0} to Level {1}'.format(y, d_level))
+                        prog((d_level - min_level) - (d_level - y) + 1, d_level - min_level,
+                             'Upgrading From Level {0} to Level {1}'.format(y, d_level))
                     if total > 1:
-                        progress(count, total, 'Upgrading Slot {0} of {1}'.format(count, total))
+                        prog(count, total, 'Upgrading Slot {0} of {1}'.format(count, total))
                     elif speed_item:
-                        progress(prog_dur - duration, prog_dur, 'Used {0} to speed through'.format(speed_item))
+                        prog(prog_dur - duration, prog_dur, 'Used {0} to speed through'.format(speed_item))
                     else:
                         pass
                     if speeds_used:
@@ -2901,8 +2654,7 @@ def upgrade_building(title):
     ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
     ctr_it('Delay: {0}s'.format(d_delay, cvt_time(time() - d_start)))
     div_line('-')
-    progress(1, 1, 'Upgrade Completed Successfully!', 'Process completed in {0}'.format(
-        cvt_time(time() - d_start)))
+    prog(1, 1, 'Process Completed in {0}'.format(cvt_time(time() - d_start)))
     if speeds_used:
         ctr_it('~~~ Speed Items Used ~~~', prefix=True)
         display_it(speeds_used, single=False)
@@ -2917,7 +2669,7 @@ def upgrade_building(title):
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     print('Refreshing... Please wait!')
-    get_data(title, data3=True, data5=True, unmute=False)
+    get_data(title, op=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3023,10 +2775,11 @@ def train_troop(title):
                                            'tc_level': selection[d_loc]['tc_level'], 'quantity': d_pop,
                                            'tc_total': selection[d_loc]['tc_total'], 'trainable': d_max_queue,
                                            'time': mData['units'][x]['time'], 'multiplier': multiplier,
-                                           'power': mData['units'][x]['stats']['power'], 'location': d_loc}
+                                           'power': mData['units'][x]['stats']['power'], 'location': d_loc,
+                                           'desc': t(mData['units'][x]['type']), 'loc_desc': t(d_loc)}
                                 d_list.append(my_dict)
                                 break
-    d_troop = None
+    d_list = sorted(d_list, key=itemgetter('desc'))
     selection.clear()
     if not d_list:
         nothing_to_do(title, 'Select Troop To Train', 'Trainable Troops')
@@ -3034,71 +2787,87 @@ def train_troop(title):
     elif len(d_list) == 1:
         d_troop = d_list[0]['troop']
     else:
+        a, b, c = ['Troop', 'Trainable', 'Power Gain']
+        a1, b1, c1 = [len(a), len(b), len(c)]
         for x in range(len(d_list)):
-            if d_list[x]['troop'] not in selection.keys():
-                selection[d_list[x]['troop']] = t(d_list[x]['troop'])
-
-    # Select Troop To Train
-    while d_troop is None:
-        screen_update(title, 'Select Troop To Train')
-        ctr_it('~~~ Available Troops ~~~')
-        display_it(selection)
-        div_line()
-        d_select = input(' Enter selection : ')
-        if len(d_select) >= 3:
-            if all(i.isalpha() or i == ' ' for i in d_select):
+            if len(d_list[x]['desc']) > a1:
+                a1 = len(d_list[x]['desc'])
+            if len('{0:,}'.format(d_list[x]['trainable'])) > b1:
+                b1 = len('{0:,}'.format(d_list[x]['trainable']))
+            if len('{0:,}'.format(d_list[x]['trainable'] * d_list[x]['power'])) > c1:
+                c1 = len('{0:,}'.format(d_list[x]['trainable'] * d_list[x]['power']))
+        # Select Troop To Train
+        d_troop = None
+        while d_troop is None:
+            screen_update(title, 'Select Troop To Train')
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
+            ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
+            for x in range(len(d_list)):
+                if d_list[x]['desc'] not in selection:
+                    selection[d_list[x]['desc']] = d_list[x]['desc']
+                    ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5},}'.format(
+                        d_list[x]['desc'], a1, d_list[x]['trainable'], b1, d_list[x]['trainable'] * d_list[x]['power'],
+                        c1))
+            div_line()
+            d_select = input(' Enter selection : ')
+            if len(d_select) >= 3:
                 if d_select.lower() == 'exit':
                     return
                 else:
-                    for key, value in selection.items():
-                        if d_select.lower() in value.lower() or d_select.lower() == value.lower():
-                            d_troop = key
+                    for x in range(len(d_list)):
+                        if d_select.lower() == d_list[x]['desc'].lower():
+                            d_troop = d_list[x]['troop']
+                            break
+                    else:
+                        for x in range(len(d_list)):
+                            if d_select.lower() in d_list[x]['desc'].lower():
+                                d_troop = d_list[x]['troop']
+                                break
     d_list[:] = [d for d in d_list if d.get('troop') == d_troop]
     selection.clear()
     if len(d_list) == 1:
         d_location = d_list[0]['location']
     else:
         d_location = None
-        for x in range(len(d_list)):
-            if t(d_list[x]['location']) not in selection.keys():
-                my_dict = {'location': d_list[x]['location'],
-                           'tc_level': d_list[x]['tc_level'],
-                           'tc_total': d_list[x]['tc_total'],
-                           'time': int(d_list[x]['time'] / d_list[x]['multiplier'])}
-                selection[t(d_list[x]['location'])] = my_dict
-
+        d_list = sorted(d_list, key=itemgetter('loc_desc'))
         # Select Location To Train
-        a, b, c, d, len_a, len_b, len_c, len_d = ['Location', 'Level', 'Total', 'Time', 8, 5, 5, 4]
-        for x in selection.keys():
-            if len(x) > len_a:
-                len_a = len(x)
-            if len('{0}'.format(selection[x]['tc_level'])) > len_b:
-                len_b = len('{0}'.format(selection[x]['tc_level']))
-            if len('{0}'.format(selection[x]['tc_total'])) > len_c:
-                len_c = len('{0}'.format(selection[x]['tc_total']))
-            if len(cvt_time(selection[x]['time'])) > len_d:
-                len_d = len(cvt_time(selection[x]['time']))
+        a, b, c, d = ['Location', 'Level', 'Total', 'Time']
+        a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
+        for x in range(len(d_list)):
+            if len(d_list[x]['loc_desc']) > a1:
+                a1 = len(d_list[x]['loc_desc'])
+            if len('{0}'.format(d_list[x]['tc_level'])) > b1:
+                b1 = len('{0}'.format(d_list[x]['tc_level']))
+            if len('{0}'.format(d_list[x]['tc_total'])) > c1:
+                c1 = len('{0}'.format(d_list[x]['tc_total']))
+            if len(cvt_time(d_list[x]['time'] / d_list[x]['multiplier'])) > d1:
+                d1 = len(cvt_time(d_list[x]['time'] / d_list[x]['multiplier']))
         while d_location is None:
             screen_update(title, 'Select Location To Train')
             ctr_it('Troop: {0}'.format(t(d_troop)))
             ctr_it(' ')
             div_line('-')
-            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
-            ctr_it('{0}  {1}  {2}  {3}'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
-            for x in sorted(selection.keys()):
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, a1, b, b1, c, c1, d, d1))
+            ctr_it('{0}  {1}  {2}  {3}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1))
+            for x in range(len(d_list)):
                 ctr_it('{0:<{1}}  {2:^{3}}  {4:^{5}}  {6:>{7}}'.format(
-                    x, len_a, selection[x]['tc_level'], len_b, selection[x]['tc_total'], len_c,
-                    cvt_time(selection[x]['time']), len_d))
+                    d_list[x]['loc_desc'], a1, d_list[x]['tc_level'], b1, d_list[x]['tc_total'], c1,
+                    cvt_time(d_list[x]['time'] / d_list[x]['multiplier']), d1))
             div_line()
             d_select = input(' Enter selection : ')
             if len(d_select) >= 3:
-                if all(i.isalpha() or i == ' ' for i in d_select):
-                    if d_select.lower() == 'exit':
-                        return
+                if d_select.lower() == 'exit':
+                    return
+                else:
+                    for x in range(len(d_list)):
+                        if d_select.lower() == d_list[x]['loc_desc'].lower():
+                            d_location = d_list[x]['location']
+                            break
                     else:
-                        for x in sorted(selection.keys()):
-                            if d_select.lower() in x.lower() or d_select.lower() == x.lower():
-                                d_location = selection[x]['location']
+                        for x in range(len(d_list)):
+                            if d_select.lower() in d_list[x]['loc_desc'].lower():
+                                d_location = d_list[x]['location']
+                                break
     d_list[:] = [d for d in d_list if d.get('location') == d_location]
     d_max_queue = 1 if d_list[0]['quantity'] == 1 else 0
 
@@ -3125,7 +2894,7 @@ def train_troop(title):
     selection.clear()
 
     # Set Speed Items
-    a, b, c, d, len_a, len_b, len_c, len_d = ['Speed Item', 'Description', 'Available', 'Use', 10, 11, 9, 3]
+    a, b, c, d, a1, b1, c1, d1 = ['Speed Item', 'Description', 'Available', 'Use', 10, 11, 9, 3]
     selection = [{'item': 'TestroniusInfusion', 'time': 0.99}, {'item': 'TestroniusDeluxe', 'time': 0.5},
                  {'item': 'TestroniusPowder', 'time': 0.3}, {'item': 'Blitz', 'time': 345600},
                  {'item': 'Blast', 'time': 216000}, {'item': 'Bolt', 'time': 86400}, {'item': 'Bore', 'time': 54000},
@@ -3142,26 +2911,26 @@ def train_troop(title):
                 my_dict = {'item': selection[x]['item'], 'qty': pData['items'][selection[x]['item']],
                            'time': selection[x]['time'], 'desc': y, 'use': 0}
                 d_speed.append(my_dict)
-                if len(t(selection[x]['item'])) > len_a:
-                    len_a = len(t(selection[x]['item']))
-                if len(y) > len_b:
-                    len_b = len(y)
+                if len(t(selection[x]['item'])) > a1:
+                    a1 = len(t(selection[x]['item']))
+                if len(y) > b1:
+                    b1 = len(y)
                 z = '{0:,}'.format(pData['items'][selection[x]['item']])
-                if len(z) > len_c:
-                    len_c = len(str(pData['items'][selection[x]['item']]))
+                if len(z) > c1:
+                    c1 = len(str(pData['items'][selection[x]['item']]))
     while True:
         screen_update(title, 'Set Speed Items To Use For Each Queue')
         ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
             t(d_troop), t(d_location), d_list[0]['quantity']))
         ctr_it(' ')
         div_line('-')
-        ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, len_a, b, len_b, c, len_c, d, len_d))
-        ctr_it('{0}  {1}  {2}  {3}'.format('-' * len_a, '-' * len_b, '-' * len_c, '-' * len_d))
+        ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, a1, b, b1, c, c1, d, d1))
+        ctr_it('{0}  {1}  {2}  {3}'.format('-' * a1, '-' * b1, '-' * c1, '-' * d1))
         reduced_time = (d_list[0]['time'] / d_list[0]['multiplier']) * d_list[0]['quantity']
         for x in range(len(d_speed)):
             ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}'.format(
-                t(d_speed[x]['item']), len_a, d_speed[x]['desc'], len_b, d_speed[x]['qty'], len_c,
-                d_speed[x]['use'], len_d))
+                t(d_speed[x]['item']), a1, d_speed[x]['desc'], b1, d_speed[x]['qty'], c1,
+                d_speed[x]['use'], d1))
             if d_speed[x]['use'] != 0:
                 if d_speed[x]['time'] < 1:
                     for y in range(d_speed[x]['use']):
@@ -3173,7 +2942,7 @@ def train_troop(title):
             reduced_time = 0 if reduced_time < 0 else cvt_time(reduced_time)
             ctr_it('Training Duration: {0}'.format(reduced_time), prefix=True, suffix=True)
         if reduced_time != 0:
-            print(' NOTE: Enter ITEM=QUANTITY (e.g. Infusion=3)')
+            print(' NOTE: Enter ITEM@QUANTITY (e.g. Infusion@3)')
         else:
             print(' Enter NEXT to proceed...')
         div_line()
@@ -3185,16 +2954,19 @@ def train_troop(title):
                 break
             else:
                 try:
-                    i_item, i_qty = d_select.split('=')
-                    if i_item.replace(' ', '').isalpha() and i_qty.isnumeric():
+                    i_item, i_qty = d_select.replace(' ', '').split('@')
+                    if i_item.isalpha() and i_qty.isnumeric():
                         for x in range(len(d_speed)):
-                            if i_item.lower() in t(d_speed[x]['item']).lower() or \
-                                                    i_item.lower() == t(d_speed[x]['item']).lower() and \
-                                                    int(i_qty) < d_speed[x]['qty']:
+                            if i_item.lower() == t(d_speed[x]['item']).lower() and int(i_qty) < d_speed[x]['qty']:
                                 d_speed[x]['use'] = int(i_qty)
                                 break
+                        else:
+                            for x in range(len(d_speed)):
+                                if i_item.lower() in t(d_speed[x]['item']).lower() and int(i_qty) < d_speed[x]['qty']:
+                                    d_speed[x]['use'] = int(i_qty)
+                                    break
                 except(TypeError, ValueError):
-                    sleep(1)
+                    pass
     d_speed[:] = [d for d in d_speed if d.get('use') != 0]
     d_max_queue = int(d_list[0]['trainable'] / d_list[0]['quantity'])
     speed_cut_off = 0
@@ -3238,7 +3010,7 @@ def train_troop(title):
             return
 
     # Train Troops
-    speeds_used = {}
+    speeds_used, powders_used = [{}, {}]
     d_start = time()
     d_conn.connect()
     for x in range(d_batch):
@@ -3254,20 +3026,23 @@ def train_troop(title):
                 ctr_it('Target Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
                     d_batch, d_delay, cvt_time(time() - d_start)))
                 div_line('-')
-                progress(x + 1, d_batch, 'Training Batch {0:,} of {1:,}'.format(x + 1, d_batch))
-                if speeds_used:
+                prog(x + 1, d_batch, 'Training Batch {0:,} of {1:,}'.format(x + 1, d_batch))
+                if speeds_used or powders_used:
                     init = 'Initializing Queue...' if dur == -1 else 'Remaning Duration: {0}'.format(cvt_time(dur))
-                    progress(y + 1, item['use'], 'Using {0}'.format(t(item['item'])), init)
-                    ctr_it('~~~ Speed Items Used ~~~', prefix=True)
-                    for key, value in speeds_used.items():
-                        ctr_it('{0}: {1:,}'.format(t(key), value))
+                    prog(y + 1, item['use'], 'Using {0}'.format(t(item['item'])), init)
+                    if powders_used:
+                        ctr_it('~~~ Testronius Used ~~~', prefix=True)
+                        display_it(powders_used, single=False)
+                    if speeds_used:
+                        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+                        display_it(speeds_used, single=False)
                     if x > 0:
                         ctr_it('~~~ Troops Trained ~~~', prefix=True)
                         ctr_it('{0:,}'.format(d_list[0]['quantity'] * x))
                         ctr_it('~~~ Power Gained ~~~', prefix=True)
                         ctr_it('{0:,}'.format(d_list[0]['quantity'] * x * d_list[0]['power']))
                 else:
-                    progress(0, 1, 'Initializing...')
+                    prog(0, 1, 'Initializing...')
                 if dur == -1:
                     x_param = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
                         d_list[0]['quantity'], d_troop)
@@ -3294,10 +3069,16 @@ def train_troop(title):
                                 dur = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
                                 if dur < 0:
                                     dur = 0
-                                if t(item['item']) in speeds_used:
-                                    speeds_used[t(item['item'])] += 1
+                                if 'Testronius' not in item['item']:
+                                    if t(item['item']) in speeds_used:
+                                        speeds_used[t(item['item'])] += 1
+                                    else:
+                                        speeds_used[t(item['item'])] = 1
                                 else:
-                                    speeds_used[t(item['item'])] = 1
+                                    if t(item['item']) in powders_used:
+                                        powders_used[t(item['item'])] += 1
+                                    else:
+                                        powders_used[t(item['item'])] = 1
                                 break
                         except (KeyError, TypeError):
                             sleep(1)
@@ -3306,11 +3087,13 @@ def train_troop(title):
     ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(t(d_troop), t(d_location), d_list[0]['quantity']))
     ctr_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
     div_line('-')
-    progress(1, 1, 'Training Completed Successfully!', 'Process completed in {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, 'Training Completed Successfully!', 'Process completed in {0}'.format(cvt_time(time() - d_start)))
+    if powders_used:
+        ctr_it('~~~ Testronius Used ~~~', prefix=True)
+        display_it(powders_used, single=False)
     if speeds_used:
         ctr_it('~~~ Speed Items Used ~~~', prefix=True)
-        for key, value in speeds_used.items():
-            ctr_it('{0}: {1:,}'.format(t(key), value))
+        display_it(speeds_used, single=False)
     ctr_it('~~~ Troops Trained ~~~', prefix=True)
     ctr_it('{0:,}'.format(d_list[0]['quantity'] * d_batch))
     ctr_it('~~~ Power Gained ~~~', prefix=True)
@@ -3318,7 +3101,7 @@ def train_troop(title):
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
     print('Refreshing... Please wait!')
-    get_data(title, data3=True, data5=True, unmute=False)
+    get_data(title, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3413,7 +3196,7 @@ def switch_realm(title, realm_no=0, c_no=0):
 
 def refresh_data(title):
     global pData, mData, fData, pfData, cData, tData
-    get_data(title, True, True, True, True, True, True)
+    get_data(title, pl=True, fm=True, pf=True, op=True, w1=True, w2=True, w3=True, unmute=True)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3457,6 +3240,15 @@ def menu():
 d_ui, d_rn, d_cn = [0, 0, 0]
 d_dh, d_si, realm, cookie, std_param, d_conn = ['', '', '', '', '', '']
 pData, mData, fData, pfData, cData, tData = ['', '', '', '', '', '']
+
+lo = {}
+try:
+    with open('locale.json', 'r') as load_file:
+        l_file = json.load(load_file)
+        for lo_k, lo_v in range(len(l_file)):
+            lo[lo_k] = lo_v
+except FileNotFoundError:
+    choose_language()
 
 # Launch Menu
 if __name__ == '__main__':
