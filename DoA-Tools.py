@@ -8,7 +8,7 @@ from time import time, sleep
 
 __author__ = 'AlphaQ2 (Suresh Kumar)'
 __credits__ = 'Lucifa & Temprid'
-__version__ = '1.5.1'
+__version__ = '1.5.5'
 __maintainer__ = 'https://www.facebook.com/groups/thesanctuary.doa/'
 
 ########################################################################################################################
@@ -160,33 +160,33 @@ def web_ops(conn, operation, param_add_on, method='POST', post=True):
         elif conn_resp.status == 429:
             conn.close()
             for ban_countdown in range(3660):
-                screen_update('TOO MANY REQUESTS ERROR', 'Your Recent Activities Has Triggered A Temporary Ban')
-                prog(ban_countdown, 3660, 'Ban duration left {0}'.format(cvt_time(3660 - ban_countdown)))
+                screen_update('{0}'.format(lo['91']), '{0}'.format(lo['92']))
+                prog(ban_countdown, 3660, '{0}: {1}'.format(lo['94'], cvt_time(3660 - ban_countdown)))
                 sleep(1)
             conn.connect()
         elif conn_resp.status == 509:
             conn.close()
             for ban_countdown in range(60):
-                screen_update('TOO MANY REQUESTS ERROR', 'Your Recent Activities Has Triggered A Warning')
-                prog(ban_countdown, 60, 'Script paused for {0}'.format(cvt_time(60 - ban_countdown)))
+                screen_update('{0}'.format(lo['91']), '{0}'.format(lo['93']))
+                prog(ban_countdown, 60, '{0}: {1}'.format(lo['95'], cvt_time(60 - ban_countdown)))
                 sleep(1)
             conn.connect()
         elif conn_resp.status == 502:
             sleep(5)
         else:
             div_line('#')
-            ctr_it('SERVER ERROR: Error Code {0} Returned By The Server'.format(conn_resp.status))
-            ctr_it('Please try again later...')
+            ctr_it('{0} {1}'.format(lo['96'], conn_resp.status))
+            ctr_it('{0}'.format(lo['25']))
             os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
             quit()
-    except http.client.HTTPException:
-        sleep(2)
     except http.client.CannotSendRequest:
         div_line('#')
-        ctr_it('SERVER ERROR: HTTP Connection Failed!')
-        ctr_it('Please reload script and try again...')
+        ctr_it('{0}'.format(lo['97']))
+        ctr_it('{0}'.format(lo['98']))
         os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
         quit()
+    except http.client.HTTPException:
+        sleep(2)
 
 
 def prog(p_count, p_total, prefix, suffix=None):
@@ -383,9 +383,12 @@ def ctr_it(string, prefix=False, suffix=False):
         print('')
 
 
-def choose_language():
+def choose_language(title=''):
     global lo
-    os.system('cls' if os.name == 'nt' else 'clear')
+    if title:
+        screen_update(title, ' ')
+    else:
+        os.system('cls' if os.name == 'nt' else 'clear')
     # conn = http.client.HTTPConnection('wackoscripts.com', 80)
     # url = 'http://wackoscripts.com/sanctuary/locale.json'
     conn = http.client.HTTPSConnection('dl.dropboxusercontent.com', 443)
@@ -403,18 +406,19 @@ def choose_language():
             continue
     else:
         div_line('#')
-        ctr_it('SERVER ERROR: Failed To Retrieve The Language File')
-        ctr_it('Please Try Again Later...')
+        ctr_it('{0}'.format(lo['99']))
+        ctr_it('{0}'.format(lo['25']))
         div_line('#')
         sleep(5)
         quit()
     if conn_data:
         d_lang = None
         while d_lang is None:
-            ctr_it('~~~ Sprog/Sprache/Language/Idioma/Langue/Lingua/Taal/Språk/Dil ~~~', prefix=True)
+            ctr_it('~~~ Language/Sprog/Sprache/Idioma/Langue/Lingua/Taal/Språk/Dil ~~~', prefix=True)
             for x in range(len(conn_data)):
                 ctr_it(conn_data[x]['type'])
-            d_select = input('\n Vælge/Auswählen/Select/Seleccionar/Sélectionner/Selezionare/Välj/Seçin : ')
+            div_line()
+            d_select = input('\n Vælge/Auswählen/Seleccionar/Sélectionner/Selezionare/Välj/Seçin\n Select : ')
             if len(d_select) >= 3:
                 for x in range(len(conn_data)):
                     if d_select.lower() == conn_data[x]['type'].lower():
@@ -488,11 +492,11 @@ def display_it(my_list, single=True):
 
 def set_batch(max_value=0, exec_string=''):
     div_line('-')
-    ctr_it('~~~ Available Options ~~~')
-    ctr_it('1 to {0}'.format(max_value - 1), suffix=True)
-    ctr_it('How many {0}?'.format(exec_string))
+    ctr_it('~~~ {0} ~~~'.format(lo['86']))
+    ctr_it('1 - {0}'.format(max_value - 1), suffix=True)
+    ctr_it('{0}'.format(exec_string))
     div_line()
-    i = input(' Enter selection : ')
+    i = input(' {0} : '.format(lo['06']))
     if len(i) >= 1:
         if i.lower() == 'exit':
             return 'exit'
@@ -503,13 +507,13 @@ def set_batch(max_value=0, exec_string=''):
 
 def set_delay():
     div_line('-')
-    ctr_it('~~~ Available Options ~~~')
-    ctr_it('0 to 5', suffix=True)
-    ctr_it('Each request made to the server increases your chances of a 1 hour')
-    ctr_it('ban. The delay feature minimizes your chances of triggering it.\n')
-    ctr_it('What delay would you like to set for this run?')
+    ctr_it('~~~ {0} ~~~'.format(lo['86']))
+    ctr_it('0 - 5', suffix=True)
+    ctr_it('{0}'.format(lo['87']))
+    ctr_it('{0}'.format(lo['88']), suffix=True)
+    ctr_it('{0}'.format(lo['89']))
     div_line()
-    i = input(' Enter selection : ')
+    i = input(' {0} : '.format(lo['06']))
     if len(i) >= 1:
         if i.lower() == 'exit':
             return 'exit'
@@ -520,11 +524,11 @@ def set_delay():
 
 def proceed_run(exec_string):
     div_line('-')
-    ctr_it('~~~ Available Options ~~~')
-    ctr_it('Yes   No', suffix=True)
-    ctr_it('Proceed with {0}?'.format(exec_string))
+    ctr_it('~~~ {0} ~~~'.format(lo['86']))
+    ctr_it('{0}'.format(lo['90']), suffix=True)
+    ctr_it('{0}'.format(exec_string))
     div_line()
-    i = input(' Enter selection : ')
+    i = input(' {0} : '.format(lo['06']))
     if len(i) >= 1:
         if i.isalpha():
             if i.lower() in 'yes':
@@ -533,21 +537,12 @@ def proceed_run(exec_string):
                 return 'exit'
 
 
-def nothing_to_do(title, subtitle, text):
+def nothing_to_do(title, subtitle, exec_string):
     screen_update(title, subtitle)
     div_line('*')
-    ctr_it('There Are No {0} Available For Now'.format(text), suffix=True)
+    ctr_it('{0}'.format(exec_string), suffix=True)
     div_line('*')
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-
-
-def result_error(text):
-    div_line('#')
-    ctr_it('SERVER ERROR')
-    ctr_it(text)
-    div_line('#')
-    os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-    quit()
 
 
 def smart_truncate(content, length=100, suffix='..'):
@@ -671,14 +666,15 @@ def get_realm_info(title):
 #                                                      FORGE CLASS                                                     #
 # -------------------------------------------------------------------------------------------------------------------- #
 def create_equipment(title):
+    # temporary
     try:
         with open('forgestat.json', 'r') as read_file:
             r_file = json.load(read_file)
     except FileNotFoundError:
         r_file = []
     # Initialize Craftable Equipment
-    screen_update(title, 'Create Troop Equipment')
-    ctr_it(' Initializing...')
+    screen_update(title, '{0}'.format(lo['49']))
+    ctr_it('{0}'.format(lo['18']))
     d_list = list()
     selection = {}
     d_blacksmith = pfData['result']['blacksmith']['level']
@@ -719,7 +715,7 @@ def create_equipment(title):
                                        'speed': int(mData['units'][x]['stats']['speed'] * f_multiply)}
                             d_list.append(my_dict)
     if not d_list:
-        nothing_to_do(title, 'Create Troop Equipment', 'Craftable Troop Items')
+        nothing_to_do(title, '{0}'.format(lo['49']), '{0}'.format(lo['50']))
         return
     else:
         for x in range(len(d_list)):
@@ -729,11 +725,11 @@ def create_equipment(title):
     # Select Troop For Equipment Crafting
     d_troop = None
     while d_troop is None:
-        screen_update(title, 'Create Troop Equipment')
-        ctr_it('~~~ Available Troops ~~~')
+        screen_update(title, '{0}'.format(lo['49']))
+        ctr_it('~~~ {0} ~~~'.format(lo['51']))
         display_it(selection)
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 3:
             if d_select.lower() == 'exit':
                 return
@@ -747,7 +743,10 @@ def create_equipment(title):
             selection[d_list[x]['item']] = '{0}: {1:,}'.format(t(d_list[x]['item']), d_list[x]['craftable'])
 
     # Select Equipment To Craft
-    a, b, c, d, e, f, g, h = ['Equipment', 'Craftable', 'Defense', 'Life', 'Melee', 'Range', 'Ranged', 'Speed']
+    a, b, c, d, e, f, g, h = ['{0}'.format(lo['52']), '{0}'.format(lo['53']), '{0}'.format(lo['54']).title(),
+                              '{0}'.format(lo['55']).title(), '{0}'.format(lo['56']).title(),
+                              '{0}'.format(lo['57']).title(), '{0}'.format(lo['58']).title(),
+                              '{0}'.format(lo['59']).title()]
     a1, b1, c1, d1, e1, f1, g1, h1 = [len(a), len(b), len(c), len(d), len(e), len(f), len(g), len(h)]
     for x in range(len(d_list)):
         if len(t(d_list[x]['item'])) > a1:
@@ -768,78 +767,85 @@ def create_equipment(title):
             h1 = len('{0:,}'.format(d_list[x]['speed']))
     d_item = None
     while d_item is None:
-        screen_update(title, 'Select Troop Equipment')
-        ctr_it('Troop: {0}'.format(t(d_troop)))
+        screen_update(title, '{0}'.format(lo['60']))
+        ctr_it('{0}: {1}'.format(lo['61'], t(d_troop)))
         ctr_it(' ')
         div_line('-')
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}} {6:^{7}} {8:^{9}} {10:^{11}} {12:^{13}} {14:^{15}}'.format(
-                a, a1, b, b1, c, c1, d, d1, e, e1, f, f1, g, g1, h, h1))
+            a, a1, b, b1, c, c1, d, d1, e, e1, f, f1, g, g1, h, h1))
         ctr_it('{0}  {1}  {2} {3} {4} {5} {6} {7}'.format(
-                '~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1, '~' * f1, '~' * g1, '~' * h1))
+            '~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1, '~' * f1, '~' * g1, '~' * h1))
         for x in range(len(d_list)):
             ctr_it('{0:<{1}}  {2:^{3},}  {4:>{5},} {6:>{7},} {8:>{9},} {10:>{11},} {12:>{13},} {14:>{15},}'.format(
-                    t(d_list[x]['item']), a1, d_list[x]['craftable'], b1, d_list[x]['defense'], c1, d_list[x]['life'],
-                    d1,
-                    d_list[x]['melee'], e1, d_list[x]['range'], f1, d_list[x]['range'], g1, d_list[x]['speed'], h1))
+                t(d_list[x]['item']), a1, d_list[x]['craftable'], b1, d_list[x]['defense'], c1, d_list[x]['life'],
+                d1,
+                d_list[x]['melee'], e1, d_list[x]['range'], f1, d_list[x]['range'], g1, d_list[x]['speed'], h1))
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 3:
             if d_select.lower() == 'exit':
                 return
             elif d_select.isalpha():
                 d_item = check_input(d_select, selection)
-
     d_list[:] = [d for d in d_list if d.get('item') == d_item]
 
     # Set Minimum Equipment Stat
     d_attrib, d_stat = [None, None]
     while d_attrib is None:
-        screen_update(title, 'Select Troop Attribute And Minimum Requirement')
-        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
+        screen_update(title, '{0}'.format(lo['62']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['63'], t(d_item)))
         ctr_it(' ')
         div_line('-')
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}  {10:^{11}}'.format(
-                c, c1, d, d1, e, e1, f, f1, g, g1, h, h1))
+            c, c1, d, d1, e, e1, f, f1, g, g1, h, h1))
         ctr_it('{0}  {1}  {2}  {3}  {4}  {5}'.format('~' * c1, '~' * d1, '~' * e1, '~' * f1, '~' * g1, '~' * h1))
         for x in range(len(d_list)):
             ctr_it('{0:<{1},}  {2:^{3},}  {4:>{5},}  {6:>{7},}  {8:>{9},}  {10:>{11},}'.format(
-                    d_list[x]['defense'], c1, d_list[x]['life'], d1, d_list[x]['melee'], e1, d_list[x]['range'], f1,
-                    d_list[x]['range'], g1, d_list[x]['speed'], h1))
-        print('\n NOTE: Enter ATTRIBUTE@REQUIREMENT (e.g. speed@300)')
+                d_list[x]['defense'], c1, d_list[x]['life'], d1, d_list[x]['melee'], e1, d_list[x]['range'], f1,
+                d_list[x]['range'], g1, d_list[x]['speed'], h1))
+        print('\n {0}'.format(lo['64']))
         div_line()
-        d_select = input(' Enter selection : ')
-        if len(d_select) >= 3:
+        d_select = input(' {0} : '.format(lo['06']))
+        if len(d_select) >= 4:
             if d_select.lower() == 'exit':
                 return
             else:
                 try:
                     i_attrib, i_stat = d_select.split('@')
-                    if i_attrib.replace(' ', '').isalpha() and i_stat.isnumeric():
-                        for key in ('defense', 'life', 'melee', 'range', 'ranged', 'speed'):
-                            if i_attrib.lower() == key:
-                                d_attrib = key
-                                d_stat = int(i_stat)
-                                break
+                    if i_stat.isnumeric():
+                        if i_attrib.lower() == '{0}'.format(lo['54']):
+                            d_attrib = 'defense'
+                        elif i_attrib.lower() == '{0}'.format(lo['55']):
+                            d_attrib = 'life'
+                        elif i_attrib.lower() == '{0}'.format(lo['56']):
+                            d_attrib = 'melee'
+                        elif i_attrib.lower() == '{0}'.format(lo['57']):
+                            d_attrib = 'range'
+                        elif i_attrib.lower() == '{0}'.format(lo['58']):
+                            d_attrib = 'ranged'
+                        elif i_attrib.lower() == '{0}'.format(lo['59']):
+                            d_attrib = 'speed'
+                        d_stat = int(i_stat)
+                        break
                 except(TypeError, ValueError):
                     sleep(1)
 
     # Set Number Of Batches
     d_batch = None
     while d_batch is None:
-        screen_update(title, 'Number Of Equipment To Forge')
-        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        ctr_it('Requirement: {0:,} {1}'.format(d_stat, d_attrib.title()))
-        d_batch = set_batch(d_list[0]['craftable'] + 1, 'equipment would you like to craft')
+        screen_update(title, '{0}'.format(lo['67']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['63'], t(d_item)))
+        ctr_it('{0}: {1:,} {2}'.format(lo['65'], d_stat, d_attrib.title()))
+        d_batch = set_batch(d_list[0]['craftable'] + 1, '{0}'.format(lo['68']))
         if d_batch == 'exit':
             return
 
     # Set Delay
     d_delay = None
     while d_delay is None:
-        screen_update(title, 'Set Delay Between Equipment Crafting')
-        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}'.format(
-                d_stat, d_attrib.title(), d_batch))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['63'], t(d_item)))
+        ctr_it('{0}: {1:,} {2}   {3}: {4:,}'.format(lo['65'], d_stat, d_attrib.title(), lo['66'], d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -847,42 +853,41 @@ def create_equipment(title):
     # Proceed Forging
     d_proceed = False
     while not d_proceed:
-        screen_update(title, 'Ready To Begin Crafting')
-        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s'.format(
-                d_stat, d_attrib.title(), d_batch, d_delay))
-        d_proceed = proceed_run('equipment crafting')
+        screen_update(title, '{0}'.format(lo['70']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['63'], t(d_item)))
+        ctr_it('{0}: {1:,} {2}   {3}: {4:,}   {5}: {6}s'.format(
+            lo['65'], d_stat, d_attrib.title(), lo['66'], d_batch, lo['71'], d_delay))
+        d_proceed = proceed_run('{0}'.format(lo['72']))
         if d_proceed == 'exit':
             return
 
     # Forge Equipment
     d_start = time()
-    forge_succ = 0
-    forge_fail = 0
-    len_item = 0
+    forge_succ, forge_fail, len_item = [0, 0, 0]
     kept_items = list()
     crushed_items = {}
     d_conn.connect()
     for x in range(1, d_batch + 1):
-        screen_update(title, 'Progress Report...')
-        ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-        ctr_it('Requirement: {0:,} {1}   Crafting: {2:,}   Delay: {3}s   Elapsed Time: {4}'.format(
-                d_stat, d_attrib.title(), d_batch, d_delay, cvt_time(time() - d_start)))
+        screen_update(title, '{0}'.format(lo['73']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['63'], t(d_item)))
+        ctr_it('{0}: {1:,} {2}   {3}: {4:,}   {5}: {6}s   {7}: {8}'.format(
+            lo['65'], d_stat, d_attrib.title(), lo['66'], d_batch, lo['71'], d_delay, lo['74'],
+            cvt_time(time() - d_start)))
         div_line('-')
-        prog(x, d_batch, 'Crafting {0} Of {1}'.format(x, d_batch),
-             'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}\n'.format(
-                     forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
+        prog(x, d_batch, '{0}: {1}/{2}'.format(lo['66'], x, d_batch),
+             '{0}: {1:,}  {2}: {3:,}  {4}: {5:,}  {6}: {7:,}'.format(
+                 lo['75'], forge_succ, lo['76'], forge_fail, lo['77'], len(kept_items), lo['78'],
+                 forge_succ - len(kept_items)))
         if kept_items:
-            ctr_it('~~~ Kept Items ~~~')
+            ctr_it('~~~ {0} ~~~'.format(lo['79']), prefix=True)
             for y in range(len(kept_items)):
-                k_item = 'Item {0}: '.format(y + 1) + ', '.join('{0} {1}'.format(
-                        k_i.title(), v_i) for k_i, v_i in kept_items[y].items())
+                k_item = '{0} {1}: '.format(lo['80'], y + 1) + ', '.join('{0} {1}'.format(
+                    k_i.title(), v_i) for k_i, v_i in kept_items[y].items())
                 if len(k_item) > len_item:
                     len_item = len(k_item)
                 ctr_it('{0:<{1}}'.format(k_item, len_item))
-            print(' ')
         if crushed_items:
-            ctr_it('~~~ Crushed Items Received ~~~')
+            ctr_it('~~~ {0} ~~~'.format(lo['81']), prefix=True)
             display_it(crushed_items, single=False)
         crush_it = False
         x_param = 'output%5Fname={0}&'.format(d_item)
@@ -923,25 +928,27 @@ def create_equipment(title):
                     sleep(1)
                     continue
     d_conn.close()
-    screen_update(title, 'Summary Report')
-    ctr_it('Troop: {0}   Type: {1}'.format(t(d_troop), t(d_item)))
-    ctr_it('Requirement: {0:,} {1}   Crafted: {2:,}   Delay: {3}s'.format(d_stat, d_attrib.title(), d_batch, d_delay))
+    screen_update(title, '')
+    ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['63'], t(d_item)))
+    ctr_it('{0}: {1:,} {2}   {3}: {4:,}   {5}: {6}s'.format(
+        lo['65'], d_stat, d_attrib.title(), lo['83'], d_batch, lo['71'], d_delay))
     div_line('-')
-    prog(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)),
-         'Success: {0:,}  Failed: {1:,}  Kept: {2:,}  Crushed: {3:,}'.format(
-                 forge_succ, forge_fail, len(kept_items), forge_succ - len(kept_items)))
+    prog(1, 1, '{0} {1}'.format(lo['84'], cvt_time(time() - d_start)),
+         '{0}: {1:,}  {2}: {3:,}  {4}: {5:,}  {6}: {7:,}'.format(
+             lo['75'], forge_succ, lo['76'], forge_fail, lo['77'], len(kept_items), lo['78'],
+             forge_succ - len(kept_items)))
     if kept_items:
-        ctr_it('~~~ Kept Items ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['79']), prefix=True)
         for y in range(len(kept_items)):
-            k_item = 'Item {0}: '.format(y + 1) + ', '.join('{0} {1}'.format(
-                    k_i.title(), v_i) for k_i, v_i in kept_items[y].items())
+            k_item = '{0} {1}: '.format(lo['80'], y + 1) + ', '.join('{0} {1}'.format(
+                k_i.title(), v_i) for k_i, v_i in kept_items[y].items())
             ctr_it('{0:<{1}}'.format(k_item, len_item))
     if crushed_items:
-        ctr_it('~~~ Crushed Items Received ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['81']), prefix=True)
         display_it(crushed_items, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-    print('Refreshing... Please wait!')
+    print('{0}'.format(lo['85']))
     get_data(title, pf=True, op=True, unmute=False)
 
 
@@ -949,8 +956,8 @@ def create_equipment(title):
 
 def forge_ingredient(title):
     # Initialize Craftable Ingredient
-    screen_update(title, 'Create Forge Ingredient')
-    ctr_it(' Initializing...')
+    screen_update(title, '{0}'.format(lo['A0']))
+    ctr_it('{0}'.format(lo['18']))
     d_list = list()
     selection = {}
     d_blacksmith = pfData['result']['blacksmith']['level']
@@ -989,11 +996,11 @@ def forge_ingredient(title):
                         d_list.insert(x, my_dict)
 
     if not d_list:
-        nothing_to_do(title, 'Create Forge Ingredient', 'Forgeable Ingredients')
+        nothing_to_do(title, '{0}'.format(lo['A0']), '{0}'.format(lo['A1']))
         return
 
     # Select Ingredient for Crafting
-    a, b, c = ['Ingredient', 'Available', 'Forgeable']
+    a, b, c = ['{0}'.format(lo['A2']), '{0}'.format(lo['A3']), '{0}'.format(lo['A4'])]
     a1, b1, c1 = [len(a), len(b), len(c)]
     for x in range(len(d_list)):
         if d_list[x]['item'] not in selection.keys():
@@ -1006,14 +1013,14 @@ def forge_ingredient(title):
             c1 = len('{0:,}'.format(d_list[x]['craftable']))
     d_item = None
     while d_item is None:
-        screen_update(title, 'Select Ingredient To Forge')
+        screen_update(title, '{0}'.format(lo['A5']))
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
         ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
         for x in range(len(d_list)):
             ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5},}'.format(
-                    t(d_list[x]['item']), a1, d_list[x]['available'], b1, d_list[x]['craftable'], c1))
+                t(d_list[x]['item']), a1, d_list[x]['available'], b1, d_list[x]['craftable'], c1))
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 3:
             if d_select.lower() == 'exit':
                 return
@@ -1024,8 +1031,8 @@ def forge_ingredient(title):
     # Set Number Of Batches
     d_batch = None
     while d_batch is None:
-        screen_update(title, 'Number Of Ingredient To Forge')
-        ctr_it('Ingredient: {0}'.format(t(d_item)))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}: {1}'.format(lo['A2'], t(d_item)))
         ctr_it(' ')
         d_batch = set_batch(d_list[0]['craftable'] + 1, 'ingredients would you like to forge')
         if d_batch == 'exit':
@@ -1034,8 +1041,8 @@ def forge_ingredient(title):
     # Set Delay
     d_delay = None
     while d_delay is None:
-        screen_update(title, 'Set Delay Between Ingredient Forging')
-        ctr_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}: {1}   {2}: {3:,}'.format(lo['A2'], t(d_item), lo['66'], d_batch))
         ctr_it(' ')
         d_delay = set_delay()
         if d_delay == 'exit':
@@ -1044,10 +1051,10 @@ def forge_ingredient(title):
     # Proceed Forging
     d_proceed = False
     while not d_proceed:
-        screen_update(title, 'Proceed With Ingredient Forging?')
-        ctr_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
-        ctr_it('Delay: {0}s'.format(d_delay))
-        d_proceed = proceed_run('ingredient forging')
+        screen_update(title, '{0}'.format(lo['70']))
+        ctr_it('{0}: {1}   {2}: {3:,}'.format(lo['A2'], t(d_item), lo['66'], d_batch))
+        ctr_it('{0}: {1}s'.format(lo['71'], d_delay))
+        d_proceed = proceed_run('{0}'.format(lo['72']))
         if d_proceed == 'exit':
             return
 
@@ -1062,13 +1069,12 @@ def forge_ingredient(title):
     d_conn.connect()
     for x in range(1, d_batch + 1):
         screen_update(title, 'Progress Report...')
-        ctr_it('Ingredient: {0}   Crafting: {1:,}'.format(t(d_item), d_batch))
-        ctr_it('Delay: {0}s   Elapsed Time: {1}'.format(
-                d_delay, cvt_time(time() - d_start)))
+        ctr_it('{0}: {1}   {2}: {3:,}'.format(lo['A2'], t(d_item), lo['66'], d_batch))
+        ctr_it('{0}: {1}s   {2}: {3}'.format(lo['71'], d_delay, lo['74'], cvt_time(time() - d_start)))
         div_line('-')
-        prog(x, d_batch, 'Forging {0} of {1}'.format(x, d_batch), ' ')
+        prog(x, d_batch, '{0}: {1}/{2}'.format(lo['B0'], x, d_batch))
         if selection:
-            ctr_it('~~~ Items Used ~~~')
+            ctr_it('~~~ {0} ~~~'.format(lo['B1']), prefix=True)
             display_it(selection, single=False)
         for web_retry in range(5):
             sleep(d_delay)
@@ -1087,17 +1093,18 @@ def forge_ingredient(title):
                 sleep(1)
                 continue
     d_conn.close()
-    screen_update(title, 'Summary Report')
+    screen_update(title, '{0}'.format(lo['82']))
     ctr_it('Ingredient: {0}   Crafted: {1:,}'.format(t(d_item), d_batch))
-    ctr_it('Delay: {0}s'.format(d_delay))
+    ctr_it('{0}: {1}   {2}: {3:,}'.format(lo['A2'], t(d_item), lo['83'], d_batch))
+    ctr_it('{0}: {1}s'.format(lo['71'], d_delay))
     div_line('-')
-    prog(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, '{0} {1}'.format(lo['84'], cvt_time(time() - d_start)))
     if selection:
-        ctr_it('~~~ Items Used ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['B1']), prefix=True)
         display_it(selection, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-    print('Refreshing... Please wait!')
+    print('{0}'.format(lo['85']))
     get_data(title, pf=True, op=True, unmute=False)
 
 
@@ -1106,8 +1113,8 @@ def forge_ingredient(title):
 
 def farm_mission(title):
     # Initialize Player Missions
-    screen_update(title, 'Select A Mission To Farm')
-    ctr_it(' Initializing...')
+    screen_update(title, '{0}'.format(lo['B2']))
+    ctr_it('{0}'.format(lo['18']))
     d_list = list()
     selection = {}
     adventurers = pData['forge']['adventurers']
@@ -1117,7 +1124,7 @@ def farm_mission(title):
     for x in range(len(adventurers)):
         if adventurers[x]['current_mission'] is not None:
             x_param = 'adventurer_id={0}&mission_type={1}&'.format(
-                    adventurers[x]['adventurer_id'], adventurers[x]['current_mission'])
+                adventurers[x]['adventurer_id'], adventurers[x]['current_mission'])
             item_json = web_ops(d_conn, 'player_missions/claim_mission', x_param)
             if item_json['result']['success']:
                 claimed = True
@@ -1171,12 +1178,12 @@ def farm_mission(title):
                     d_list.append(my_dict)
 
     if not d_list:
-        nothing_to_do(title, 'Select A Mission To Farm', 'Adventurers')
+        nothing_to_do(title, '{0}'.format(lo['B2']), '{0}'.format(lo['B3']))
         return
     selection.clear()
 
     # Select Mission
-    a, b, c = ['Mission', 'Time', 'Quantity']
+    a, b, c = ['{0}'.format(lo['B4']), '{0}'.format(lo['B5']), '{0}'.format(lo['B6'])]
     a1, b1, c1 = [len(a), len(b), len(c)]
     for x in range(len(d_list)):
         if len(t(d_list[x]['mission'])) > a1:
@@ -1188,23 +1195,22 @@ def farm_mission(title):
     d_list = sorted(d_list, key=itemgetter('desc'))
     d_mission = None
     while d_mission is None:
-        screen_update(title, 'Select A Mission To Farm')
+        screen_update(title, '{0}'.format(lo['B2']))
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
         ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
         for x in range(len(d_list)):
             if d_list[x]['mission'] not in selection.keys():
                 selection[d_list[x]['mission']] = d_list[x]['desc']
-                c = 'No Limit' if d_list[x]['batch'] == 9999999 else '{0:,}'.format(d_list[x]['batch'])
+                c = '{0}'.format(lo['B7']) if d_list[x]['batch'] == 9999999 else '{0:,}'.format(d_list[x]['batch'])
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5}}'.format(
-                        d_list[x]['desc'], a1, cvt_time(d_list[x]['time'], show_seconds=False), b1, c, c1))
+                    d_list[x]['desc'], a1, cvt_time(d_list[x]['time'], show_seconds=False), b1, c, c1))
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 3:
             if d_select.lower() == 'exit':
                 return
-            elif d_select.isalpha():
+            else:
                 d_mission = check_input(d_select, selection)
-
     d_list[:] = [d for d in d_list if d.get('mission') == d_mission]
     selection.clear()
     for x in range(len(d_list)):
@@ -1214,14 +1220,14 @@ def farm_mission(title):
     # Select Adventurer
     d_adventurer = None
     while d_adventurer is None:
-        screen_update(title, 'Select An Adventurer To Farm The Mission')
-        ctr_it('Mission: {0} ({1})'.format(t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False)))
+        screen_update(title, '{0}'.format(lo['B8']))
+        ctr_it('{0}: {1} ({2})'.format(lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False)))
         ctr_it(' ')
         div_line('-')
-        ctr_it('~~~ Available Adventurers ~~~')
+        ctr_it('~~~ {0} ~~~'.format(lo['C0']))
         display_it(selection)
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 3:
             if d_select.lower() == 'exit':
                 return
@@ -1239,7 +1245,7 @@ def farm_mission(title):
 
     # Select Speed Items
     d_speed = list()
-    a, b, c, d = ['Item', 'Description', 'Available', 'Use']
+    a, b, c, d = ['{0}'.format(lo['80']), '{0}'.format(lo['C1']), '{0}'.format(lo['A3']), '{0}'.format(lo['C2'])]
     a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
     for key in range(len(speed_items_dict)):
         look_up = speed_items_dict[key]
@@ -1254,13 +1260,13 @@ def farm_mission(title):
                        'quantity': pData['items'][look_up['item']], 'use': 0}
             d_speed.append(my_dict)
     if not d_speed:
-        nothing_to_do(title, 'Select A Mission To Farm', 'Speed Items')
+        nothing_to_do(title, '{0}'.format(lo['B2']), '{0}'.format(lo['C3']))
         return
 
     while True:
-        screen_update(title, 'Select Speed Items To Use')
-        ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(
-                t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), t(d_adventurer)))
+        screen_update(title, '{0}'.format(lo['C4']))
+        ctr_it('{0}: {1} ({2})   {3}: {4}'.format(
+            lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), lo['C5'], t(d_adventurer)))
         ctr_it(' ')
         div_line('-')
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, a1, b, b1, c, c1, d, d1))
@@ -1268,18 +1274,18 @@ def farm_mission(title):
         reduced_time = d_list[0]['time']
         for key in range(len(d_speed)):
             ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}'.format(
-                    d_speed[key]['item'], a1, cvt_time(d_speed[key]['time'], show_seconds=False), b1,
-                    d_speed[key]['quantity'], c1, d_speed[key]['use'], d1))
+                d_speed[key]['item'], a1, cvt_time(d_speed[key]['time'], show_seconds=False), b1,
+                d_speed[key]['quantity'], c1, d_speed[key]['use'], d1))
             if d_speed[key]['use']:
                 reduced_time -= d_speed[key]['time'] * d_speed[key]['use']
                 reduced_time = 0 if reduced_time <= 0 else reduced_time
-        ctr_it('Mission Duration: {0}'.format(cvt_time(reduced_time, show_seconds=False)), prefix=True, suffix=True)
+        ctr_it('{0}: {1}'.format(lo['A7'], cvt_time(reduced_time, show_seconds=False)), prefix=True, suffix=True)
         if reduced_time != 0:
-            print(' NOTE: Enter ITEM@QUANTITY (e.g. Hop@3)')
+            print(' {0}'.format(lo['C6']))
         else:
-            print(' Enter NEXT to proceed...')
+            print(' {0}'.format(lo['C7']))
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} '.format(lo['06']))
         if len(d_select) >= 2:
             if d_select.lower() == 'exit':
                 return
@@ -1288,13 +1294,16 @@ def farm_mission(title):
             else:
                 try:
                     i_item, i_qty = d_select.split('@')
-                    if i_item.replace(' ', '').isalpha() and i_qty.isnumeric():
+                    if i_qty.isnumeric():
                         for x in range(len(d_speed)):
-                            if i_item.lower() in t(d_speed[x]['item']).lower() or \
-                                                    i_item.lower() == t(d_speed[x]['item']).lower() and \
-                                                    int(i_qty) < d_speed[x]['qty']:
+                            if i_item.lower() == t(d_speed[x]['item']).lower() and int(i_qty) < d_speed[x]['qty']:
                                 d_speed[x]['use'] = int(i_qty)
                                 break
+                        else:
+                            for x in range(len(d_speed)):
+                                if i_item.lower() in t(d_speed[x]['item']).lower() and int(i_qty) < d_speed[x]['qty']:
+                                    d_speed[x]['use'] = int(i_qty)
+                                    break
                 except(TypeError, ValueError):
                     sleep(1)
     d_speed[:] = [d for d in d_speed if d.get('use') != 0]
@@ -1306,21 +1315,21 @@ def farm_mission(title):
 
     # Set Number Of Batches
     while d_batch is None:
-        screen_update(title, 'Number Of Times To Farm Mission')
-        ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), cvt_time(
-                d_list[0]['time'], show_seconds=False), t(d_adventurer)))
+        screen_update(title, '{0}'.format(lo['C8']))
+        ctr_it('{0}: {1} ({2})   {3}: {4}'.format(
+            lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), lo['C5'], t(d_adventurer)))
         ctr_it(' ')
-        d_batch = set_batch(d_max_queue + 1, 'times would you like to farm the mission')
+        d_batch = set_batch(d_max_queue + 1, '{0}'.format(lo['C9']))
         if d_batch == 'exit':
             return
 
     # Set Delay
     d_delay = None
     while d_delay is None:
-        screen_update(title, 'Set Delay Between Game Requests')
-        ctr_it('Mission: {0} ({1})   Adventurer: {2}'.format(t(d_mission), cvt_time(
-                d_list[0]['time'], show_seconds=False), t(d_adventurer)))
-        ctr_it('Batches: {0:,}'.format(d_batch))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}: {1} ({2})   {3}: {4}'.format(
+            lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), lo['C5'], t(d_adventurer)))
+        ctr_it('{0}: {1:,}'.format(lo['A8'], d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -1328,17 +1337,17 @@ def farm_mission(title):
     # Proceed With Farming
     d_proceed = False
     while not d_proceed:
-        screen_update(title, 'Proceed With Farming Mission?')
-        ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
-        ctr_it('Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
-        d_proceed = proceed_run('farming mission')
+        screen_update(title, '{0}'.format(lo['70']))
+        ctr_it('{0}: {1} ({2})   {3}: {4}'.format(
+            lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), lo['C5'], t(d_adventurer)))
+        ctr_it('{0}: {1:,}   {2}: {3}s'.format(lo['A8'], d_batch, lo['71'], d_delay))
+        d_proceed = proceed_run('{0}'.format(lo['72']))
         if d_proceed == 'exit':
             return
 
     # Farm Mission
     d_start = time()
-    speeds_used = {}
-    items_gained = {}
+    speeds_used, items_gained = [{}, {}]
     d_conn.connect()
     for x in range(d_batch):
         job_id = 0
@@ -1347,20 +1356,21 @@ def farm_mission(title):
             for y in range(item['use']):
                 if dur == 0 and y < item['use'] - 1:
                     break
-                screen_update(title, 'Progress Report...')
-                ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
-                ctr_it('Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                        d_batch, d_delay, cvt_time(time() - d_start)))
+                screen_update(title, '{0}'.format(lo['73']))
+                ctr_it('{0}: {1} ({2})   {3}: {4}'.format(
+                    lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), lo['C5'], t(d_adventurer)))
+                ctr_it('{0}: {1:,}   {2}: {3}s   {4}: {5}'.format(
+                    lo['A8'], d_batch, lo['71'], d_delay, lo['74'], cvt_time(time() - d_start)))
                 div_line('-')
                 if dur == -1:
-                    prog(x, d_batch, 'Farming {0} of {1}'.format(x, d_batch), 'Initializing...')
+                    prog(x, d_batch, '{0}: {1}/{2}'.format(lo['A9'], x, d_batch), '{0}'.format(lo['18']))
                 else:
-                    prog(x + 1, d_batch, 'Farming {0} of {1}'.format(x + 1, d_batch))
+                    prog(x + 1, d_batch, '{0}: {1}/{2}'.format(lo['A9'], x + 1, d_batch))
                 if speeds_used:
-                    ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+                    ctr_it('~~~ {0} ~~~'.format(lo['D0']), prefix=True)
                     display_it(speeds_used, single=False)
                 if items_gained:
-                    ctr_it('~~~ Items Gained ~~~', prefix=True)
+                    ctr_it('~~~ {0} ~~~'.format(lo['D1']), prefix=True)
                     display_it(items_gained, single=False)
                 if dur == -1:
                     for web_retry in range(5):
@@ -1414,20 +1424,21 @@ def farm_mission(title):
                             sleep(1)
                             continue
     d_conn.close()
-    screen_update(title, 'Summary Report')
-    ctr_it('Mission: {0}   Adventurer: {1}'.format(t(d_mission), t(d_adventurer)))
-    ctr_it('Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+    screen_update(title, '{0}'.format(lo['82']))
+    ctr_it('{0}: {1} ({2})   {3}: {4}'.format(
+        lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), lo['C5'], t(d_adventurer)))
+    ctr_it('{0}: {1:,}   {2}: {3}s'.format(lo['A8'], d_batch, lo['71'], d_delay))
     div_line('-')
-    prog(1, 1, 'Process Completed in {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, '{0} {1}'.format(lo['84'], cvt_time(time() - d_start)))
     if speeds_used:
-        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['D0']), prefix=True)
         display_it(speeds_used, single=False)
     if items_gained:
-        ctr_it('~~~ Items Gained ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['D1']), prefix=True)
         display_it(items_gained, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
-    print('Refreshing... Please wait!')
+    print('{0}'.format(lo['85']))
     get_data(title, pf=True, unmute=False)
 
 
@@ -1436,8 +1447,8 @@ def farm_mission(title):
 # -------------------------------------------------------------------------------------------------------------------- #
 def open_chest(title):
     # Initialize Chest Opener
-    screen_update(title, 'Select Chests To Open')
-    ctr_it(' Initializing...')
+    screen_update(title, '{0}'.format(lo['D2']))
+    ctr_it('{0}'.format(lo['18']))
     d_list = list()
     selection = {}
     max_len = 0
@@ -1453,62 +1464,65 @@ def open_chest(title):
             d_list.append(my_dict)
 
     if not d_list:
-        nothing_to_do(title, 'Open Chests', 'Chests')
+        nothing_to_do(title, '{0}'.format(lo['D2']), '{0}'.format(lo['D3']))
         return
     else:
         d_list = sorted(d_list, key=itemgetter('desc'))
-
-    # Select Chests
-    if len(d_list) == 1:
-        d_list[0]['open'] = True
-    else:
-        a, b, c = ['Chest', 'Quantity', 'Open']
-        a1, b1, c1 = [len(a), len(b), len(c)]
-        for x in range(len(d_list)):
-            if len(d_list[x]['desc']) > a1:
-                a1 = len(d_list[x]['desc'])
-            if len('{0:,}'.format(d_list[x]['qty'])) > b1:
-                b1 = len('{0:,}'.format(d_list[x]['qty']))
-        while True:
-            screen_update(title, 'Select Chests To Open')
-            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
-            ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
-            selected = False
+        # Select Chests
+        if len(d_list) == 1:
+            d_list[0]['open'] = True
+        else:
+            a, b, c = ['{0}'.format(lo['D4']), '{0}'.format(lo['B6']), '{0}'.format(lo['D5'])]
+            a1, b1, c1 = [len(a), len(b), len(c)]
             for x in range(len(d_list)):
-                d = 'Yes' if d_list[x]['open'] else 'No'
-                if d_list[x]['open']:
-                    selected = True
-                ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5}}'.format(d_list[x]['desc'], a1, d_list[x]['qty'], b1, d, c1))
-            if not selected:
-                print('\n NOTE: Enter chest keywords to select single or multiple chests.')
-                print('       Enter ALL for all chests or NONE for resetting list')
-            else:
-                print('\n Enter NEXT to continue...\n')
-            div_line()
-            d_select = input(' Enter selection : ')
-            if len(d_select) >= 3:
-                if d_select.lower() == 'exit':
-                    return
-                elif selected and d_select.lower() == 'next':
-                    break
-                elif d_select.lower() == 'all':
-                    for x in range(len(d_list)):
-                        d_list[x]['open'] = True
-                elif d_select.lower() == 'none':
-                    for x in range(len(d_list)):
-                        d_list[x]['open'] = False
+                if len(d_list[x]['desc']) > a1:
+                    a1 = len(d_list[x]['desc'])
+                if len('{0:,}'.format(d_list[x]['qty'])) > b1:
+                    b1 = len('{0:,}'.format(d_list[x]['qty']))
+                if len('{0}'.format('D6')) > c1:
+                    c1 = len('{0}'.format('D6'))
+                if len('{0}'.format('D7')) > c1:
+                    c1 = len('{0}'.format('D7'))
+            while True:
+                screen_update(title, '{0}'.format(lo['D2']))
+                ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
+                ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
+                selected = False
+                for x in range(len(d_list)):
+                    d = '{0}'.format('D6') if d_list[x]['open'] else '{0}'.format(lo['D7'])
+                    if d_list[x]['open']:
+                        selected = True
+                    ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5}}'.format(d_list[x]['desc'], a1, d_list[x]['qty'], b1, d, c1))
+                if not selected:
+                    print('\n {0}'.format('D8'))
+                    print('       {0}'.format('D9'))
                 else:
-                    for x in range(len(d_list)):
-                        if d_select.lower() == t(d_list[x]['chest']).lower():
-                            d_list[x]['open'] = False if d_list[x]['open'] else True
-                            break
+                    print('\n {0}\n'.format('C7'))
+                div_line()
+                d_select = input(' {0} : '.format('06'))
+                if len(d_select) >= 3:
+                    if d_select.lower() == 'exit':
+                        return
+                    elif selected and d_select.lower() == 'next':
+                        break
+                    elif d_select.lower() == 'all':
+                        for x in range(len(d_list)):
+                            d_list[x]['open'] = True
+                    elif d_select.lower() == 'none':
+                        for x in range(len(d_list)):
+                            d_list[x]['open'] = False
                     else:
                         for x in range(len(d_list)):
-                            if d_select.lower() in t(d_list[x]['chest']).lower():
+                            if d_select.lower() == t(d_list[x]['chest']).lower():
                                 d_list[x]['open'] = False if d_list[x]['open'] else True
+                                break
+                        else:
+                            for x in range(len(d_list)):
+                                if d_select.lower() in t(d_list[x]['chest']).lower():
+                                    d_list[x]['open'] = False if d_list[x]['open'] else True
     d_list[:] = [d for d in d_list if d.get('open') == True]
-    d_chest = 'Chest: {0}'.format(t(d_list[0]['chest'])) if len(d_list) == 1 else 'Types Of Chest: {0}'.format(
-            len(d_list))
+    d_chest = '{0}: {1}'.format(lo['D4'], t(d_list[0]['chest'])) if len(d_list) == 1 else '{0}: {1}'.format(
+        lo['E0'], len(d_list))
     d_total, max_chest = [0, 0]
     for x in range(len(d_list)):
         d_total += d_list[x]['qty']
@@ -1520,19 +1534,19 @@ def open_chest(title):
     # Set Number Of Batches
     d_batch = None
     while d_batch is None:
-        screen_update(title, 'Set Batches Of Chests To Open')
-        ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
+        screen_update(title, '{0}'.format(lo['E1']))
+        ctr_it('{0}   {1}: {2:,}'.format(d_chest, lo['E2'], d_total))
         ctr_it(' ')
-        d_batch = set_batch(max_chest + 1, 'chests would you like to open in batches')
+        d_batch = set_batch(max_chest + 1, '{0}'.format(lo['E3']))
         if d_batch == 'exit':
             return
 
     # Set Delay
     d_delay = None
     while d_delay is None:
-        screen_update(title, 'Set Batches Of Chests To Open')
-        ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
-        ctr_it('Open in Batches: {0}'.format(d_batch))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}   {1}: {2:,}'.format(d_chest, lo['E2'], d_total))
+        ctr_it('{0}: {1}'.format(lo['E4'], d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -1540,88 +1554,95 @@ def open_chest(title):
     # Proceed With Run
     d_proceed = False
     while not d_proceed:
-        screen_update(title, 'Set Batches Of Chests To Open')
-        ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
-        ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
-        d_proceed = proceed_run('Opening of Chests')
+        screen_update(title, '{0}'.format(lo['70']))
+        ctr_it('{0}   {1}: {2:,}'.format(d_chest, lo['E2'], d_total))
+        ctr_it('{0}: {1}   {2}: {3}s'.format(lo['E4'], d_batch, lo['71'], d_delay))
+        d_proceed = proceed_run('{0}'.format(lo['72']))
         if d_proceed == 'exit':
             return
 
     # Open Chests
-    screen_update(title, 'Progress Report...')
-    ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
-    ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
+    screen_update(title, '{0}'.format(lo['73']))
+    ctr_it('{0}   {1}: {2:,}'.format(d_chest, lo['E2'], d_total))
+    ctr_it('{0}: {1}   {2}: {3}s'.format(lo['E4'], d_batch, lo['71'], d_delay))
     div_line('-')
-    prog(0, 1, 'Initializing...')
+    prog(0, 1, '{0}'.format(lo['18']))
     selection.clear()
     d_start = time()
     look_up = pData['items']
-    overall_received = {'Chests': {}, 'Arsenal': {}, 'Speeds': {}, 'Grants & Seals': {}, 'Others': {}}
-    speed_items = ('DarkTestroniusInfusion', 'DarkTestroniusPowder', 'DarkTestroniusDeluxe', 'Hop', 'TranceMarchDrops',
-                   'TestroniusInfusion', 'ForcedMarchDrops', 'TranceMarchElixir', 'Godspeed', 'Bounce', 'Skip', 'Jump',
-                   'TestroniusPowder', 'TestroniusDeluxe', 'Leap', 'Bore', 'Bolt', 'Blast', 'Blitz', 'Blink')
+    o_received = {'{0}'.format(lo['D4']): {}, '{0}'.format(lo['E5']): {}, '{0}'.format(lo['E6']): {},
+                  '{0}'.format(lo['E7']): {}, '{0}'.format(lo['E8']): {}, '{0}'.format(lo['E9']): {}}
+    speed_items = ('Hop', 'TranceMarchDrops', 'ForcedMarchDrops', 'TranceMarchElixir', 'Godspeed', 'Bounce', 'Skip',
+                   'Jump', 'Leap', 'Bore', 'Bolt', 'Blast', 'Blitz', 'Blink')
     ttl_open = 0
     d_conn.connect()
     for x in range(len(d_list)):
-        received_items = {'Chests': {}, 'Arsenal': {}, 'Speeds': {}, 'Grants & Seals': {}, 'Others': {}}
+        i_received = {'{0}'.format(lo['D4']): {}, '{0}'.format(lo['E5']): {}, '{0}'.format(lo['E6']): {},
+                      '{0}'.format(lo['E7']): {}, '{0}'.format(lo['E8']): {}, '{0}'.format(lo['E9']): {}}
         opened = d_list[x]['qty']
         count = 0
-        open_quantity = d_batch if d_list[x]['max_use'] >= d_batch else d_list[x]['max_use']
-        open_quantity = d_list[x]['qty'] if d_list[x]['qty'] <= open_quantity else open_quantity
+        open_qty = d_batch if d_list[x]['max_use'] >= d_batch else d_list[x]['max_use']
+        open_qty = d_list[x]['qty'] if d_list[x]['qty'] <= open_qty else open_qty
         while opened != 0:
-            if opened < open_quantity:
-                open_quantity = opened
+            if opened < open_qty:
+                open_qty = opened
             for web_retry in range(5):
                 sleep(d_delay)
                 try:
-                    x_param = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
+                    x_param = '%5Fmethod=delete&quantity={0}&'.format(open_qty)
                     main_data = web_ops(d_conn, 'player_items/{0}'.format(d_list[x]['chest']), x_param)
                     result = main_data['result']['success']
                     if result:
-                        opened -= open_quantity
-                        count += open_quantity
-                        ttl_open += open_quantity
+                        opened -= open_qty
+                        count += open_qty
+                        ttl_open += open_qty
                         for r_key, r_value in main_data['result']['items'].items():
                             if 'Chest' in r_key:
                                 if r_key in look_up.keys() and r_value > look_up[r_key]:
-                                    received_items['Chests'][t(r_key)] = r_value - look_up[r_key]
+                                    i_received['{0}'.format(lo['D4'])][t(r_key)] = r_value - look_up[r_key]
                                 if r_key not in look_up.keys():
-                                    received_items['Chests'][t(r_key)] = r_value
+                                    i_received['{0}'.format(lo['D4'])][t(r_key)] = r_value
                             elif 'TroopPrize' in r_key:
                                 if r_key in look_up.keys() and r_value > look_up[r_key]:
-                                    received_items['Arsenal'][t(r_key)] = r_value - look_up[r_key]
+                                    i_received['{0}'.format(lo['E5'])][t(r_key)] = r_value - look_up[r_key]
                                 if r_key not in look_up.keys():
-                                    received_items['Arsenal'][t(r_key)] = r_value
+                                    i_received['{0}'.format(lo['E5'])][t(r_key)] = r_value
                             elif 'Seal' in r_key or 'Grant' in r_key:
                                 if r_key in look_up.keys() and r_value > look_up[r_key]:
-                                    received_items['Grants & Seals'][t(r_key)] = r_value - look_up[r_key]
+                                    i_received['{0}'.format(lo['E8'])][t(r_key)] = r_value - look_up[r_key]
                                 if r_key not in look_up.keys():
-                                    received_items['Grants & Seals'][t(r_key)] = r_value
+                                    i_received['{0}'.format(lo['E8'])][t(r_key)] = r_value
+                            elif 'Testronius' in r_key:
+                                if r_key in look_up.keys() and r_value > look_up[r_key]:
+                                    i_received['{0}'.format(lo['E7'])][t(r_key)] = r_value - look_up[r_key]
+                                if r_key not in look_up.keys():
+                                    i_received['{0}'.format(lo['E7'])][t(r_key)] = r_value
                             elif r_key in speed_items:
                                 if r_key in look_up.keys() and r_value > look_up[r_key]:
-                                    received_items['Speeds'][t(r_key)] = r_value - look_up[r_key]
+                                    i_received['{0}'.format(lo['E6'])][t(r_key)] = r_value - look_up[r_key]
                                 if r_key not in look_up.keys():
-                                    received_items['Speeds'][t(r_key)] = r_value
+                                    i_received['{0}'.format(lo['E6'])][t(r_key)] = r_value
                             else:
                                 if r_key in look_up.keys() and r_value > look_up[r_key]:
-                                    received_items['Others'][t(r_key)] = r_value - look_up[r_key]
+                                    i_received['{0}'.format(lo['E9'])][t(r_key)] = r_value - look_up[r_key]
                                 if r_key not in look_up.keys():
-                                    received_items['Others'][t(r_key)] = r_value
-                        screen_update(title, 'Progress Report...')
-                        ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
-                        ctr_it('Open in Batches: {0}   Delay: {1}s   Elapsed Time: {2}'.format(
-                                d_batch, d_delay, cvt_time(time() - d_start)))
+                                    i_received['{0}'.format(lo['E9'])][t(r_key)] = r_value
+                        screen_update(title, '{0}'.format(lo['73']))
+                        ctr_it('{0}   {1}: {2:,}'.format(d_chest, lo['E2'], d_total))
+                        ctr_it('{0}: {1}   {2}: {3}s   {4}: {5}'.format(
+                            lo['E4'], d_batch, lo['71'], d_delay, lo['74'], cvt_time(time() - d_start)))
                         div_line('-')
                         if len(d_list) > 1:
-                            prog(ttl_open, d_total, 'Overall Opened: {0:,} of {1:,}'.format(ttl_open, d_total))
-                            prog(count, d_list[x]['qty'], 'Current chest: {0}'.format(t(d_list[x]['chest'])),
-                                 'Opened {0:,} of {1:,}'.format(count, d_list[x]['qty']))
+                            prog(ttl_open, d_total, '{0}: {1:,}/{2:,}'.format(lo['F0'], ttl_open, d_total))
+                            prog(count, d_list[x]['qty'], '{0}: {1}'.format(lo['F1'], t(d_list[x]['chest'])),
+                                 '{0}: {1:,}/{2:,}'.format(lo['F2'], count, d_list[x]['qty']))
                         else:
-                            prog(count, d_list[x]['qty'], 'Opened {0:,} of {1:,}'.format(count, d_list[x]['qty']))
-                        for category in ('Chests', 'Arsenal', 'Speeds', 'Grants & Seals', 'Others'):
-                            if len(received_items[category]) > 0:
-                                selection = received_items[category]
-                                ctr_it('~~~ {0} Received ~~~'.format(category), prefix=True)
+                            prog(count, d_list[x]['qty'], '{0} {1:,}/{2:,}'.format(lo['F2'], count, d_list[x]['qty']))
+                        for category in ('{0}'.format(lo['D4']), '{0}'.format(lo['E5']), '{0}'.format(lo['E6']),
+                                         '{0}'.format(lo['E7']), '{0}'.format(lo['E8']), '{0}'.format(lo['E9'])):
+                            if len(i_received[category]) > 0:
+                                selection = i_received[category]
+                                ctr_it('~~~ {0} ~~~'.format(category), prefix=True)
                                 display_it(selection, single=False)
                         if count == d_list[x]['qty']:
                             look_up = main_data['result']['items']
@@ -1629,26 +1650,27 @@ def open_chest(title):
                 except (KeyError, TypeError):
                     sleep(1)
                     continue
-        for category in ('Chests', 'Arsenal', 'Speeds', 'Grants & Seals', 'Others'):
-            for r_key, r_value in received_items[category].items():
-                if r_key in overall_received[category].keys():
-                    overall_received[category][r_key] += r_value
+        for category in ('{0}'.format(lo['D4']), '{0}'.format(lo['E5']), '{0}'.format(lo['E6']), '{0}'.format(lo['E7']),
+                         '{0}'.format(lo['E8']), '{0}'.format(lo['E9'])):
+            for r_key, r_value in i_received[category].items():
+                if r_key in o_received[category].keys():
+                    o_received[category][r_key] += r_value
                 else:
-                    overall_received[category][r_key] = r_value
-    screen_update(title, 'Summary Report')
-    ctr_it('{0}   Total Chests: {1:,}'.format(d_chest, d_total))
-    ctr_it('Open in Batches: {0}   Delay: {1}s'.format(d_batch, d_delay))
+                    o_received[category][r_key] = r_value
+    screen_update(title, '{0}'.format(lo['82']))
+    ctr_it('{0}   {1}: {2:,}'.format(d_chest, lo['E2'], d_total))
+    ctr_it('{0}: {1}   {2}: {3}s'.format(lo['E4'], d_batch, lo['71'], d_delay))
     div_line('-')
-    prog(1, 1, 'Chest Opening Completed!', 'Process completed in {0}'.format(
-            cvt_time(time() - d_start)))
-    for category in ('Chests', 'Arsenal', 'Speeds', 'Grants & Seals', 'Others'):
-        if len(overall_received[category]) > 0:
-            selection = overall_received[category]
-            ctr_it('~~~ {0} Received ~~~'.format(category), prefix=True)
+    prog(1, 1, '{0} {1}'.format(lo['84'], cvt_time(time() - d_start)))
+    for category in ('{0}'.format(lo['D4']), '{0}'.format(lo['E5']), '{0}'.format(lo['E6']), '{0}'.format(lo['E7']),
+                     '{0}'.format(lo['E8']), '{0}'.format(lo['E9'])):
+        if len(o_received[category]) > 0:
+            selection = o_received[category]
+            ctr_it('~~~ {0} ~~~'.format(category), prefix=True)
             display_it(selection, single=False)
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
-    print('Refreshing... Please wait!')
+    print('{0}'.format(lo['85']))
     get_data(title, pf=True, unmute=False)
 
 
@@ -1656,8 +1678,8 @@ def open_chest(title):
 
 def unpack_arsenal(title):
     # Initialize Open Arsenal
-    screen_update(title, 'Select Troop Type')
-    ctr_it(' Initializing...')
+    screen_update(title, '{0}'.format(lo['F3']))
+    ctr_it('{0}'.format(lo['18']))
     d_list = list()
     selection = {}
     max_use_quantity = 0
@@ -1686,7 +1708,7 @@ def unpack_arsenal(title):
                                'bin_type': bin_type, 'max_use': max_use_quantity, 'use': False}
                     d_list.append(my_dict)
     if not d_list:
-        nothing_to_do(title, 'Select Troop Type', 'no bins')
+        nothing_to_do(title, '{0}'.format(lo['F3']), '{0}'.format(lo['F4']))
         return
     if len(d_list) == 1:
         d_troop = d_list[0]['troop']
@@ -1697,26 +1719,30 @@ def unpack_arsenal(title):
                 selection[d_list[x]['troop']] = t(d_list[x]['troop'])
         # Select Troop Type
         while not d_troop:
-            screen_update(title, 'Select Troop Type')
-            ctr_it('~~~ Available Troop Bins ~~~')
+            screen_update(title, '{0}'.format(lo['F3']))
+            ctr_it('~~~ {0} ~~~'.format(lo['F5']))
             display_it(selection)
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format('06'))
             if len(d_select) >= 3:
-                if all(i.isalpha() or i == ' ' for i in d_select):
-                    if d_select.lower() == 'exit':
-                        return
+                if d_select.lower() == 'exit':
+                    return
+                else:
+                    for key, value in selection.items():
+                        if d_select.lower() == value.lower():
+                            d_troop = key
+                            break
                     else:
                         for key, value in selection.items():
-                            if d_select.lower() in value.lower() or d_select.lower() == value.lower():
+                            if d_select.lower() == value.lower():
                                 d_troop = key
+                                break
     d_list[:] = [d for d in d_list if d.get('troop') == d_troop]
-
     if len(d_list) == 1:
         d_list[0]['use'] = True
     else:
         # Select Bins To Open
-        a, b, c, d = ['Type', 'Quantity', 'Power Gain', 'Open']
+        a, b, c, d = ['{0}'.format(lo['63']), '{0}'.format(lo['B6']), '{0}'.format(lo['F6']), '{0}'.format(lo['D5'])]
         a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
         for x in range(len(d_list)):
             if len('{0}'.format(d_list[x]['bin_desc'])) > a1:
@@ -1725,33 +1751,42 @@ def unpack_arsenal(title):
                 b1 = len('{0:,}'.format(d_list[x]['quantity']))
             if len('{0:,}'.format(d_list[x]['bin_type'] * d_list[x]['quantity'] * d_list[x]['power'])) > c1:
                 c1 = len('{0:,}'.format(d_list[x]['bin_type'] * d_list[x]['quantity'] * d_list[x]['power']))
-        while True:
-            screen_update(title, 'Select Arsenal Type')
-            ctr_it('Selected Troop: {0}'.format(t(d_troop)))
+        selected = False
+        while not selected:
+            screen_update(title, '{0}'.format(lo['F7']))
+            ctr_it('{0}: {1}'.format(lo['F8'], t(d_troop)))
             ctr_it(' ')
             div_line('-')
             ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, a1, b, b1, c, c1, d, d1))
             ctr_it('{0}  {1}  {2}  {3}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1))
+            gtg = False
             for x in range(len(d_list)):
                 e = '{0:,}'.format(d_list[x]['bin_type'] * d_list[x]['quantity'] * d_list[x]['power'])
-                f = 'Yes' if d_list[x]['use'] == True else 'No'
+                if d_list[x]['use']:
+                    f = 'Yes'
+                    gtg = True
+                else:
+                    f = 'No'
                 ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5}}  {6:>{7}}'.format(
-                        d_list[x]['bin_desc'], a1, d_list[x]['quantity'], b1, e, c1, f, d1))
-            print('\n Note: ALL = Unpacks all troop bins listed above')
+                    d_list[x]['bin_desc'], a1, d_list[x]['quantity'], b1, e, c1, f, d1))
+            if not gtg:
+                print('\n {0}'.format(lo['G0']))
+            else:
+                print('\n {0}'.format(lo['C7']))
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format('06'))
             if len(d_select) >= 3:
                 if d_select.lower() == 'exit':
                     return
                 elif d_select.lower() == 'all':
                     for x in range(len(d_list)):
                         d_list[x]['use'] = True
-                        break
+                elif d_select.lower() == 'next' and gtg is True:
+                    selected = True
                 else:
                     for x in range(len(d_list)):
                         if d_select.lower() == d_list[x]['bin_desc'].lower():
                             d_list[x]['use'] = True if d_list[x]['use'] else False
-                            break
                     else:
                         for x in range(len(d_list)):
                             if d_select.lower() in d_list[x]['bin_desc'].lower():
@@ -1759,28 +1794,28 @@ def unpack_arsenal(title):
     d_list[:] = [d for d in d_list if d.get('use') == True]
     d_batch = None
     if len(d_list) > 1:
-        d_bin_type = '{0} Bin Types'.format(len(d_list))
+        d_bin_type = '{0} {1}'.format(len(d_list), lo['G1'])
         d_batch = 0
         for x in range(len(d_list)):
             d_batch += d_list[x]['quantity']
     else:
-        d_bin_type = '{0:,} Bin Type'.format(d_list[0]['bin_type'])
+        d_bin_type = '{0:,} {1}'.format(d_list[0]['bin_type'], lo['G1'])
 
     # Set Number Of Batches
     while d_batch is None:
-        screen_update(title, 'Set Maximum Troop Bins To Unpack')
-        ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
+        screen_update(title, '{0}'.format(lo['G3']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['F8'], t(d_troop), lo['G4'], d_bin_type))
         ctr_it(' ')
-        d_batch = set_batch(d_list[0]['quantity'] + 1, 'troop bins would you like to unpack')
+        d_batch = set_batch(d_list[0]['quantity'] + 1, '{0}'.format(lo['G5']))
         if d_batch == 'exit':
             return
 
     # Set Delay
     d_delay = None
     while d_delay is None:
-        screen_update(title, 'Set Delay Between Instructions')
-        ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-        ctr_it('Bins Selected: {0:,}'.format(d_batch))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['F8'], t(d_troop), lo['G4'], d_bin_type))
+        ctr_it('{0}: {1:,}'.format(lo['G6'], d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -1788,19 +1823,19 @@ def unpack_arsenal(title):
     # Proceed With Run
     d_proceed = False
     while not d_proceed:
-        screen_update(title, 'Proceed With Unpacking Troop Bins?')
-        ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-        ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
-        d_proceed = proceed_run('Unpacking of Troop Bins')
+        screen_update(title, '{0}'.format(lo['70']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['F8'], t(d_troop), lo['G4'], d_bin_type))
+        ctr_it('{0}: {1:,}   {2}: {3}s'.format(lo['G6'], d_batch, lo['71'], d_delay))
+        d_proceed = proceed_run('{0}'.format(lo['72']))
         if d_proceed == 'exit':
             return
 
     # Unpack Troop Bins
-    screen_update(title, 'Progress Report...')
-    ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-    ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+    screen_update(title, '{0}'.format(lo['73']))
+    ctr_it('{0}: {1}   {2}: {3}'.format(lo['F8'], t(d_troop), lo['G4'], d_bin_type))
+    ctr_it('{0}: {1:,}   {2}: {3}s'.format(lo['G6'], d_batch, lo['71'], d_delay))
     div_line('-')
-    prog(0, 1, 'Initializing...')
+    prog(0, 1, '{0}'.format(lo['18']))
     d_start = time()
     total_opened = 0
     d_power = 0
@@ -1813,15 +1848,15 @@ def unpack_arsenal(title):
             d_quantity = d_batch
         open_quantity = d_list[x]['max_use']
         while d_quantity != 0:
-            screen_update(title, 'Progress Report...')
-            ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-            ctr_it('Bins Selected: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                    d_batch, d_delay, cvt_time(time() - d_start)))
+            screen_update(title, '{0}'.format(lo['73']))
+            ctr_it('{0}: {1}   {2}: {3}'.format(lo['F8'], t(d_troop), lo['G4'], d_bin_type))
+            ctr_it('{0}: {1:,}   {2}: {3}s   {4}: {5}'.format(
+                lo['G6'], d_batch, lo['71'], d_delay, lo['74'], cvt_time(time() - d_start)))
             div_line('-')
-            prog(total_opened, d_batch, 'Unpacking {0:,} of {1:,}'.format(total_opened, d_batch))
+            prog(total_opened, d_batch, '{0}: {1:,}/{2:,}'.format(lo['G7'], total_opened, d_batch))
             if len(d_list) > 1:
-                prog(current_opened, d_list[x]['quantity'], 'Unpacking {0}'.format(t(d_list[x]['bin'])))
-            ctr_it('~~~ Power Gained ~~~', prefix=True)
+                prog(current_opened, d_list[x]['quantity'], '{0} {1}'.format(lo['G7'], t(d_list[x]['bin'])))
+            ctr_it('~~~ {0} ~~~'.format(lo['G8']), prefix=True)
             ctr_it('{0:,}'.format(d_power))
             if d_quantity < open_quantity:
                 open_quantity = d_quantity
@@ -1841,16 +1876,16 @@ def unpack_arsenal(title):
                     sleep(1)
                     continue
     d_conn.close()
-    screen_update(title, 'Summary Report')
-    ctr_it('Selected Troop: {0}   Unpack: {1}'.format(t(d_troop), d_bin_type))
-    ctr_it('Bins Selected: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+    screen_update(title, '{0}'.format(lo['82']))
+    ctr_it('{0}: {1}   {2}: {3}'.format(lo['F8'], t(d_troop), lo['G4'], d_bin_type))
+    ctr_it('{0}: {1:,}   {2}: {3}s'.format(lo['G6'], d_batch, lo['71'], d_delay))
     div_line('-')
-    prog(1, 1, 'Process Completed In {0}'.format(cvt_time(time() - d_start)))
-    ctr_it('~~~ Power Gained ~~~', prefix=True)
+    prog(1, 1, '{0} {1}'.format(lo['84'], cvt_time(time() - d_start)))
+    ctr_it('~~~ {0} ~~~'.format(lo['G8']), prefix=True)
     ctr_it('{0:,}'.format(d_power))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue . . ."')
-    print('Refreshing... Please wait!')
+    print('{0}'.format(lo['85']))
     get_data(title, pf=True, unmute=False)
 
 
@@ -1859,12 +1894,10 @@ def unpack_arsenal(title):
 
 def fill_building(title):
     # Initialize
-    screen_update(title, 'Fills Slots With Buildings')
-    ctr_it(' Initializing...')
-    d_list = list()
-    selection = {}
-    built = list()
-    capital_buildings = {}
+    screen_update(title, '{0}'.format(lo['G9']))
+    ctr_it('{0}'.format(lo['18']))
+    d_list, built = [list(), list()]
+    selection, capital_buildings = [{}, {}]
     for x in range(len(cData['capital']['city']['buildings'])):
         building = cData['capital']['city']['buildings'][x]
         if building['type'] not in capital_buildings:
@@ -1909,9 +1942,8 @@ def fill_building(title):
                                                'location_id': cData[key]['city']['id'], 'desc': t(key),
                                                'time': manifest['levels'][z]['time']}
                                     d_list.append(my_dict)
-
     if not d_list:
-        nothing_to_do(title, 'Fills Slots With Buildings', 'no buildings')
+        nothing_to_do(title, '{0}'.format(lo['G9']), '{0}'.format(lo['H0']))
         return
     elif len(d_list) == 1:
         d_location = d_list[0]['city']
@@ -1919,13 +1951,13 @@ def fill_building(title):
         d_list = sorted(d_list, key=itemgetter('desc'))
         d_location = None
         # Select Location
-        a, b, c = ['Location', 'City', 'Field']
+        a, b, c = ['{0}'.format(lo['H1']), '{0}'.format(lo['H2']), '{0}'.format(lo['H3'])]
         a1, b1, c1 = [len(a), len(b), len(c)]
         for x in range(len(d_list)):
             if len(d_list[x]['desc']) > a1:
                 a1 = len(d_list[x]['desc'])
         while d_location is None:
-            screen_update(title, 'Select Location')
+            screen_update(title, '{0}'.format(lo['H4']))
             ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
             ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
             for x in range(len(d_list)):
@@ -1935,7 +1967,7 @@ def fill_building(title):
                     selection[d_list[x]['city']] = d_list[x]['city']
                     ctr_it('{0:<{1}}  {2:^{3}}  {4:^{5}}'.format(d_list[x]['desc'], a1, d1, b1, d2, c1))
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format('06'))
             if len(d_select) >= 2:
                 if d_select.lower() == 'exit':
                     return
@@ -1956,7 +1988,7 @@ def fill_building(title):
     else:
         d_building = None
         # Select Building
-        a, b, c = ['Building', 'Time', 'Slots']
+        a, b, c = ['{0}'.format(lo['H5']), '{0}'.format(lo['B5']), '{0}'.format(lo['H6'])]
         a1, b1, c1 = [len(a), len(b), len(c)]
         for x in range(len(d_list)):
             if len(d_list[x]['type']) > a1:
@@ -1964,8 +1996,8 @@ def fill_building(title):
             if len('{0}'.format(cvt_time(d_list[x]['time']))) > b1:
                 b1 = len('{0}'.format(cvt_time(d_list[x]['time'])))
         while d_building is None:
-            screen_update(title, 'Choose Building For Location')
-            ctr_it('Location: {0}'.format(t(d_location)))
+            screen_update(title, '{0}'.format(lo['H7']))
+            ctr_it('{0}: {1}'.format(lo['H1'], t(d_location)))
             ctr_it(' ')
             div_line('-')
             ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
@@ -1976,9 +2008,9 @@ def fill_building(title):
                 else:
                     d = d_list[x]['f_slot_max'] - len(d_list[x]['f_slot'])
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:^{5}}'.format(
-                        d_list[x]['type'], a1, cvt_time(d_list[x]['time']), b1, d, c1))
+                    d_list[x]['type'], a1, cvt_time(d_list[x]['time']), b1, d, c1))
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format('06'))
             if len(d_select) >= 3:
                 if d_select.lower() == 'exit':
                     return
@@ -2006,14 +2038,14 @@ def fill_building(title):
     else:
         d_slots = 0
         while d_slots is 0:
-            screen_update(title, 'How Many Slot To Fill?')
-            ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+            screen_update(title, '{0}'.format(lo['H8']))
+            ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5']), t(d_building))
             ctr_it(' ')
             div_line('-')
-            ctr_it('~~~ Available Options ~~~')
-            ctr_it('1 to {0}'.format(max_slot))
+            ctr_it('~~~ {0} ~~~'.format(lo['86']))
+            ctr_it('1 - {0}'.format(max_slot))
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format('06'))
             if len(d_select) >= 1:
                 if d_select.lower() == 'exit':
                     return
@@ -2042,63 +2074,57 @@ def fill_building(title):
                         for c_key, c_value in requirements[key].items():
                             if c_key in capital_buildings.keys():
                                 if c_value > capital_buildings[c_key]:
-                                    req = '{0} Level {1} Required. Yours is level {2}'.format(
-                                            c_key, c_value, capital_buildings[c_key])
+                                    req = '{0} {1} {2} {3}'.format(c_key, c_value, lo['I0'], capital_buildings[c_key])
                                     req_check.append(req)
                             else:
-                                req = '{0} Level {1} Required. Yours is not built'.format(c_key, c_value)
+                                req = '{0} {1} {2}'.format(c_key, c_value, lo['I1'])
                                 req_check.append(req)
                     if key == 'items':
                         for c_key, c_value in requirements[key].items():
                             if c_key in pData['items']:
                                 if pData['items'][c_key] < c_value:
-                                    req = '{0:,} {1} Required. You have {2:,}'.format(
-                                            c_value, c_key, pData['items'][c_key])
+                                    req = '{0:,} {1} {2} {3:,}'.format(c_value, c_key, lo['I2'], pData['items'][c_key])
                                     req_check.append(req)
                             else:
-                                req = '{0:,} {1} Required. You have none'.format(c_value, c_key)
+                                req = '{0:,} {1} {2}'.format(c_value, c_key, lo['I3'])
                                 req_check.append(req)
                     if key == 'resources':
                         for c_key, c_value in requirements[key].items():
                             if c_key in cData['capital']['city']['resources']:
                                 if cData['capital']['city']['resources'][c_key] < c_value:
-                                    req = '{0:,} {1} Required. You have {2:,}'.format(
-                                            c_value, c_key, cData['capital']['city']['resources'][c_key])
+                                    req = '{0:,} {1} {2} {3:,}'.format(
+                                        c_value, c_key, lo['I2'], cData['capital']['city']['resources'][c_key])
                                     req_check.append(req)
                             else:
-                                req = '{0:,} {1} Required. You have none'.format(c_value, c_key)
+                                req = '{0:,} {1} {2}'.format(c_value, c_key, lo['I3'])
                                 req_check.append(req)
-            screen_update(title, 'How Many Slot To Fill?')
-            ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+            screen_update(title, '{0}'.format(lo['H8']))
+            ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5']), t(d_building))
             ctr_it(' ')
             div_line('-')
+            ctr_it('~~~ {0} ~~~'.format(lo['86']))
+            ctr_it('1 - {0}'.format(max_slot), suffix=True)
             if len(req_check) != 0:
                 for x in range(len(req_check)):
                     ctr_it(req_check[x])
-                ctr_it('')
-                ctr_it('Requirements Not Met. Try Lowering Slots To Fill')
-                ctr_it('')
-                div_line('-')
-                print(' Selection options available:')
-                print(' 1-{1} = Slots to fill, EXIT = Return to main menu'.format(max_slot))
+                ctr_it('{0}'.format(lo['H9']), prefix=True, suffix=True)
                 div_line()
             if len(req_check) == 0 and d_slots != 0:
                 gtg = True
             else:
-                d_select = input('Enter selection : ')
+                d_select = input(' {0} : '.format('06'))
                 if len(d_select) >= 1:
                     if d_select.lower() == 'exit':
                         return
-                    if not d_select.isnumeric():
-                        sleep(1)
-                    else:
+                    if d_select.isnumeric():
                         if int(d_select) in range(max_slot + 1):
                             d_slots = int(d_select)
                             req_check.clear()
 
     # Select Speed Items
     selection = list()
-    a, b, c, d, e = ['Item', 'Description', 'Available', 'Exceeding', 'Use']
+    a, b, c, d, e = ['{0}'.format(lo['80']), '{0}'.format(lo['C1']), '{0}'.format(lo['A3']), '{0}'.format(lo['I4']),
+                     '{0}'.format(lo['C2'])]
     a1, b1, c1, d1, e1 = [len(a), len(b), len(c), len(d), len(e)]
     for key in range(len(speed_items_dict)):
         look_up = speed_items_dict[key]
@@ -2116,25 +2142,25 @@ def fill_building(title):
             selection.append(my_dict)
     if selection:
         while True:
-            screen_update(title, 'Select Speed Items To Use')
-            ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-            ctr_it('Slots To Fill: {0}'.format(d_slots))
+            screen_update(title, '{0}'.format(lo['C4']))
+            ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5']), t(d_building))
+            ctr_it('{0}: {1}'.format(lo['I8'], d_slots))
             div_line('-')
             ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}'.format(a, a1, b, b1, c, c1, d, d1, e, e1))
             ctr_it('{0}  {1}  {2}  {3}  {4}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1))
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>{9}}'.format(
-                        selection[key]['item'], a1, cvt_time(selection[key]['time'], show_seconds=False), b1,
-                        selection[key]['quantity'], c1, cvt_time(selection[key]['exceed'], show_seconds=False),
-                        d1, use_item, e1))
-            print('\n Exceeding - Item used when duration exceeds the displayed time')
+                    selection[key]['item'], a1, cvt_time(selection[key]['time'], show_seconds=False), b1,
+                    selection[key]['quantity'], c1, cvt_time(selection[key]['exceed'], show_seconds=False),
+                    d1, use_item, e1))
+            print('\n {0}'.format(lo['I5']))
             div_line('-')
-            print(' Selection options available:')
-            print(' ALL = Enable all, NONE = Disable all, Item Name = Enable/Disable selected')
-            print(' NEXT = Accept list and proceed to the next screen, EXIT = Return to main menu')
+            print(' {0}:'.format(lo['86']))
+            print(' {0}'.format(lo['I6']))
+            print(' {0}'.format(lo['I7']))
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format('06'))
             if len(d_select) >= 2:
                 if d_select.lower() == 'exit':
                     return
@@ -2158,9 +2184,9 @@ def fill_building(title):
     # Set Delay
     d_delay = None
     while d_delay is None:
-        screen_update(title, 'Set Delay Between Instructions')
-        ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-        ctr_it('Slots To Fill: {0}'.format(d_slots))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5']), t(d_building))
+        ctr_it('{0}: {1}'.format(lo['I8'], d_slots))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -2168,19 +2194,19 @@ def fill_building(title):
     # Proceed With Run
     d_proceed = False
     while not d_proceed:
-        screen_update(title, 'Proceed With Filling Slots?')
-        ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-        ctr_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
-        d_proceed = proceed_run('Filling Building Slots')
+        screen_update(title, '{0}'.format(lo['70']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5']), t(d_building))
+        ctr_it('{0}: {1}   {2}: {3}s'.format(lo['I8'], d_slots, lo['71'], d_delay))
+        d_proceed = proceed_run('{0}'.format(lo['72']))
         if d_proceed == 'exit':
             return
 
     # Run Auto Fill
-    screen_update(title, 'Progress Report')
-    ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-    ctr_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
+    screen_update(title, '{0}'.format(lo['73']))
+    ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5']), t(d_building))
+    ctr_it('{0}: {1}   {2}: {3}s'.format(lo['I8'], d_slots, lo['71'], d_delay))
     div_line('-')
-    prog(0, 1, 'Initializing...')
+    prog(0, 1, '{0}'.format(lo['18']))
     d_start = time()
     speeds_used = {}
     d_conn.connect()
@@ -2198,29 +2224,29 @@ def fill_building(title):
         jobid = 0
         duration = -1
         while duration != 0:
-            screen_update(title, 'Progress Report')
-            ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-            ctr_it('Slots To Fill: {0}   Delay: {1}   Elapsed Time: {2}'.format(
-                    d_slots, d_delay, cvt_time(time() - d_start)))
+            screen_update(title, '{0}'.format(lo['73']))
+            ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5']), t(d_building))
+            ctr_it('{0}: {1}   {2}: {3}s   {4}: {5}'.format(
+                lo['I8'], d_slots, lo['71'], d_delay, lo['74'], cvt_time(time() - d_start)))
             div_line('-')
             if speeds_used:
-                prog(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots))
+                prog(count, d_slots, '{0}: {1}/{2}'.format(lo['I9'], count, d_slots))
                 ctr_it(' ')
-                ctr_it('~~~ Speed Items Used ~~~')
+                ctr_it('~~~ {0} ~~~'.format(lo['D0']))
                 display_it(speeds_used, single=False)
             elif duration != -1:
-                prog(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots),
-                     'Waiting {0} for job to finish...'.format(cvt_time(duration)))
+                prog(count, d_slots, '{0}: {1}/{2}'.format(lo['I9'], count, d_slots),
+                     '{0}: {1}'.format(lo['J0'], cvt_time(duration)))
             else:
-                prog(count, d_slots, 'Filling Slot {0} of {1}'.format(count, d_slots), 'Initializing...')
+                prog(count, d_slots, '{0}: {1}/{2}'.format(lo['I9'], count, d_slots), '{0}'.format(lo['18']))
             if duration == -1:
                 x_param = 'city%5F{0}%5B{0}%5Ftype%5D={1}&%5Fmethod=post&city%5F{0}%5Bslot%5D={2}&'.format(
-                        'building', d_building, slots[x])
+                    'building', d_building, slots[x])
                 for web_retry in range(5):
                     try:
                         sleep(d_delay)
                         json_data = web_ops(d_conn, 'cities/{0}/buildings'.format(
-                                d_list[0]['location_id']), x_param)
+                            d_list[0]['location_id']), x_param)
                         result = json_data['result']['success']
                         if result:
                             duration = json_data['result']['job']['duration']
@@ -2267,25 +2293,25 @@ def fill_building(title):
                 if duration < 1:
                     duration = 0
                 sleep(1)
-    screen_update(title, 'Summary Report')
-    ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
-    ctr_it('Slots To Fill: {0}   Delay: {1}'.format(d_slots, d_delay))
+    screen_update(title, '{0}'.format(lo['82']))
+    ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5']), t(d_building))
+    ctr_it('{0}: {1}   {2}: {3}s'.format(lo['I8'], d_slots, lo['71'], d_delay))
     div_line('-')
-    prog(1, 1, 'Process Completed in {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, '{0} {1}'.format(lo['84'], cvt_time(time() - d_start)))
     if speeds_used:
-        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['D0']), prefix=True)
         display_it(speeds_used, single=False)
     if len(requirements['items']) >= 1:
-        ctr_it('~~~ Seals & Grants Used ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['J1']), prefix=True)
         for key, value in requirements['items'].items():
             ctr_it('{0:>}: {1:,}'.format(t(key), value))
     if len(requirements['resources']) >= 1:
-        ctr_it('~~~ Resources Used  ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['J2']), prefix=True)
         for key, value in requirements['resources'].items():
             ctr_it('{0:>5}: {1:,}'.format(key.title(), value))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-    print('Refreshing... Please wait!')
+    print('{0}'.format(lo['85']))
     get_data(title, op=True, unmute=False)
 
 
@@ -2293,8 +2319,8 @@ def fill_building(title):
 
 def upgrade_building(title):
     # Initialize
-    screen_update(title, 'Choose A Location To Upgrade')
-    ctr_it(' Initializing...')
+    screen_update(title, '{0}'.format(lo['H4']))
+    ctr_it('{0}'.format(lo['18']))
     d_list = list()
     selection = {}
     capital_buildings = {}
@@ -2327,7 +2353,7 @@ def upgrade_building(title):
                         break
 
     if not d_list:
-        nothing_to_do(title, 'Choose A Location To Upgrade', 'Buildings')
+        nothing_to_do(title, '{0}'.format(lo['H4']), '{0}'.format(lo['J4']))
         return
     if len(d_list) == 1:
         d_location = d_list[0]['city']
@@ -2338,18 +2364,22 @@ def upgrade_building(title):
                 selection[d_list[x]['city']] = t(d_list[x]['city'])
         # Select Location
         while d_location is None:
-            screen_update(title, 'Choose A Location To Upgrade')
-            ctr_it('~~~ Available Locations ~~~')
+            screen_update(title, '{0}'.format(lo['J4']))
+            ctr_it('~~~ {0} ~~~'.format(lo['J3']))
             display_it(selection)
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format(lo['06']))
             if len(d_select) >= 3:
-                if all(i.isalpha() or i == ' ' for i in d_select):
-                    if d_select.lower() == 'exit':
-                        return
+                if d_select.lower() == 'exit':
+                    return
+                else:
+                    for key, value in selection.items():
+                        if d_select.lower() == value.lower():
+                            d_location = key
+                            break
                     else:
                         for key, value in selection.items():
-                            if d_select.lower() in value.lower() or d_select.lower() == value.lower():
+                            if d_select.lower() in value.lower():
                                 d_location = key
                                 break
     d_list[:] = [d for d in d_list if d.get('city') == d_location]
@@ -2363,53 +2393,54 @@ def upgrade_building(title):
         # Select Building
         d_building = None
         while d_building is None:
-            screen_update(title, 'Choose Building For Location')
-            ctr_it('Location: {0}'.format(t(d_location)))
+            screen_update(title, '{0}'.format(lo['H7']))
+            ctr_it('{0}: {1}'.format(lo['H1'], t(d_location)))
             ctr_it(' ')
             div_line('-')
-            ctr_it('~~~ Available Buildings ~~~')
+            ctr_it('~~~ {0} ~~~'.format(lo['J5']))
             display_it(selection)
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format(lo['06']))
             if len(d_select) >= 3:
-                if all(i.isalpha() or i == ' ' for i in d_select):
-                    if d_select.lower() == 'exit':
-                        return
+                if d_select.lower() == 'exit':
+                    return
+                else:
+                    for key, value in selection.items():
+                        if d_select.lower() == value.lower():
+                            d_location = key
+                            break
                     else:
                         for key, value in selection.items():
-                            if d_select.lower() in value.lower() or d_select.lower() == value.lower():
-                                d_building = key
+                            if d_select.lower() in value.lower():
+                                d_location = key
                                 break
     d_list[:] = [d for d in d_list if d.get('type') == d_building]
     max_level = d_list[0]['max_level']
-    min_level = max_level
+    min_lvl = max_level
     for x in range(len(d_list)):
-        if d_list[x]['level'] < min_level:
-            min_level = d_list[x]['level']
+        if d_list[x]['level'] < min_lvl:
+            min_lvl = d_list[x]['level']
 
     # Select Level
     gtg = False
     d_level = 0
     requirements = {}
     while d_level is 0:
-        screen_update(title, 'Select Level To Upgrade')
-        ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+        screen_update(title, '{0}'.format(lo['J6']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5'], t(d_building)))
+        ctr_it(' ')
         div_line('-')
-        ctr_it('')
-        ctr_it('Which Level Would You Like To Upgrade This Building To?')
-        ctr_it('')
-        div_line('-')
-        print(' Selection options available:')
-        print(' {0}-{1} = Level to upgrade, EXIT = Return to main menu'.format(min_level + 1, max_level))
+        ctr_it('{0}'.format(lo['J7']), prefix=True)
+        ctr_it('{0} - {1}'.format(min_lvl + 1, max_level), suffix=True)
         div_line()
-        d_select = input('Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 1:
             if d_select.lower() == 'exit':
                 return
             if not d_select.isnumeric():
                 sleep(1)
             else:
-                if int(d_select) in range(min_level + 1, max_level + 1):
+                if int(d_select) in range(min_lvl + 1, max_level + 1):
                     d_level = int(d_select)
     while gtg is False:
         requirements = {'items': {}, 'buildings': {}, 'research': {}, 'resources': {}}
@@ -2434,104 +2465,103 @@ def upgrade_building(title):
                     for c_key, c_value in requirements[key].items():
                         if c_key in capital_buildings.keys():
                             if c_value > capital_buildings[c_key]:
-                                req = '{0} Level {1} Required. Yours is level {2}'.format(
-                                        c_key, c_value, capital_buildings[c_key])
+                                req = '{0} {1} {2} {3}'.format(c_key, c_value, lo['I0'], capital_buildings[c_key])
                                 req_check.append(req)
                         else:
-                            req = '{0} Level {1} Required. Yours is not built'.format(c_key, c_value)
+                            req = '{0} {1} {2}'.format(c_key, c_value, lo['I1'])
                             req_check.append(req)
                 if key == 'items':
                     for c_key, c_value in requirements[key].items():
                         if c_key in pData['items']:
                             if pData['items'][c_key] < c_value:
-                                req = '{0:,} {1} Required. You have {2:,}'.format(
-                                        c_value, c_key, pData['items'][c_key])
+                                req = '{0:,} {1} {2} {3:,}'.format(
+                                    c_value, c_key, lo['I2'], pData['items'][c_key])
                                 req_check.append(req)
                         else:
-                            req = '{0:,} {1} Required. You have none'.format(c_value, c_key)
+                            req = '{0:,} {1} {2}'.format(c_value, c_key, lo['I3'])
                             req_check.append(req)
                 if key == 'research':
                     for c_key, c_value in requirements[key].items():
                         if c_key in pData['research']:
                             if pData['research'][c_key] < c_value:
-                                req = '{1} Level {0} Required. Your {1} is at {2}'.format(
-                                        c_value, c_key, pData['research'][c_key])
+                                req = '{1} {0} {2} {3}'.format(c_value, c_key, lo['I0'], pData['research'][c_key])
                                 req_check.append(req)
                         else:
-                            req = '{1} Level {0} Required. You are yet to start on {1}'.format(c_value, c_key)
+                            req = '{1} {0} {2} {1}'.format(c_value, c_key, lo['J8'])
                             req_check.append(req)
                 if key == 'resources':
                     for c_key, c_value in requirements[key].items():
                         if c_key in cData['capital']['city']['resources']:
                             if cData['capital']['city']['resources'][c_key] < c_value:
-                                req = '{0:,} {1} Required. You have {2:,}'.format(
-                                        c_value, c_key, cData['capital']['city']['resources'][c_key])
+                                req = '{0:,} {1} {2} {3:,}'.format(
+                                    c_value, c_key, lo['I2'], cData['capital']['city']['resources'][c_key])
                                 req_check.append(req)
-        screen_update(title, 'Select Level To Upgrade')
-        ctr_it('Location: {0}   Building: {1}'.format(t(d_location), t(d_building)))
+        screen_update(title, '{0}'.format(lo['J6']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['H1'], t(d_location), lo['H5'], t(d_building)))
+        ctr_it(' ')
         div_line('-')
+        ctr_it('{0}'.format(lo['J7']), prefix=True)
+        ctr_it('{0} - {1}'.format(min_lvl + 1, max_level), suffix=True)
         if len(req_check) != 0:
             for x in range(len(req_check)):
                 ctr_it(req_check[x])
-            ctr_it('')
-            ctr_it('Requirements Not Met. Try Lowering Upgrade Level')
-            ctr_it('')
-            div_line('-')
-            print(' Selection options available:')
-            print(' {0}-{1} = Slots to fill, EXIT = Return to main menu'.format(min_level + 1, max_level))
+            ctr_it('{0}'.format(lo['H9']), prefix=True, suffix=True)
             div_line()
         if len(req_check) == 0 and d_level != 0:
             gtg = True
         else:
-            d_select = input('Enter selection : ')
+            d_select = input(' {0} : '.format(lo['06']))
             if len(d_select) >= 1:
                 if d_select.lower() == 'exit':
                     return
                 if not d_select.isnumeric():
                     sleep(1)
                 else:
-                    if int(d_select) in range(min_level + 1, max_level + 1):
+                    if int(d_select) in range(min_lvl + 1, max_level + 1):
                         d_level = int(d_select)
                         max_level = int(d_select) - 1
                         req_check.clear()
 
     # Select Speed Items
     selection = list()
-    a, b, c, d, len_a, len_b, len_c, len_d = ['Item', 'Description', 'Available', 'Exceeding', 4, 11, 9, 9]
+    a, b, c, d = ['{0}'.format(lo['80']), '{0}'.format(lo['C1']), '{0}'.format(lo['A3']), '{0}'.format(lo['I4'])]
+    a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
     for key in range(len(speed_items_dict)):
         look_up = speed_items_dict[key]
         if look_up['item'] in pData['items'] and pData['items'][look_up['item']] > 0:
-            if len(look_up['item']) > len_a:
-                len_a = len(look_up['item'])
-            if len(cvt_time(look_up['time'], show_seconds=False)) > len_b:
-                len_b = len(cvt_time(look_up['time'], show_seconds=False))
-            if len('{0:,}'.format(pData['items'][look_up['item']])) > len_c:
-                len_c = len('{0:,}'.format(pData['items'][look_up['item']]))
-            if len(cvt_time(look_up['exceed'], show_seconds=False)) > len_d:
-                len_d = len(cvt_time(look_up['exceed'], show_seconds=False))
+            if len(look_up['item']) > a1:
+                a1 = len(look_up['item'])
+            if len(cvt_time(look_up['time'], show_seconds=False)) > b1:
+                b1 = len(cvt_time(look_up['time'], show_seconds=False))
+            if len('{0:,}'.format(pData['items'][look_up['item']])) > c1:
+                c1 = len('{0:,}'.format(pData['items'][look_up['item']]))
+            if len(cvt_time(look_up['exceed'], show_seconds=False)) > d1:
+                d1 = len(cvt_time(look_up['exceed'], show_seconds=False))
             my_dict = {'item': look_up['item'], 'exceed': look_up['exceed'], 'time': look_up['time'],
                        'quantity': pData['items'][look_up['item']], 'use': False}
             selection.append(my_dict)
     if selection:
         while True:
-            screen_update(title, 'Select Speed Items To Use')
-            ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
+            screen_update(title, '{0}'.format(lo['C4']))
+            ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+                lo['H1'], t(d_location), lo['H5'], t(d_building), lo['J9'], d_level))
+            ctr_it(' ')
             div_line('-')
-            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(a, len_a, b, len_b, c, len_c, d, len_d))
-            ctr_it('{0}  {1}  {2}  {3}  ~~~'.format('~' * len_a, '~' * len_b, '~' * len_c, '~' * len_d))
+            ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  Use'.format(a, a1, b, b1, c, c1, d, d1))
+            ctr_it('{0}  {1}  {2}  {3}  ~~~'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1))
             for key in range(len(selection)):
                 use_item = 'Yes' if selection[key]['use'] is True else 'No'
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
-                        selection[key]['item'], len_a, cvt_time(selection[key]['time'], show_seconds=False), len_b,
-                        selection[key]['quantity'], len_c, cvt_time(selection[key]['exceed'], show_seconds=False),
-                        len_d, use_item))
-            print('\n Exceeding - Item used when duration exceeds the displayed time')
+                    selection[key]['item'], a1, cvt_time(selection[key]['time'], show_seconds=False), b1,
+                    selection[key]['quantity'], c1, cvt_time(selection[key]['exceed'], show_seconds=False),
+                    d1, use_item))
+            print('\n {0}'.format(lo['I5']))
             div_line('-')
-            print(' Selection options available:')
-            print(' ALL = Enable all, NONE = Disable all, Item Name = Enable/Disable selected')
-            print(' NEXT = Accept list and proceed to the next screen, EXIT = Return to main menu')
+            print(' {0}:'.format(lo['86']))
+            print(' {0}'.format(lo['I6']))
+            print(' {0}'.format(lo['I7']))
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format(lo['06']))
             if len(d_select) >= 2:
                 if d_select.lower() == 'exit':
                     return
@@ -2555,8 +2585,10 @@ def upgrade_building(title):
     # Set Delay
     d_delay = None
     while d_delay is None:
-        screen_update(title, 'Set Delay Between Requests')
-        ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+            lo['H1'], t(d_location), lo['H5'], t(d_building), lo['J9'], d_level))
+        ctr_it(' ')
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -2564,25 +2596,25 @@ def upgrade_building(title):
     # Proceed With Run
     d_proceed = False
     while not d_proceed:
-        screen_update(title, 'Proceed With Upgrading?')
-        ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
-        ctr_it('Delay: {0}s'.format(d_delay))
-        d_proceed = proceed_run('Unpacking of Troop Bins')
+        screen_update(title, '{0}'.format(lo['70']))
+        ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+            lo['H1'], t(d_location), lo['H5'], t(d_building), lo['J9'], d_level))
+        ctr_it('{0}: {1}s'.format(lo['71'], d_delay))
+        d_proceed = proceed_run('{0}'.format(lo['72']))
         if d_proceed == 'exit':
             return
 
     # Run Auto Upgrade
-    screen_update(title, 'Progress Report...')
-    ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
-    ctr_it('Delay: {0}'.format(d_delay))
-    ctr_it('')
+    screen_update(title, '{0}'.format(lo['73']))
+    ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(lo['H1'], t(d_location), lo['H5'], t(d_building), lo['J9'], d_level))
+    ctr_it('{0}: {1}s'.format(lo['71'], d_delay))
     div_line('-')
-    prog(0, 1, 'Initializing...')
+    prog(0, 1, '{0}'.format(lo['18']))
     d_start = time()
     speeds_used = {}
     d_conn.connect()
     d_list_len = len(d_list)
-    for y in range(min_level, d_level):
+    for y in range(min_lvl, d_level):
         total = len([d for d in d_list if d.get('level') == y])
         count = 0
         for x in range(d_list_len):
@@ -2591,23 +2623,21 @@ def upgrade_building(title):
                 duration = -1
                 speed_item = None
                 while duration != 0:
-                    screen_update('UPGRADE BUILDING', 'Progress Report...')
-                    ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(
-                            t(d_location), t(d_building), d_level))
-                    ctr_it('Delay: {0}s   Elapsed Time: {1}'.format(d_delay, cvt_time(time() - d_start)))
+                    screen_update(title, '{0}'.format(lo['73']))
+                    ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+                        lo['H1'], t(d_location), lo['H5'], t(d_building), lo['J9'], d_level))
+                    ctr_it('{0}: {1}s   {2}: {3}'.format(lo['71'], d_delay, lo['74'], cvt_time(time() - d_start)))
                     div_line('-')
-                    if (d_level - min_level) > 1:
-                        prog((d_level - min_level) - (d_level - y) + 1, d_level - min_level,
-                             'Upgrading From Level {0} to Level {1}'.format(y, d_level))
+                    if (d_level - min_lvl) > 1:
+                        prog((d_level - min_lvl) - (d_level - y) + 1, d_level - min_lvl, '{0} {1}'.format(lo['K0'], y))
                     if total > 1:
-                        prog(count, total, 'Upgrading Slot {0} of {1}'.format(count, total))
+                        prog(count, total, '{0}: {1}/{2}'.format(lo['K1'], count, total))
                     elif speed_item:
-                        prog(prog_dur - duration, prog_dur, 'Used {0} to speed through'.format(speed_item))
+                        prog(prog_dur - duration, prog_dur, '{0} {1}'.format(lo['K2'], speed_item))
                     else:
                         pass
                     if speeds_used:
-                        ctr_it(' ')
-                        ctr_it('~~~ Speed Items Used ~~~')
+                        ctr_it('~~~ {0} ~~~'.format(lo['D0']), prefix=True)
                         display_it(speeds_used, single=False)
                     if duration == -1:
                         x_param = '%5Fmethod=put&'
@@ -2615,7 +2645,7 @@ def upgrade_building(title):
                             sleep(d_delay + 1)
                             try:
                                 main_json = web_ops(d_conn, 'cities/{0}/buildings/{1}'.format(
-                                        d_list[x]['location_id'], d_list[x]['building_id']), x_param)
+                                    d_list[x]['location_id'], d_list[x]['building_id']), x_param)
                                 result = main_json['result']['success']
                                 if result:
                                     duration = int(main_json['result']['job']['duration'])
@@ -2655,7 +2685,7 @@ def upgrade_building(title):
                                     else:
                                         speeds_used[speed_item] = 1
                                     duration = int(
-                                            item_json['result']['item_response']['run_at'] - item_json['timestamp'])
+                                        item_json['result']['item_response']['run_at'] - item_json['timestamp'])
                                     if duration < 1:
                                         duration = 0
                                         d_list[x]['level'] = item_json['result']['item_response']['level']
@@ -2669,25 +2699,25 @@ def upgrade_building(title):
                             duration = 0
                             d_list[x]['level'] += 1
                         sleep(1)
-    screen_update(title, 'Summary Report')
-    ctr_it('Location: {0}   Building: {1}   Target Level: {2}'.format(t(d_location), t(d_building), d_level))
-    ctr_it('Delay: {0}s'.format(d_delay, cvt_time(time() - d_start)))
+    screen_update(title, '{0}'.format(lo['82']))
+    ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(lo['H1'], t(d_location), lo['H5'], t(d_building), lo['J9'], d_level))
+    ctr_it('{0}: {1}s'.format(lo['71'], d_delay))
     div_line('-')
-    prog(1, 1, 'Process Completed in {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, '{0} {1}'.format(lo['84'], cvt_time(time() - d_start)))
     if speeds_used:
-        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['D0']), prefix=True)
         display_it(speeds_used, single=False)
     if len(requirements['items']) >= 1:
-        ctr_it('~~~ Seals & Grants Used ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['J1']), prefix=True)
         for key, value in requirements['items'].items():
             ctr_it('{0:>}: {1:,}'.format(t(key), value))
     if len(requirements['resources']) >= 1:
-        ctr_it('~~~ Resources Used  ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['J2']), prefix=True)
         for key, value in requirements['resources'].items():
             ctr_it('{0:>5}: {1:,}'.format(key.title(), value))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-    print('Refreshing... Please wait!')
+    print('{0}'.format(lo['85']))
     get_data(title, op=True, unmute=False)
 
 
@@ -2695,8 +2725,8 @@ def upgrade_building(title):
 
 def train_troop(title):
     # Initialize
-    screen_update(title, 'Select Troop To Train')
-    ctr_it(' Initializing...')
+    screen_update(title, '{0}'.format(lo['K3']))
+    ctr_it('{0}'.format(lo['18']))
     d_list = list()
     selection = {}
     pseudo_tc = ('Garrison', 'TrainingCamp', 'CaveTrainingCamp')
@@ -2713,8 +2743,8 @@ def train_troop(title):
     d_rookery = 0
     for x in range(len(mData['units'])):
         if mData['units'][x]['trainable_in']:
-            d_max_queue = d_pop = -1
-            met_research = met_resource = met_item = met_unit = met_idle = met_building = True
+            d_max_queue, d_pop = [-1, -1]
+            met_rsch, met_rsc, met_item, met_unit, met_idle, met_bldg = [True, True, True, True, True, True]
             d_unit = mData['units'][x]
             d_req = d_unit['requirements']['capital']
             if 'research' in d_req.keys():
@@ -2723,7 +2753,7 @@ def train_troop(title):
                     if key in pData['research']:
                         if value <= pData['research'][key]:
                             met_req -= 1
-                met_research = True if met_req == 0 else False
+                met_rsch = True if met_req == 0 else False
             if 'resources' in d_req.keys():
                 met_req = len(d_req['resources'])
                 lookup = cData['capital']['city']['resources']
@@ -2734,7 +2764,7 @@ def train_troop(title):
                             if value != 0:
                                 if d_max_queue > int(lookup[key] / value) or d_max_queue == -1:
                                     d_max_queue = int(lookup[key] / value)
-                met_resource = True if met_req == 0 else False
+                met_rsc = True if met_req == 0 else False
             if 'items' in d_req.keys():
                 met_req = len(d_req['items'])
                 lookup = pData['items']
@@ -2777,8 +2807,8 @@ def train_troop(title):
                                 met_req -= 1
                                 d_rookery = lookup[y]['level'] if key == 'Rookery' else 0
                                 break
-                met_building = True if met_req == 0 else False
-            if met_research and met_resource and met_item and met_unit and met_idle and met_building:
+                met_bldg = True if met_req == 0 else False
+            if met_rsch and met_rsc and met_item and met_unit and met_idle and met_bldg:
                 for d_loc in mData['units'][x]['trainable_in']:
                     if 'buildings' in d_req.keys():
                         for key, value in d_req['buildings'].items():
@@ -2801,12 +2831,12 @@ def train_troop(title):
     d_list = sorted(d_list, key=itemgetter('desc'))
     selection.clear()
     if not d_list:
-        nothing_to_do(title, 'Select Troop To Train', 'Trainable Troops')
+        nothing_to_do(title, '{0}'.format(lo['K3']), '{0}'.format(lo['K4']))
         return
     elif len(d_list) == 1:
         d_troop = d_list[0]['troop']
     else:
-        a, b, c = ['Troop', 'Trainable', 'Power Gain']
+        a, b, c = ['{0}'.format(lo['61']), '{0}'.format(lo['K5']), '{0}'.format(lo['F6'])]
         a1, b1, c1 = [len(a), len(b), len(c)]
         for x in range(len(d_list)):
             if len(d_list[x]['desc']) > a1:
@@ -2818,18 +2848,18 @@ def train_troop(title):
         # Select Troop To Train
         d_troop = None
         while d_troop is None:
-            screen_update(title, 'Select Troop To Train')
+            screen_update(title, '{0}'.format(lo['K3']))
             ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
             ctr_it('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
             for x in range(len(d_list)):
                 if d_list[x]['desc'] not in selection:
                     selection[d_list[x]['desc']] = d_list[x]['desc']
                     ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5},}'.format(
-                            d_list[x]['desc'], a1, d_list[x]['trainable'], b1,
-                            d_list[x]['trainable'] * d_list[x]['power'],
-                            c1))
+                        d_list[x]['desc'], a1, d_list[x]['trainable'], b1,
+                        d_list[x]['trainable'] * d_list[x]['power'],
+                        c1))
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format(lo['06']))
             if len(d_select) >= 3:
                 if d_select.lower() == 'exit':
                     return
@@ -2851,7 +2881,7 @@ def train_troop(title):
         d_location = None
         d_list = sorted(d_list, key=itemgetter('loc_desc'))
         # Select Location To Train
-        a, b, c, d = ['Location', 'Level', 'Total', 'Time']
+        a, b, c, d = ['{0}'.format(lo['H1']), '{0}'.format(lo['K6']), '{0}'.format(lo['K7']), '{0}'.format(lo['B5'])]
         a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
         for x in range(len(d_list)):
             if len(d_list[x]['loc_desc']) > a1:
@@ -2863,18 +2893,18 @@ def train_troop(title):
             if len(cvt_time(d_list[x]['time'] / d_list[x]['multiplier'])) > d1:
                 d1 = len(cvt_time(d_list[x]['time'] / d_list[x]['multiplier']))
         while d_location is None:
-            screen_update(title, 'Select Location To Train')
-            ctr_it('Troop: {0}'.format(t(d_troop)))
+            screen_update(title, '{0}'.format(lo['H4']))
+            ctr_it('{0}: {1}'.format(lo['61'], t(d_troop)))
             ctr_it(' ')
             div_line('-')
             ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, a1, b, b1, c, c1, d, d1))
             ctr_it('{0}  {1}  {2}  {3}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1))
             for x in range(len(d_list)):
                 ctr_it('{0:<{1}}  {2:^{3}}  {4:^{5}}  {6:>{7}}'.format(
-                        d_list[x]['loc_desc'], a1, d_list[x]['tc_level'], b1, d_list[x]['tc_total'], c1,
-                        cvt_time(d_list[x]['time'] / d_list[x]['multiplier']), d1))
+                    d_list[x]['loc_desc'], a1, d_list[x]['tc_level'], b1, d_list[x]['tc_total'], c1,
+                    cvt_time(d_list[x]['time'] / d_list[x]['multiplier']), d1))
             div_line()
-            d_select = input(' Enter selection : ')
+            d_select = input(' {0} : '.format(lo['06']))
             if len(d_select) >= 3:
                 if d_select.lower() == 'exit':
                     return
@@ -2893,15 +2923,15 @@ def train_troop(title):
 
     # Set Training Queue Size
     while d_max_queue is 0:
-        screen_update(title, 'Set Quantity for Training Queue')
-        ctr_it('Troop: {0}   Location: {1}'.format(t(d_troop), t(d_location)))
+        screen_update(title, '{0}'.format(lo['K8']))
+        ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['H1'], t(d_location)))
         ctr_it(' ')
         div_line('-')
-        ctr_it('~~~ Available Options ~~~')
+        ctr_it('~~~ {0} ~~~'.format(lo['86']))
         ctr_it('1 to {0}'.format(d_list[0]['quantity']), suffix=True)
-        print(' NOTE: Enter MAX for maximum queue')
+        print(' {0}'.format(lo['K9']))
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 1:
             if d_select.lower() == 'exit':
                 return
@@ -2914,7 +2944,8 @@ def train_troop(title):
     selection.clear()
 
     # Set Speed Items
-    a, b, c, d, a1, b1, c1, d1 = ['Speed Item', 'Description', 'Available', 'Use', 10, 11, 9, 3]
+    a, b, c, d = ['{0}'.format(lo['L0']), '{0}'.format(lo['C1']), '{0}'.format(lo['A3']), '{0}'.format(lo['C2'])]
+    a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
     selection = [{'item': 'TestroniusInfusion', 'time': 0.99}, {'item': 'TestroniusDeluxe', 'time': 0.5},
                  {'item': 'TestroniusPowder', 'time': 0.3}, {'item': 'Blitz', 'time': 345600},
                  {'item': 'Blast', 'time': 216000}, {'item': 'Bolt', 'time': 86400}, {'item': 'Bore', 'time': 54000},
@@ -2939,9 +2970,9 @@ def train_troop(title):
                 if len(z) > c1:
                     c1 = len(str(pData['items'][selection[x]['item']]))
     while True:
-        screen_update(title, 'Set Speed Items To Use For Each Queue')
-        ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-                t(d_troop), t(d_location), d_list[0]['quantity']))
+        screen_update(title, '{0}'.format(lo['L1']))
+        ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+            lo['61'], t(d_troop), lo['H1'], t(d_location), lo['L2'], d_list[0]['quantity']))
         ctr_it(' ')
         div_line('-')
         ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}'.format(a, a1, b, b1, c, c1, d, d1))
@@ -2949,8 +2980,8 @@ def train_troop(title):
         reduced_time = (d_list[0]['time'] / d_list[0]['multiplier']) * d_list[0]['quantity']
         for x in range(len(d_speed)):
             ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}'.format(
-                    t(d_speed[x]['item']), a1, d_speed[x]['desc'], b1, d_speed[x]['qty'], c1,
-                    d_speed[x]['use'], d1))
+                t(d_speed[x]['item']), a1, d_speed[x]['desc'], b1, d_speed[x]['qty'], c1,
+                d_speed[x]['use'], d1))
             if d_speed[x]['use'] != 0:
                 if d_speed[x]['time'] < 1:
                     for y in range(d_speed[x]['use']):
@@ -2960,13 +2991,13 @@ def train_troop(title):
                         reduced_time -= d_speed[x]['time']
         else:
             reduced_time = 0 if reduced_time < 0 else cvt_time(reduced_time)
-            ctr_it('Training Duration: {0}'.format(reduced_time), prefix=True, suffix=True)
+            ctr_it('{0}: {1}'.format(lo['L3'], reduced_time), prefix=True, suffix=True)
         if reduced_time != 0:
-            print(' NOTE: Enter ITEM@QUANTITY (e.g. Infusion@3)')
+            print(' {0}'.format(lo['C6']))
         else:
-            print(' Enter NEXT to proceed...')
+            print(' {0}'.format(lo['C7']))
         div_line()
-        d_select = input(' Enter selection : ')
+        d_select = input(' {0} : '.format(lo['06']))
         if len(d_select) >= 3:
             if d_select.lower() == 'exit':
                 return
@@ -2974,8 +3005,8 @@ def train_troop(title):
                 break
             else:
                 try:
-                    i_item, i_qty = d_select.replace(' ', '').split('@')
-                    if i_item.isalpha() and i_qty.isnumeric():
+                    i_item, i_qty = d_select.split('@')
+                    if i_qty.isnumeric():
                         for x in range(len(d_speed)):
                             if i_item.lower() == t(d_speed[x]['item']).lower() and int(i_qty) < d_speed[x]['qty']:
                                 d_speed[x]['use'] = int(i_qty)
@@ -2999,21 +3030,21 @@ def train_troop(title):
 
     # Set Number Of Batches
     while d_batch is None:
-        screen_update(title, 'Set Training Batches')
-        ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-                t(d_troop), t(d_location), d_list[0]['quantity']))
+        screen_update(title, '{0}'.format(lo['L4']))
+        ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+            lo['61'], t(d_troop), lo['H1'], t(d_location), lo['L2'], d_list[0]['quantity']))
         ctr_it(' ')
-        d_batch = set_batch(d_max_queue + 1, 'batches to train?')
+        d_batch = set_batch(d_max_queue + 1, '{0}'.format(lo['L5']))
         if d_batch == 'exit':
             return
 
     # Set Delay
     d_delay = None
     while d_delay is None:
-        screen_update(title, 'Set Delay Between Game Requests')
-        ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-                t(d_troop), t(d_location), d_list[0]['quantity']))
-        ctr_it('Target Batches: {0:,}'.format(d_batch))
+        screen_update(title, '{0}'.format(lo['69']))
+        ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+            lo['61'], t(d_troop), lo['H1'], t(d_location), lo['L2'], d_list[0]['quantity']))
+        ctr_it('{0}: {1:,}'.format(lo['L6'], d_batch))
         d_delay = set_delay()
         if d_delay == 'exit':
             return
@@ -3021,11 +3052,11 @@ def train_troop(title):
     # Proceed With Run
     d_proceed = False
     while not d_proceed:
-        screen_update(title, 'Proceed With Troop Training?')
-        ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-                t(d_troop), t(d_location), d_list[0]['quantity']))
-        ctr_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
-        d_proceed = proceed_run('training of troops?')
+        screen_update(title, '{0}'.format(lo['70']))
+        ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+            lo['61'], t(d_troop), lo['H1'], t(d_location), lo['L2'], d_list[0]['quantity']))
+        ctr_it('{0}: {1:,}   {2}: {3}'.format(lo['L6'], d_batch, lo['71'], d_delay))
+        d_proceed = proceed_run('{0}'.format(lo['72']))
         if d_proceed == 'exit':
             return
 
@@ -3040,32 +3071,32 @@ def train_troop(title):
             for y in range(item['use']):
                 if 'Testronius' in item['item'] and speed_cut_off >= dur != -1 or dur == 0:
                     break
-                screen_update(title, 'Progress Report...')
-                ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(
-                        t(d_troop), t(d_location), d_list[0]['quantity']))
-                ctr_it('Target Batches: {0:,}   Delay: {1}s   Elapsed Time: {2}'.format(
-                        d_batch, d_delay, cvt_time(time() - d_start)))
+                screen_update(title, '{0}'.format(lo['73']))
+                ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+                    lo['61'], t(d_troop), lo['H1'], t(d_location), lo['L2'], d_list[0]['quantity']))
+                ctr_it('{0}: {1:,}   {2}: {3}   {4}: {5}'.format(
+                    lo['L6'], d_batch, lo['71'], d_delay, lo['74'], cvt_time(time() - d_start)))
                 div_line('-')
-                prog(x + 1, d_batch, 'Training Batch {0:,} of {1:,}'.format(x + 1, d_batch))
+                prog(x + 1, d_batch, '{0}: {1:,}/{2:,}'.format(lo['L7'], x + 1, d_batch))
                 if speeds_used or powders_used:
-                    init = 'Initializing Queue...' if dur == -1 else 'Remaning Duration: {0}'.format(cvt_time(dur))
+                    init = '{0}'.format(lo['18']) if dur == -1 else '{0}: {1}'.format(lo['L8'], cvt_time(dur))
                     prog(y + 1, item['use'], 'Using {0}'.format(t(item['item'])), init)
                     if powders_used:
-                        ctr_it('~~~ Testronius Used ~~~', prefix=True)
+                        ctr_it('~~~ {0} ~~~'.format(lo['L9']), prefix=True)
                         display_it(powders_used, single=False)
                     if speeds_used:
-                        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+                        ctr_it('~~~ {0} ~~~'.format(lo['D0']), prefix=True)
                         display_it(speeds_used, single=False)
                     if x > 0:
-                        ctr_it('~~~ Troops Trained ~~~', prefix=True)
+                        ctr_it('~~~ {0} ~~~'.format(lo['M0']), prefix=True)
                         ctr_it('{0:,}'.format(d_list[0]['quantity'] * x))
-                        ctr_it('~~~ Power Gained ~~~', prefix=True)
+                        ctr_it('~~~ {0} ~~~'.format(lo['G8']), prefix=True)
                         ctr_it('{0:,}'.format(d_list[0]['quantity'] * x * d_list[0]['power']))
                 else:
-                    prog(0, 1, 'Initializing...')
+                    prog(0, 1, '{0}'.format(lo['18']))
                 if dur == -1:
                     x_param = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
-                            d_list[0]['quantity'], d_troop)
+                        d_list[0]['quantity'], d_troop)
                     for server_retry in range(5):
                         sleep(d_delay)
                         try:
@@ -3103,24 +3134,25 @@ def train_troop(title):
                         except (KeyError, TypeError):
                             sleep(1)
                             continue
-    screen_update(title, 'Summary Report')
-    ctr_it('Troop: {0}   Location: {1}   Queue Size: {2:,}'.format(t(d_troop), t(d_location), d_list[0]['quantity']))
-    ctr_it('Target Batches: {0:,}   Delay: {1}s'.format(d_batch, d_delay))
+    screen_update(title, '{0}'.format(lo['82']))
+    ctr_it('{0}: {1}   {2}: {3}   {4}: {5}'.format(
+        lo['61'], t(d_troop), lo['H1'], t(d_location), lo['L2'], d_list[0]['quantity']))
+    ctr_it('{0}: {1:,}   {2}: {3}'.format(lo['L6'], d_batch, lo['71'], d_delay))
     div_line('-')
-    prog(1, 1, 'Training Completed Successfully!', 'Process completed in {0}'.format(cvt_time(time() - d_start)))
+    prog(1, 1, '{0} {1}'.format(lo['84'], cvt_time(time() - d_start)))
     if powders_used:
-        ctr_it('~~~ Testronius Used ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['L9']), prefix=True)
         display_it(powders_used, single=False)
     if speeds_used:
-        ctr_it('~~~ Speed Items Used ~~~', prefix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['D0']), prefix=True)
         display_it(speeds_used, single=False)
-    ctr_it('~~~ Troops Trained ~~~', prefix=True)
+    ctr_it('~~~ {0} ~~~'.format(lo['M0']), prefix=True)
     ctr_it('{0:,}'.format(d_list[0]['quantity'] * d_batch))
-    ctr_it('~~~ Power Gained ~~~', prefix=True)
+    ctr_it('~~~ {0} ~~~'.format(lo['G8']), prefix=True)
     ctr_it('{0:,}'.format(d_list[0]['quantity'] * d_batch * d_list[0]['power']))
     div_line()
     os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
-    print('Refreshing... Please wait!')
+    print('{0}'.format(lo['85']))
     get_data(title, unmute=False)
 
 
@@ -3177,7 +3209,7 @@ def revive_soul(title):
             ctr_it('{0}  {1}  {2}'.format('~' * len_a, '~' * len_b, '~' * len_c))
             for x in range(len(d_list)):
                 ctr_it('{0:<{1}}  {2:>{3},}  {4:>{5},}'.format(
-                        t(d_list[x]['troop']), len_a, d_list[x]['total'], len_b, d_list[x]['max'], len_c))
+                    t(d_list[x]['troop']), len_a, d_list[x]['total'], len_b, d_list[x]['max'], len_c))
             div_line()
             d_select = input(' Enter selection : ')
             if len(d_select) >= 3:
@@ -3270,10 +3302,5 @@ except FileNotFoundError:
 
 # Launch Menu
 if __name__ == '__main__':
-    try:
-        enter_script(lo['01'])
-        menu()
-    except KeyboardInterrupt:
-        print('\n {0}'.format(lo['02']))
-        sleep(3)
-        quit()
+    enter_script(lo['01'])
+    menu()
