@@ -6,7 +6,7 @@ from hashlib import sha1
 from operator import itemgetter
 from time import time, sleep
 
-__version__ = '1.9.9'
+__version__ = '2.0.0'
 
 ########################################################################################################################
 #                                             SCRIPT SECTION - Do Not Edit!                                            #
@@ -374,10 +374,8 @@ def ctr_it(string, prefix=False, suffix=False):
 
 def choose_language(title='', shut_script=True):
     global lo
-    # conn = http.client.HTTPConnection('wackoscripts.com', 80)
-    # url = 'http://wackoscripts.com/sanctuary/locale.json'
-    conn = http.client.HTTPConnection('aussielikes.net', 80)
-    url = 'http://aussielikes.net/locale.json'
+    conn = http.client.HTTPConnection('wackoscripts.com', 80)
+    url = 'http://wackoscripts.com/sanctuary/locale.json'
     conn_data = None
     for web_retry in range(2):
         try:
@@ -423,7 +421,7 @@ def choose_language(title='', shut_script=True):
         with open('locale.doa', 'w') as create_file:
             json.dump(lo, create_file)
         if shut_script:
-            ctr_it(lo['P1'])
+            ctr_it(lo['P1'], prefix=True, suffix=True)
             sleep(5)
             quit()
 
@@ -432,7 +430,7 @@ def check_version():
     if __version__ != fStat['version']:
         screen_update(lo['44'], lo['45'])
         div_line('*')
-        ctr_it('DoA-Tools v{0} {1}'.format(fStat['version'], lo['O4']), prefix=True, suffix=True)
+        ctr_it('DoA-Tools v{0} {1}'.format(fStat['version'], lo['O4']), suffix=True)
         ctr_it(lo['O5'])
         ctr_it(fStat['url'], suffix=True)
         div_line('*')
@@ -537,9 +535,9 @@ def proceed_run():
         if i.lower() == lo['N1'] or i.lower() == 'exit':
             return 'exit'
         if i.isalpha():
-            if i.lower() in lo['D6'].lower():
+            if i.lower() == lo['D6'].lower() or i.lower() == 'yes':
                 return True
-            elif i.lower() in lo['D7'].lower():
+            elif i.lower() == lo['D7'].lower() or i.lower() == 'no':
                 return 'exit'
 
 
@@ -2690,6 +2688,22 @@ def upgrade_building(title):
 
 def train_troop(title):
     # Initialize
+    low_req = None
+    while low_req is None:
+        screen_update(title, lo['K3'])
+        ctr_it('Is There An On-going Low Requirements Training Event?', prefix=True, suffix=True)
+        ctr_it('~~~ {0} ~~~'.format(lo['86']))
+        ctr_it(lo['90'])
+        div_line()
+        d_select = input(' {0} : '.format(lo['06']))
+        if len(d_select) >= 1:
+            if d_select.lower() == lo['N1'] or d_select.lower() == 'exit':
+                break
+            if d_select.isalpha():
+                if d_select.lower() == lo['D6'].lower() or d_select.lower() == 'yes':
+                    low_req = True
+                elif d_select.lower() == lo['D7'].lower() or d_select.lower() == 'no':
+                    low_req = False
     screen_update(title, lo['K3'])
     ctr_it(lo['18'])
     d_list = list()
@@ -2723,6 +2737,8 @@ def train_troop(title):
                 met_req = len(d_req['resources'])
                 lookup = cData['capital']['city']['resources']
                 for key, value in d_req['resources'].items():
+                    if key == 'blue_energy' and low_req:
+                        value = 1
                     if key in lookup:
                         if value <= lookup[key]:
                             met_req -= 1
@@ -2731,16 +2747,19 @@ def train_troop(title):
                                     d_max_queue = int(lookup[key] / value)
                 met_rsc = True if met_req == 0 else False
             if 'items' in d_req.keys():
-                met_req = len(d_req['items'])
-                lookup = pData['items']
-                for key, value in d_req['items'].items():
-                    if key in lookup:
-                        if value <= lookup[key]:
-                            met_req -= 1
-                            if value != 0:
-                                if d_max_queue > int(lookup[key] / value) or d_max_queue == -1:
-                                    d_max_queue = int(lookup[key] / value)
-                met_item = True if met_req == 0 else False
+                if low_req:
+                    met_item = True
+                else:
+                    met_req = len(d_req['items'])
+                    lookup = pData['items']
+                    for key, value in d_req['items'].items():
+                        if key in lookup:
+                            if value <= lookup[key]:
+                                met_req -= 1
+                                if value != 0:
+                                    if d_max_queue > int(lookup[key] / value) or d_max_queue == -1:
+                                        d_max_queue = int(lookup[key] / value)
+                    met_item = True if met_req == 0 else False
             if 'units' in d_req.keys():
                 met_req = len(d_req['units'])
                 lookup = cData['capital']['city']['units']
@@ -2946,7 +2965,7 @@ def train_troop(title):
                     for y in range(d_speed[x]['use']):
                         reduced_time -= d_speed[x]['time']
         else:
-            reduced_time = 0 if reduced_time < 0 else cvt_time(reduced_time)
+            reduced_time = 0 if reduced_time < 1 else cvt_time(reduced_time)
             ctr_it('{0}: {1}'.format(lo['L3'], reduced_time), prefix=True, suffix=True)
         if reduced_time != 0:
             print(' {0}'.format(lo['C6']))
@@ -3489,7 +3508,7 @@ try:
     with open('locale.doa', 'r') as load_file:
         lo = json.load(load_file)
 except FileNotFoundError:
-    choose_language()
+    choose_language(shut_script=False)
 # Load Translations
 for tlookup in ('dict_f_eqp', 'dict_build', 'dict_troop', 'dict_f_adv', 'dict_f_mis', 'dict_f_itm'):
     for tkey, tvalue in lo[tlookup].items():
