@@ -1762,7 +1762,7 @@ def unpack_arsenal(title):
             else:
                 print('\n {0}'.format(lo['C7']))
             div_line()
-            d_select = input(' {0} : '.format('06'))
+            d_select = input(' {0} : '.format(lo['06']))
             if len(d_select) >= 3:
                 if d_select.lower() == lo['N1'] or d_select.lower() == 'exit':
                     return
@@ -2691,7 +2691,7 @@ def train_troop(title):
     low_req = None
     while low_req is None:
         screen_update(title, lo['K3'])
-        ctr_it('Is There An On-going Low Requirements Training Event?', prefix=True, suffix=True)
+        ctr_it(lo['P2'], prefix=True, suffix=True)
         ctr_it('~~~ {0} ~~~'.format(lo['86']))
         ctr_it(lo['90'])
         div_line()
