@@ -6,7 +6,7 @@ from hashlib import sha1
 from operator import itemgetter
 from time import time, sleep
 
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 ########################################################################################################################
 #                                             SCRIPT SECTION - Do Not Edit!                                            #
@@ -134,12 +134,13 @@ def screen_update(title, subtitle):
     div_line()
 
 
-def web_ops(conn, operation, param_add_on, method='POST', post=True):
-    global realm, std_param, cookie
+def web_ops(operation, param_add_on, method='POST', post=True):
+    global realm, std_param, cookie, d_conn
     url = 'http://{0}/api/{1}.json'.format(realm, operation)
     params = param_add_on + '{0}&timestamp={1}'.format(std_param, int(time()))
+    d_conn.connect()
     if not post:
-        conn.request(method, url + params)
+        d_conn.request(method, url + params)
     else:
         cmd = 'Draoumculiasis' + params + 'LandCrocodile' + url + 'Bevar-Asp'
         headers = {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate, sdch', 'Accept-Language': 'en-US,en;q=0.8',
@@ -148,26 +149,24 @@ def web_ops(conn, operation, param_add_on, method='POST', post=True):
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like'
                                  ' Gecko Chrome/45.0.2454.101 Safari/537.36)',
                    'X-Requested-With': 'ShockwaveFlash/19.0.0.226', 'X-S3-AWS': sha1(cmd.encode('utf-8')).hexdigest()}
-        conn.request(method, url, params, headers)
+        d_conn.request(method, url, params, headers)
     try:
-        conn_resp = conn.getresponse()
+        conn_resp = d_conn.getresponse()
         if conn_resp.status == 200:
             conn_json = conn_resp.read().decode('utf-8')
             return json.loads(conn_json)
         elif conn_resp.status == 429:
-            conn.close()
+            d_conn.close()
             for ban_countdown in range(3660):
                 screen_update('{0}'.format(lo['91']), '{0}'.format(lo['92']))
                 prog(ban_countdown, 3660, '{0}: {1}'.format(lo['94'], cvt_time(3660 - ban_countdown)))
                 sleep(1)
-            conn.connect()
         elif conn_resp.status == 509:
-            conn.close()
+            d_conn.close()
             for ban_countdown in range(60):
                 screen_update('{0}'.format(lo['91']), '{0}'.format(lo['93']))
                 prog(ban_countdown, 60, '{0}: {1}'.format(lo['95'], cvt_time(60 - ban_countdown)))
                 sleep(1)
-            conn.connect()
         elif conn_resp.status == 502:
             sleep(5)
         else:
@@ -183,6 +182,7 @@ def web_ops(conn, operation, param_add_on, method='POST', post=True):
         os.system('pause' if os.name == 'nt' else 'read -s -n 1 -p "Press any key to continue..."')
         quit()
     except http.client.HTTPException:
+        d_conn.close()
         sleep(2)
 
 
@@ -221,6 +221,7 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
                 prog(count, max_count, '{0} {1}'.format(lo['22'], name))
             for web_retry in range(2):
                 try:
+                    conn.connect()
                     conn.request('GET', url)
                     conn_resp = conn.getresponse()
                     conn_data = json.loads(conn_resp.read().decode('utf-8'))
@@ -231,6 +232,7 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
                         w1_data = conn_data
                     elif req[x]['2'] == 'forgestat':
                         fStat = conn_data
+                    conn.close()
                     break
                 except (KeyError, TypeError):
                     if unmute:
@@ -252,10 +254,8 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
                         tData[key] = value
                     if key not in tData and value == '':
                         tData[key] = key
-    conn.close()
 
     # Get Forge and Player
-    d_conn.connect()
     req = [{'0': pl, '1': lo['26'], '2': 'player', '3': '?', '4': 'GET', '5': False},
            {'0': fm, '1': lo['27'], '2': 'forge/forge', '3': '', '4': 'GET', '5': True},
            {'0': pf, '1': lo['28'], '2': 'forge/player_forge_info', '3': '', '4': 'GET', '5': True}]
@@ -267,7 +267,7 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
                 prog(count, max_count, '{0} {1}'.format(lo['22'], name))
             for web_retry in range(2):
                 try:
-                    conn_data = web_ops(d_conn, req[x]['2'], req[x]['3'], req[x]['4'], req[x]['5'])
+                    conn_data = web_ops(req[x]['2'], req[x]['3'], req[x]['4'], req[x]['5'])
                     count += 1
                     if req[x]['2'] == 'forge/forge':
                         fData = conn_data
@@ -300,7 +300,7 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
                 prog(1, 1, '{0} {1}'.format(lo['29'], t(loc_key)))
             for web_retry in range(5):
                 try:
-                    current_location = web_ops(d_conn, 'cities/{0}'.format(pData['cities'][loc_key]['id']), '')
+                    current_location = web_ops('cities/{0}'.format(pData['cities'][loc_key]['id']), '')
                     cData[loc_key] = current_location
                     break
                 except (KeyError, TypeError):
@@ -316,7 +316,6 @@ def get_data(title, pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w
                 ctr_it(lo['25'])
                 div_line('#')
                 quit()
-    d_conn.close()
 
     # Save Entry If Loading Went Well...
     acct = list()
@@ -379,9 +378,11 @@ def choose_language(title='', shut_script=True):
     conn_data = None
     for web_retry in range(2):
         try:
+            conn.connect()
             conn.request('GET', url)
             conn_resp = conn.getresponse()
             conn_data = json.loads(conn_resp.read().decode('utf-8'))
+            conn.close()
             break
         except (KeyError, TypeError) as err:
             print(err)
@@ -873,7 +874,6 @@ def create_equipment(title):
     f_succ, f_fail, len_item = [0, 0, 0]
     kept_items = list()
     crushed_items = {}
-    d_conn.connect()
     for x in range(1, d_batch + 1):
         screen_update(title, lo['73'])
         ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['63'], t(d_item)))
@@ -900,7 +900,7 @@ def create_equipment(title):
         for web_retry in range(5):
             sleep(d_delay)
             try:
-                main_json = web_ops(d_conn, 'forge/forge_item', x_param)
+                main_json = web_ops('forge/forge_item', x_param)
                 result = main_json['result']['success']
                 if result:
                     forge_equip = main_json['result']['forge_result']
@@ -921,7 +921,7 @@ def create_equipment(title):
             for web_retry in range(5):
                 sleep(d_delay)
                 try:
-                    crush_json = web_ops(d_conn, 'forge/disenchant_equipment', x_param)
+                    crush_json = web_ops('forge/disenchant_equipment', x_param)
                     result = crush_json['result']['success']
                     if result:
                         for y in range(len(crush_json['result']['disenchanted_ingredients'])):
@@ -933,7 +933,6 @@ def create_equipment(title):
                 except (KeyError, TypeError):
                     sleep(1)
                     continue
-    d_conn.close()
     screen_update(title, lo['82'])
     ctr_it('{0}: {1}   {2}: {3}'.format(lo['61'], t(d_troop), lo['63'], t(d_item)))
     ctr_it('{0}: {1:,} {2}   {3}: {4:,}   {5}: {6}s'.format(
@@ -1071,7 +1070,6 @@ def forge_ingredient(title):
         if t(pData['forge']['items']['ingredients'][x]['name']) not in base_list:
             base_list[t(pData['forge']['items']['ingredients'][x]['name'])] = pData[
                 'forge']['items']['ingredients'][x]['quantity']
-    d_conn.connect()
     for x in range(1, d_batch + 1):
         screen_update(title, lo['73'])
         ctr_it('{0}: {1}   {2}: {3:,}'.format(lo['A2'], t(d_item), lo['66'], d_batch))
@@ -1085,7 +1083,7 @@ def forge_ingredient(title):
             sleep(d_delay)
             try:
                 x_param = 'output%5Fname={0}&'.format(d_item)
-                main_json = web_ops(d_conn, 'forge/forge_item', x_param)
+                main_json = web_ops('forge/forge_item', x_param)
                 result = main_json['result']['success']
                 if result:
                     check_use = main_json['result']['forge_items']['ingredients']
@@ -1097,7 +1095,6 @@ def forge_ingredient(title):
             except (KeyError, TypeError):
                 sleep(1)
                 continue
-    d_conn.close()
     screen_update(title, lo['82'])
     ctr_it('{0}: {1}   {2}: {3:,}'.format(lo['A2'], t(d_item), lo['83'], d_batch))
     ctr_it('{0}: {1}s'.format(lo['71'], d_delay))
@@ -1124,17 +1121,15 @@ def farm_mission(title):
     adventurers = pData['forge']['adventurers']
     missions = fData['forge']['missions']
     claimed = False
-    d_conn.connect()
     for x in range(len(adventurers)):
         if adventurers[x]['current_mission'] is not None:
             x_param = 'adventurer_id={0}&mission_type={1}&'.format(
                 adventurers[x]['adventurer_id'], adventurers[x]['current_mission'])
-            item_json = web_ops(d_conn, 'player_missions/claim_mission', x_param)
+            item_json = web_ops('player_missions/claim_mission', x_param)
             if item_json['result']['success']:
                 claimed = True
             else:
                 selection[adventurers[x]['current_mission']] = adventurers[x]['current_mission']
-    d_conn.close()
     if claimed:
         get_data(title, pf=True, unmute=False)
         adventurers = pData['forge']['adventurers']
@@ -1260,7 +1255,7 @@ def farm_mission(title):
         return
 
     while True:
-        screen_update(title, lo['C4'])
+        screen_update(title, lo['L1'])
         ctr_it('{0}: {1} ({2})   {3}: {4}'.format(
             lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), lo['C5'], t(d_adventurer)))
         ctr_it(' ')
@@ -1344,7 +1339,6 @@ def farm_mission(title):
     # Farm Mission
     d_start = time()
     speeds_used, items_gained = [{}, {}]
-    d_conn.connect()
     for x in range(d_batch):
         job_id = 0
         dur = -1
@@ -1373,7 +1367,7 @@ def farm_mission(title):
                         sleep(d_delay)
                         x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
                         try:
-                            main_json = web_ops(d_conn, 'player_missions', x_param)
+                            main_json = web_ops('player_missions', x_param)
                             result = main_json['result']['success']
                             if result:
                                 dur = int(main_json['result']['job']['duration'])
@@ -1387,7 +1381,7 @@ def farm_mission(title):
                         sleep(d_delay)
                         x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(job_id)
                         try:
-                            item_json = web_ops(d_conn, 'player_items/{0}'.format(item['item']), x_param)
+                            item_json = web_ops('player_items/{0}'.format(item['item']), x_param)
                             result = item_json['result']['success']
                             if result:
                                 dur = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
@@ -1406,7 +1400,7 @@ def farm_mission(title):
                         sleep(d_delay)
                         x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_list[0]['id'], d_mission)
                         try:
-                            claim_json = web_ops(d_conn, 'player_missions/claim_mission', x_param)
+                            claim_json = web_ops('player_missions/claim_mission', x_param)
                             result = claim_json['result']['success']
                             if result:
                                 for z in range(len(claim_json['result']['items'])):
@@ -1419,7 +1413,6 @@ def farm_mission(title):
                             print(err)
                             sleep(1)
                             continue
-    d_conn.close()
     screen_update(title, lo['82'])
     ctr_it('{0}: {1} ({2})   {3}: {4}'.format(
         lo['B4'], t(d_mission), cvt_time(d_list[0]['time'], show_seconds=False), lo['C5'], t(d_adventurer)))
@@ -1571,7 +1564,6 @@ def open_chest(title):
     speed_items = ('Hop', 'TranceMarchDrops', 'ForcedMarchDrops', 'TranceMarchElixir', 'Godspeed', 'Bounce', 'Skip',
                    'Jump', 'Leap', 'Bore', 'Bolt', 'Blast', 'Blitz', 'Blink')
     ttl_open = 0
-    d_conn.connect()
     for x in range(len(d_list)):
         i_received = {'{0}'.format(lo['D4']): {}, '{0}'.format(lo['E5']): {}, '{0}'.format(lo['E6']): {},
                       '{0}'.format(lo['E7']): {}, '{0}'.format(lo['E8']): {}, '{0}'.format(lo['E9']): {}}
@@ -1586,7 +1578,7 @@ def open_chest(title):
                 sleep(d_delay)
                 try:
                     x_param = '%5Fmethod=delete&quantity={0}&'.format(open_qty)
-                    main_data = web_ops(d_conn, 'player_items/{0}'.format(d_list[x]['chest']), x_param)
+                    main_data = web_ops('player_items/{0}'.format(d_list[x]['chest']), x_param)
                     result = main_data['result']['success']
                     if result:
                         opened -= open_qty
@@ -1827,7 +1819,6 @@ def unpack_arsenal(title):
     d_start = time()
     total_opened = 0
     d_power = 0
-    d_conn.connect()
     for x in range(len(d_list)):
         current_opened = 0
         if len(d_list) > 1:
@@ -1852,7 +1843,7 @@ def unpack_arsenal(title):
                 sleep(d_delay)
                 try:
                     x_param = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
-                    main_json = web_ops(d_conn, 'player_items/{0}'.format(d_list[x]['bin']), x_param)
+                    main_json = web_ops('player_items/{0}'.format(d_list[x]['bin']), x_param)
                     result = main_json['result']['success']
                     if result:
                         total_opened += open_quantity
@@ -1863,7 +1854,6 @@ def unpack_arsenal(title):
                 except (KeyError, TypeError):
                     sleep(1)
                     continue
-    d_conn.close()
     screen_update(title, lo['82'])
     ctr_it('{0}: {1}   {2}: {3}'.format(lo['F8'], t(d_troop), lo['G4'], d_bin_type))
     ctr_it('{0}: {1:,}   {2}: {3}s'.format(lo['G6'], d_batch, lo['71'], d_delay))
@@ -2196,7 +2186,6 @@ def fill_building(title):
     prog(0, 1, lo['18'])
     d_start = time()
     speeds_used = {}
-    d_conn.connect()
     slots = list()
     count = 0
     if d_list[0]['location'] == 'city':
@@ -2232,7 +2221,7 @@ def fill_building(title):
                 for web_retry in range(5):
                     try:
                         sleep(d_delay)
-                        json_data = web_ops(d_conn, 'cities/{0}/buildings'.format(
+                        json_data = web_ops('cities/{0}/buildings'.format(
                             d_list[0]['location_id']), x_param)
                         result = json_data['result']['success']
                         if result:
@@ -2261,7 +2250,7 @@ def fill_building(title):
                 for web_retry in range(5):
                     try:
                         sleep(d_delay)
-                        json_data = web_ops(d_conn, 'player_items/{0}'.format(speed_item), x_param)
+                        json_data = web_ops('player_items/{0}'.format(speed_item), x_param)
                         result = json_data['result']['success']
                         if result:
                             if speed_item in speeds_used:
@@ -2575,7 +2564,6 @@ def upgrade_building(title):
     prog(0, 1, lo['18'])
     d_start = time()
     speeds_used = {}
-    d_conn.connect()
     d_list_len = len(d_list)
     for y in range(min_lvl, d_lvl):
         total = len([d for d in d_list if d.get('level') == y])
@@ -2607,7 +2595,7 @@ def upgrade_building(title):
                         for server_retry in range(5):
                             sleep(d_delay + 1)
                             try:
-                                main_json = web_ops(d_conn, 'cities/{0}/buildings/{1}'.format(
+                                main_json = web_ops('cities/{0}/buildings/{1}'.format(
                                     d_list[x]['location_id'], d_list[x]['building_id']), x_param)
                                 result = main_json['result']['success']
                                 if result:
@@ -2637,7 +2625,7 @@ def upgrade_building(title):
                         for server_retry in range(5):
                             sleep(d_delay + 1)
                             try:
-                                item_json = web_ops(d_conn, 'player_items/{0}'.format(speed_item), x_param)
+                                item_json = web_ops('player_items/{0}'.format(speed_item), x_param)
                                 result = item_json['result']['success']
                                 if result:
                                     for z in range(len(d_speed)):
@@ -3038,7 +3026,6 @@ def train_troop(title):
     # Train Troops
     speeds_used, powders_used = [{}, {}]
     d_start = time()
-    d_conn.connect()
     for x in range(d_batch):
         dur = -1
         job_id = 0
@@ -3075,7 +3062,7 @@ def train_troop(title):
                     for server_retry in range(5):
                         sleep(d_delay)
                         try:
-                            main_json = web_ops(d_conn, 'cities/{0}/units'.format(d_list[0]['id']), x_param)
+                            main_json = web_ops('cities/{0}/units'.format(d_list[0]['id']), x_param)
                             result = main_json['result']['success']
                             if result:
                                 job_id = main_json['result']['job']['id']
@@ -3089,7 +3076,7 @@ def train_troop(title):
                     for server_retry in range(5):
                         sleep(d_delay)
                         try:
-                            item_json = web_ops(d_conn, 'player_items/{0}'.format(item['item']), x_param)
+                            item_json = web_ops('player_items/{0}'.format(item['item']), x_param)
                             result = item_json['result']['success']
                             if result:
                                 dur = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
@@ -3347,7 +3334,6 @@ def revive_soul(title):
     # Revive Troops
     speeds_used, powders_used = [{}, {}]
     d_start = time()
-    d_conn.connect()
     for x in range(d_batch):
         dur = -1
         job_id = 0
@@ -3384,7 +3370,7 @@ def revive_soul(title):
                     for server_retry in range(5):
                         sleep(d_delay)
                         try:
-                            main_json = web_ops(d_conn, 'cities/{0}/units/resurrect'.format(d_list[0]['id']), x_param)
+                            main_json = web_ops('cities/{0}/units/resurrect'.format(d_list[0]['id']), x_param)
                             result = main_json['result']['success']
                             if result:
                                 job_id = main_json['result']['job']['id']
@@ -3398,7 +3384,7 @@ def revive_soul(title):
                     for server_retry in range(5):
                         sleep(d_delay)
                         try:
-                            item_json = web_ops(d_conn, 'player_items/{0}'.format(item['item']), x_param)
+                            item_json = web_ops('player_items/{0}'.format(item['item']), x_param)
                             result = item_json['result']['success']
                             if result:
                                 dur = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
