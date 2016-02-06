@@ -6,7 +6,7 @@ from hashlib import sha1
 from operator import itemgetter
 from time import time, sleep
 
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 ########################################################################################################################
 #                                             SCRIPT SECTION - Do Not Edit!                                            #
@@ -130,7 +130,8 @@ def screen_update(title, subtitle):
         a = '{0}({1})'.format(pData['name'], d_rn) if d_rn != 0 else ''
     except (KeyError, NameError):
         a = ''
-    print('\n {0:<55}  {1:>21}\n     {2:<{3}}{4}'.format(title, a, subtitle, 74 - v_len, __version__))
+    print('\n {0:<55}  {1:>21}\n     {2:<{3}}{4}'.format(
+            title.capitalize(), a, subtitle.title(), 74 - v_len, __version__))
     div_line()
 
 
@@ -2149,6 +2150,7 @@ def fill_building(title):
                     for key in range(len(selection)):
                         if d_select.lower() == selection[key]['item'].lower():
                             selection[key]['use'] = True if selection[key]['use'] is False else False
+                            break
                     else:
                         for key in range(len(selection)):
                             if d_select.lower() in selection[key]['item'].lower():
@@ -2417,13 +2419,21 @@ def upgrade_building(title):
             for key in requirements:
                 if key == 'buildings':
                     for c_key, c_value in requirements[key].items():
-                        if c_key in c_bldg.keys():
-                            if c_value > c_bldg[c_key]:
-                                req = '{0} {1} {2} {3}'.format(c_key, c_value, lo['I0'], c_bldg[c_key])
-                                req_check.append(req)
+                        for x in range(len(cData[d_lct]['city']['buildings'])):
+                            if c_key == cData[d_lct]['city']['buildings'][x]['type']:
+                                if c_value > cData[d_lct]['city']['buildings'][x]['level']:
+                                    req = '{0} {1} {2} {3}'.format(
+                                            t(c_key), c_value, lo['I0'], cData[d_lct]['city']['buildings'][x]['level'])
+                                    req_check.append(req)
+                                break
                         else:
-                            req = '{0} {1} {2}'.format(c_key, c_value, lo['I1'])
-                            req_check.append(req)
+                            if c_key in c_bldg.keys():
+                                if c_value > c_bldg[c_key]:
+                                    req = '{0} {1} {2} {3}'.format(t(c_key), c_value, lo['I0'], c_bldg[c_key])
+                                    req_check.append(req)
+                            else:
+                                req = '{0} {1} {2}'.format(t(c_key), c_value, lo['I1'])
+                                req_check.append(req)
                 if key == 'items':
                     for c_key, c_value in requirements[key].items():
                         if c_key in pData['items']:
@@ -2457,13 +2467,15 @@ def upgrade_building(title):
         ctr_it(lo['J7'], prefix=True)
         ctr_it('{0} - {1}'.format(min_lvl + 1, max_level), suffix=True)
         if len(req_check) != 0:
+            div_line('#')
+            ctr_it(lo['H9'], suffix=True)
             for x in range(len(req_check)):
                 ctr_it(req_check[x])
-            ctr_it(lo['H9'], prefix=True, suffix=True)
-            div_line()
+            div_line('#')
         if len(req_check) == 0 and d_lvl != 0:
             gtg = True
         else:
+            div_line()
             d_select = input(' {0} : '.format(lo['06']))
             if len(d_select) >= 1:
                 if d_select.lower() == lo['N1'] or d_select.lower() == 'exit':
@@ -2500,11 +2512,11 @@ def upgrade_building(title):
             div_line('-')
             ctr_it('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}'.format(a, a1, b, b1, c, c1, d, d1, e, e1))
             ctr_it('{0}  {1}  {2}  {3}  {4}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1))
-            for key in range(len(selection)):
-                use_item = lo['D6'] if selection[key]['use'] is True else lo['D7']
+            for x in range(len(selection)):
+                use_item = lo['D6'] if selection[x]['use'] is True else lo['D7']
                 ctr_it('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
-                    selection[key]['item'], a1, cvt_time(selection[key]['time'], show_seconds=False), b1,
-                    selection[key]['quantity'], c1, cvt_time(selection[key]['exceed'], show_seconds=False),
+                        selection[x]['item'], a1, cvt_time(selection[x]['time'], show_seconds=False), b1,
+                        selection[x]['quantity'], c1, cvt_time(selection[x]['exceed'], show_seconds=False),
                     d1, use_item))
             print('\n {0}'.format(lo['I5']))
             div_line('-')
@@ -2519,19 +2531,20 @@ def upgrade_building(title):
                 elif d_select.lower() == lo['N4'] or d_select.lower() == 'next':
                     break
                 elif d_select.lower() == lo['N5'] or d_select.lower() == 'all':
-                    for key in range(len(selection)):
-                        selection[key]['use'] = True
+                    for x in range(len(selection)):
+                        selection[x]['use'] = True
                 elif d_select.lower() == lo['N6'] or d_select.lower() == 'none':
-                    for key in range(len(selection)):
-                        selection[key]['use'] = False
+                    for x in range(len(selection)):
+                        selection[x]['use'] = False
                 else:
-                    for key in range(len(selection)):
-                        if d_select.lower() == selection[key]['item'].lower():
-                            selection[key]['use'] = True if selection[key]['use'] is False else False
+                    for x in range(len(selection)):
+                        if d_select.lower() == selection[x]['item'].lower():
+                            selection[x]['use'] = True if not selection[x]['use'] else False
+                            break
                     else:
-                        for key in range(len(selection)):
-                            if d_select.lower() == selection[key]['item'].lower():
-                                selection[key]['use'] = True if selection[key]['use'] is False else False
+                        for x in range(len(selection)):
+                            if d_select.lower() in selection[x]['item'].lower():
+                                selection[x]['use'] = True if not selection[x]['use'] else False
     d_speed = list()
     for x in range(len(selection)):
         if selection[x]['use'] is True:
