@@ -7,7 +7,7 @@ from hashlib import sha1
 from operator import itemgetter
 from time import time, sleep
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 
 ########################################################################################################################
@@ -331,8 +331,9 @@ def chkver():
 
 
 def t(string):
-    if string in tData.keys():
-        return tData[string]
+    for key, value in tData.items():
+        if string == key:
+            return value
     else:
         return string
 
@@ -402,7 +403,7 @@ def stbtch(max_value, exec_string):
 
 
 def stdly():
-    dl = {'00': lo['a11'], '01': lo['a46'], '02': lo['c34'], '03': lo['c80'], '04': lo['a52'], '05': lo['a59']}
+    dl = {'00': lo['a11'], '01': lo['a46'], '02': lo['c43'], '03': lo['c80'], '04': lo['a52'], '05': lo['a59']}
     dvsn('-')
     ctrt('~~~ {0} ~~~'.format(dl['00']))
     ctrt('0 - 5', suffix=True)
@@ -455,7 +456,7 @@ def trnct(content, length=100, suffix='..'):
 
 
 def scpxt():
-    dl = {'00': lo[''], '01': lo['a24'], '02': lo['c83'], '03': lo['a98']}
+    dl = {'00': lo['c42'], '01': lo['a24'], '02': lo['c83'], '03': lo['a98']}
     os.system('cls' if os.name == 'nt' else 'clear')
     ctrt('{0} DoA Tools v{1}'.format(dl['00'], __version__), prefix=True, suffix=True)
     ctrt(dl['01'])
@@ -1170,8 +1171,8 @@ def farm_mission():
                 b1 = len(cvttm(look_up['time'], ss=False))
             if len('{0:,}'.format(pData['items'][look_up['item']])) > c1:
                 c1 = len('{0:,}'.format(pData['items'][look_up['item']]))
-            my_dict = {'item': look_up['item'], 'time': look_up['time'],
-                       'qty': pData['items'][look_up['item']], 'use': 0}
+            my_dict = {'item': look_up['item'], 'desc': t(look_up['item']), 'use': 0,
+                       'time': look_up['time'], 'qty': pData['items'][look_up['item']]}
             d_speed.append(my_dict)
     if not d_speed:
         nthng(dl['00'], dl['24'], dl['25'])
@@ -1351,12 +1352,12 @@ def farm_mission():
 # -------------------------------------------------------------------------------------------------------------------- #
 def open_chest():
     dl = {'00': lo['b36'], '01': lo['b97'], '02': lo['a92'], '03': lo['c46'], '04': lo['a27'], '05': lo['c72'],
-          '06': lo['b52'], '07': lo['b38'], '08': lo['c85'], '09': lo['b19'], '10': lo['b23'], '11': lo['b21'],
+          '06': lo['b52'], '07': lo['b38'], '08': lo['c85'], '09': lo['b19'], '10': lo['b23'], '11': lo['a48'],
           '12': lo['a51'], '13': lo['a52'], '14': lo['a59'], '15': lo['b16'], '16': lo['a04'], '17': lo['b20'],
-          '18': lo['c68'], '19': lo['c14'], '21': lo['a86'], '22': lo['c15'], '23': lo['b37'], '24': lo['a43'],
-          '25': lo['b57'], '26': lo['b51'], '27': lo['a06'], '28': lo['c29'], '29': lo['c41'], '30': lo['a82'],
-          '31': lo['b40'], '32': lo['b51'], '33': lo['a47'], '34': lo['b41'], '35': lo['a38'], '36': lo['b39'],
-          '37': lo['b88'], '38': lo['c31'], '39': lo['b49'], '40': lo['b47']}
+          '18': lo['c68'], '19': lo['c14'], '20': lo['c57'], '21': lo['a86'], '22': lo['c15'], '23': lo['b37'],
+          '24': lo['a43'], '25': lo['b57'], '26': lo['b51'], '27': lo['a06'], '28': lo['c29'], '29': lo['c41'],
+          '30': lo['a82'], '31': lo['b40'], '32': lo['b51'], '33': lo['a47'], '34': lo['b41'], '35': lo['a38'],
+          '36': lo['b39'], '37': lo['b88'], '38': lo['c31'], '39': lo['b49'], '40': lo['b47']}
     # Initialize Chest Opener
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
@@ -1381,7 +1382,7 @@ def open_chest():
         if len(d_lst) == 1:
             d_lst[0]['open'] = True
         else:
-            a, b, c = [dl['04'], dl['05'], dl['06']]
+            a, b, c = [dl['04'], dl['06'], dl['07']]
             a1, b1, c1 = [len(a), len(b), len(c)]
             for x in range(len(d_lst)):
                 if len(d_lst[x]['desc']) > a1:
@@ -1553,7 +1554,7 @@ def open_chest():
                         for category in (dl['04'], dl['27'], dl['28'], dl['29'], dl['30'], dl['31']):
                             if len(i_received[category]) > 0:
                                 slctn = i_received[category]
-                                ctrt('~~~ {0} ~~~'.format(category), prefix=True)
+                                ctrt('~~~ {0} ~~~'.format(category.title()), prefix=True)
                                 dsply(slctn, single=False)
                         if count == d_lst[x]['qty']:
                             look_up = main_data['result']['items']
@@ -1577,11 +1578,11 @@ def open_chest():
     for category in (dl['04'], dl['27'], dl['28'], dl['29'], dl['30'], dl['31']):
         if len(o_rcvd[category]) > 0:
             slctn = o_rcvd[category]
-            ctrt('~~~ {0} ~~~'.format(category), prefix=True)
+            ctrt('~~~ {0} ~~~'.format(category.title()), prefix=True)
             dsply(slctn, single=False)
     dvsn()
     input(dl['40'])
-    print(dl['07'])
+    print(dl['05'])
     gtdt(pf=True, unmute=False)
 
 
@@ -1592,7 +1593,7 @@ def unpack_arsenal():
     dl = {'00': lo['c69'], '01': lo['c08'], '02': lo['a92'], '03': lo['a66'], '04': lo['a71'], '05': lo['b35'],
           '06': lo['c36'], '07': lo['a65'], '08': lo['c53'], '09': lo['c64'], '10': lo['c56'], '11': lo['b44'],
           '12': lo['a52'], '13': lo['a59'], '14': lo['c67'], '15': lo['b52'], '16': lo['b44'], '17': lo['b38'],
-          '18': lo['b95'], '19': lo['c65'], '20': lo['c85'], '21': lo['b19'], '22': lo['b51'], '23': lo['a51'],
+          '18': lo['b95'], '19': lo['c65'], '20': lo['c85'], '21': lo['b19'], '22': lo['b21'], '23': lo['a51'],
           '24': lo['a59'], '25': lo['a04'], '26': lo['b20'], '27': lo['b16'], '28': lo['a16'], '29': lo['a17'],
           '30': lo['b90'], '31': lo['c19'], '32': lo['a89'], '33': lo['c70'], '34': lo['c15'], '35': lo['b57'],
           '36': lo['a43'], '37': lo['b51'], '38': lo['a47'], '39': lo['c71'], '40': lo['b45'], '41': lo['c31'],
@@ -1607,7 +1608,7 @@ def unpack_arsenal():
                 break
         if 'TroopPrizeItem' in key and value > 0:
             for x in range(len(mData['units'])):
-                if mData['units'][x]['type'] in key:
+                if key.startswith(mData['units'][x]['type']):
                     if '50TroopPrizeItem' in key:
                         bin_desc, bin_type = [dl['03'], 50]
                     elif '500TroopPrizeItem' in key:
@@ -1693,10 +1694,10 @@ def unpack_arsenal():
             for x in range(len(d_lst)):
                 e = '{0:,}'.format(d_lst[x]['b_typ'] * d_lst[x]['qty'] * d_lst[x]['pwr'])
                 if d_lst[x]['use']:
-                    f = dl['20']
+                    f = dl['20'].title()
                     gtg = True
                 else:
-                    f = dl['21']
+                    f = dl['21'].title()
                 ctrt('{0:<{1}}  {2:>{3},}  {4:>{5}}  {6:>{7}}'.format(
                         d_lst[x]['b_dsc'], a1, d_lst[x]['qty'], b1, e, c1, f, d1))
             if not gtg:
@@ -1828,7 +1829,7 @@ def fill_slot():
     dl = {'00': lo['a69'], '01': lo['c02'], '02': lo['a92'], '03': lo['c50'], '04': lo['b07'], '05': lo['a30'],
           '06': lo['a64'], '07': lo['a52'], '08': lo['a59'], '09': lo['a26'], '10': lo['c54'], '11': lo['c24'],
           '12': lo['b96'], '13': lo['c22'], '14': lo['a11'], '15': lo['b68'], '16': lo['b69'], '17': lo['b67'],
-          '18': lo['b66'], '19': lo['b70'], '20': lo['a95'], '21': lo['a44'], '22': lo['a13'], '23': lo['a58'],
+          '18': lo['b66'], '19': lo['b70'], '20': lo['a95'], '21': lo['a44'], '22': lo['a13'], '23': lo['a02'],
           '24': lo['c76'], '25': lo['a20'], '26': lo['a18'], '27': lo['a21'], '28': lo['a22'], '29': lo['a23'],
           '30': lo['b03'], '31': lo['a99'], '32': lo['c21'], '33': lo['a83'], '34': lo['a19'], '35': lo['c06'],
           '36': lo['c23'], '37': lo['b28'], '38': lo['a49'], '39': lo['a50'], '40': lo['a01'], '41': lo['b16'],
@@ -2315,28 +2316,17 @@ def fill_slot():
 # -------------------------------------------------------------------------------------------------------------------- #
 
 def upgrade_building():
-    dl = {'00': 'UPGRADE BUILDING', '01': 'Select Location', '02': lo['a92'],
-          '03': 'There Are No Buildings To Upgrade', '04': 'Available Location', '05': lo['a52'],
-          '06': lo['a59'], '07': 'Select Building', '08': 'Location', '09': 'Building', '10': 'Available Building',
-          '11': 'Set Upgrade Level', '12': 'What Level Would You Like To Upgrade This Building To?',
-          '13': 'Required. You are yet to start on', '14': '', '15': 'Required. Yours is level',
-          '16': 'Required. Yours is not built', '17': 'Required. You have', '18': 'Required. You have none',
-          '19': 'Requirements Not Met', '20': 'Item', '21': 'Description', '22': 'Available', '23': '*Exceeding',
-          '24': 'Use', '25': lo['a20'], '26': lo['a18'], '27': lo['a21'], '28': lo['a22'], '29': lo['a23'],
-          '30': lo['b03'],
-          '31': lo['a99'], '32': lo['c21'], '33': lo['a83'], '34': lo['a19'], '35': 'Select Speed Items To Auto-Use',
-          '36': 'Target Level', '37': 'NOTE: Enter speed item keywords to select single or multiple speed items',
-          '38': 'Enter ALL to select all speed items or NONE to reset list',
-          '39': 'Enter NEXT to accept selection and proceed',
-          '40': '* - Item will be used when duration exceeds the listed time', '41': lo['b16'], '42': 'all',
-          '43': 'none',
-          '44': '', '45': lo['c15'], '46': lo['a43'], '47': lo['b57'],
-          '48': lo['b51'], '49': lo['a47'], '50': 'Upgrading To Level', '51': 'Speed Items Used',
-          '52': '', '53': 'SCRIPT ERROR: Failed To Initialize Building Queue',
-          '54': 'SCRIPT ERROR: Failed To Use Speed Item', '55': lo['c31'], '56': lo['b49'],
-          '57': 'Items Used', '58': 'Resources Used', '59': lo['b47'],
-          '60': lo['c72'], '61': lo['c85'], '62': lo['b19'], '63': 'Upgrading Slot',
-          '64': 'Applying Speed Item', '65': 'No Speed Items In Use', '66': 'Remaining Duration'}
+    dl = {'00': lo['c73'], '01': lo['c02'], '02': lo['a92'], '03': lo['c45'], '04': lo['a10'], '05': lo['a52'],
+          '06': lo['a59'], '07': lo['b96'], '08': lo['b07'], '09': lo['a26'], '10': lo['a09'], '11': lo['c20'],
+          '12': lo['c81'], '13': lo['b65'], '14': lo['a05'], '15': lo['b68'], '16': lo['b69'], '17': lo['b67'],
+          '18': lo['b66'], '19': lo['b70'], '20': lo['a95'], '21': lo['a44'], '22': lo['a13'], '23': lo['a02'],
+          '24': lo['c76'], '25': lo['a20'], '26': lo['a18'], '27': lo['a21'], '28': lo['a22'], '29': lo['a23'],
+          '30': lo['b03'], '31': lo['a99'], '32': lo['c21'], '33': lo['a83'], '34': lo['a19'], '35': lo['c06'],
+          '36': lo['c35'], '37': lo['b28'], '38': lo['a49'], '39': lo['a50'], '40': lo['a01'], '41': lo['b16'],
+          '42': lo['a04'], '43': lo['b20'], '44': lo['b18'], '45': lo['c15'], '46': lo['a43'], '47': lo['b57'],
+          '48': lo['b51'], '49': lo['a47'], '50': lo['c75'], '51': lo['c28'], '52': lo['b64'], '53': lo['b83'],
+          '54': lo['b79'], '55': lo['c31'], '56': lo['b49'], '57': lo['a97'], '58': lo['b71'], '59': lo['b47'],
+          '60': lo['c72'], '61': lo['c85'], '62': lo['b19'], '63': lo['c74']}
     # Initialize
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
@@ -2701,11 +2691,11 @@ def upgrade_building():
                     prg_sf = '{0} {1}/{2}'.format(dl['63'], count, total) if total > 1 else ' '
                     prg((d_lvl - min_lvl) - (d_lvl - y) + 1, d_lvl - min_lvl, '{0} {1}'.format(dl['50'], y + 1), prg_sf)
                     if speed_item:
-                        prg(prog_dur - dur, prog_dur, '{0}: {1}'.format(dl['64'], speed_item),
-                            '{0}: {1}'.format(dl['66'], cvttm(dur)))
+                        prg(prog_dur - dur, prog_dur, '{0}: {1}'.format(dl['14'], speed_item),
+                            '{0}: {1}'.format(dl['52'], cvttm(dur)))
                     else:
                         if dur != -1 and len(d_speed) == 0:
-                            prg(prog_dur - dur, prog_dur, dl['65'], '{0}: {1}'.format(dl['66'], cvttm(dur)))
+                            prg(prog_dur - dur, prog_dur, dl['44'], '{0}: {1}'.format(dl['52'], cvttm(dur)))
                         else:
                             prg(prog_dur - dur, prog_dur, dl['02'])
                     if spd_usd:
@@ -2736,24 +2726,18 @@ def upgrade_building():
 # -------------------------------------------------------------------------------------------------------------------- #
 
 def train_troop():
-    dl = {'00': 'TRAIN TROOP', '01': 'Select Troop Type', '02': 'Is There A Elite/Low Requirements Event Currently?',
-          '03': lo['a11'], '04': lo['c84'], '05': lo['a52'], '06': lo['a59'], '07': lo['c85'], '08': lo['b19'],
-          '09': lo['a92'], '10': 'There Are No Trainable Troops', '11': 'Troop', '12': 'Trainable',
-          '13': 'Power Gain', '14': 'Location', '15': 'Level', '16': 'Total', '17': 'Time', '18': 'Select Location',
-          '19': 'Set Quantity for Revival Queue', '20': 'NOTE: Enter MAX for maximum queue', '21': 'max',
-          '22': 'Testronius Infusion', '23': 'Testronius Deluxe', '24': 'Testronius Powder',
-          '25': lo['a20'], '26': lo['a18'], '27': lo['a21'], '28': lo['a22'], '29': lo['a23'], '30': lo['b03'],
-          '31': lo['a99'],
-          '32': lo['c21'], '33': lo['a83'], '34': lo['a19'], '35': 'Reduced', '36': 'Training Duration',
-          '37': lo['b24'], '38': lo['a51'], '39': lo['b16'],
-          '40': 'Number Of Batches To Train', '41': lo['c18'], '42': 'Queue',
-          '43': 'How Many Batches To Train?', '44': lo['c15'], '45': 'Target Batches',
-          '46': lo['b57'], '47': lo['a43'], '48': lo['b51'], '49': lo['a47'], '50': 'Training Batch',
-          '51': 'Remaining Duration', '53': 'Testronius Used', '54': 'Speed Items Used', '55': 'Troops Trained',
-          '56': 'Power Gained', '57': 'SCRIPT ERROR: Failed To Initialize Training Queue',
-          '58': 'SCRIPT ERROR: Failed To Apply Speed/Testronius Item', '59': lo['c31'],
-          '60': lo['b49'], '61': lo['b47'], '62': lo['c72'],
-          '63': 'Speed Item', '64': 'Description', '65': 'Available', '66': 'Use', '67': 'Using'}
+    dl = {'00': lo['c59'], '01': lo['c08'], '02': lo['a94'], '03': lo['a11'], '04': lo['c84'], '05': lo['a52'],
+          '06': lo['a59'], '07': lo['c85'], '08': lo['b19'], '09': lo['a92'], '10': lo['c52'], '11': lo['c65'],
+          '12': lo['c60'], '13': lo['b44'], '14': lo['b07'], '15': lo['b04'], '16': lo['c58'], '17': lo['c54'],
+          '18': lo['c02'], '19': lo['b63'], '20': lo['b25'], '21': lo['b10'], '22': lo['c38'], '23': lo['c37'],
+          '24': lo['c39'], '25': lo['a20'], '26': lo['a18'], '27': lo['a21'], '28': lo['a22'], '29': lo['a23'],
+          '30': lo['b03'], '31': lo['a99'], '32': lo['c21'], '33': lo['a83'], '34': lo['a19'], '35': lo['b59'],
+          '36': lo['c62'], '37': lo['b24'], '38': lo['a51'], '39': lo['b16'], '40': lo['b30'], '41': lo['c18'],
+          '42': lo['b53'], '43': lo['a85'], '44': lo['c15'], '45': lo['c34'], '46': lo['b57'], '47': lo['a43'],
+          '48': lo['b51'], '49': lo['a47'], '50': lo['c61'], '51': lo['b64'], '52': lo['a05'], '53': lo['c40'],
+          '54': lo['c28'], '55': lo['c66'], '56': lo['b45'], '57': lo['b87'], '58': lo['b79'], '59': lo['c31'],
+          '60': lo['b49'], '61': lo['b47'], '62': lo['c72'], '63': lo['c27'], '64': lo['a44'], '65': lo['a13'],
+          '66': lo['c76'], '67': lo['b80']}
     # Initialize
     low_req = None
     while low_req is None:
@@ -3128,7 +3112,7 @@ def train_troop():
                 prg(x + 1, d_batch, '{0}: {1:,}/{2:,}'.format(dl['50'], x + 1, d_batch))
                 if speeds_used or powders_used:
                     init = dl['09'] if dur == -1 else '{0}: {1}'.format(dl['51'], cvttm(dur))
-                    prg(y + 1, item['use'], '{0} {1}'.format(dl['67'], item['desc']), init)
+                    prg(y + 1, item['use'], '{0} {1}'.format(dl['52'], item['desc']), init)
                     if powders_used:
                         ctrt('~~~ {0} ~~~'.format(dl['53']), prefix=True)
                         dsply(powders_used, single=False)
@@ -3185,7 +3169,8 @@ def train_troop():
                             sleep(1)
                             continue
                     else:
-                        errmsg(dl['57'])
+                        z = dl['67'] if 'Testronius' in item['item'] else dl['58']
+                        errmsg(z)
     scrn(dl['00'], dl['59'])
     ctrt('{0}: {1}   {2}: {3}   {4}: {5:,}'.format(
             dl['11'], t(d_trp), dl['14'], t(d_lctn), dl['42'], d_lst[0]['qty']))
@@ -3212,24 +3197,16 @@ def train_troop():
 
 
 def revive_soul():
-    dl = {'00': 'REVIVE SOUL', '01': 'Select Soul Type', '02': 'Using',
-          '03': lo['a11'], '04': lo['c84'], '05': lo['a52'], '06': lo['a59'], '07': lo['c85'], '08': lo['b19'],
-          '09': lo['a92'], '10': 'There Are No Trainable Troops', '11': 'Soul', '12': 'Revivable',
-          '13': 'Power Gain', '14': 'Location', '15': 'Level', '16': 'Total', '17': 'Time', '18': 'Select Location',
-          '19': 'Set Quantity for Revival Queue', '20': 'NOTE: Enter MAX for maximum queue', '21': 'max',
-          '22': 'Dark Testronius Infusion', '23': 'Dark Testronius Deluxe', '24': 'Dark Testronius Powder',
-          '25': lo['a20'], '26': lo['a18'], '27': lo['a21'], '28': lo['a22'], '29': lo['a23'], '30': lo['b03'],
-          '31': lo['a99'],
-          '32': lo['c21'], '33': lo['a83'], '34': lo['a19'], '35': 'Reduced', '36': 'Revival Duration',
-          '37': lo['b24'], '38': lo['a51'], '39': lo['b16'],
-          '40': 'Number Of Batches To Revive', '41': lo['c18'], '42': 'Queue',
-          '43': 'How Many Batches To Revive?', '44': lo['c15'], '45': 'Target Batches',
-          '46': lo['b57'], '47': lo['a43'], '48': lo['b51'], '49': lo['a47'], '50': 'Training Batch',
-          '51': 'Remaining Duration', '53': 'Testronius Used', '54': 'Speed Items Used', '55': 'Souls Revived',
-          '56': 'Power Gained', '57': 'SCRIPT ERROR: Failed To Initialize Revival Queue',
-          '58': 'SCRIPT ERROR: Failed To Apply Speed/Testronius Item', '59': lo['c31'],
-          '60': lo['b49'], '61': lo['b47'], '62': lo['c72'],
-          '63': 'Speed Item', '64': 'Description', '65': 'Available', '66': 'Use'}
+    dl = {'00': lo['b77'], '01': lo['c04'], '02': lo['a05'], '03': lo['a11'], '04': lo['c31'], '05': lo['a52'],
+          '06': lo['a59'], '07': lo['b49'], '08': lo['b47'], '09': lo['a92'], '10': lo['c72'], '11': lo['c25'],
+          '12': lo['b75'], '13': lo['c27'], '14': lo['b07'], '15': lo['a44'], '16': lo['c58'], '17': lo['a13'],
+          '18': lo['c76'], '19': lo['c17'], '20': lo['b25'], '21': lo['b10'], '22': lo['a40'], '23': lo['a39'],
+          '24': lo['a41'], '25': lo['a20'], '26': lo['a18'], '27': lo['a21'], '28': lo['a22'], '29': lo['a23'],
+          '30': lo['b03'], '31': lo['a99'], '32': lo['c21'], '33': lo['a83'], '34': lo['a19'], '35': lo['b59'],
+          '36': lo['b76'], '37': lo['b24'], '38': lo['a51'], '39': lo['b16'], '40': lo['b29'], '41': lo['c18'],
+          '42': lo['b53'], '43': lo['a84'], '44': lo['c15'], '45': lo['c34'], '46': lo['b57'], '47': lo['a43'],
+          '48': lo['b51'], '49': lo['a47'], '50': lo['a58'], '51': lo['b64'], '52': lo['b80'], '53': lo['c40'],
+          '54': lo['c28'], '55': lo['c26'], '56': lo['b45'], '57': lo['b86'], '58': lo['b79'], '59': lo['b52']}
     # Initialize
     scrn(dl['00'], dl['01'])
     ctrt(dl['09'])
@@ -3322,7 +3299,7 @@ def revive_soul():
                         d_queue = int(d_select)
         d_lst[0]['quantity'] = d_queue
     # Set Speed Items
-    a, b, c, d = [dl['63'], dl['64'], dl['65'], dl['66']]
+    a, b, c, d = [dl['13'], dl['15'], dl['59'], dl['18']]
     a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
     slctn = [{'item': 'DarkTestroniusInfusion', 'time': 0.99, 'desc': dl['22']},
              {'item': 'DarkTestroniusDeluxe', 'time': 0.5, 'desc': dl['23']},
@@ -3493,7 +3470,8 @@ def revive_soul():
                             sleep(1)
                             continue
                     else:
-                        errmsg(dl['57'])
+                        z = dl['52'] if 'Testronius' in item['item'] else dl['58']
+                        errmsg(z)
                 if dur > 0:
                     x_param = 'job%5Fid={0}&%5Fmethod=delete&'.format(job_id)
                     for server_retry in range(5):
@@ -3521,12 +3499,12 @@ def revive_soul():
                             continue
                     else:
                         errmsg(dl['58'])
-    scrn(dl['00'], dl['59'])
+    scrn(dl['00'], dl['04'])
     ctrt('{0}: {1}   {2}: {3}   {4}: {5:,}'.format(
             dl['11'], t(d_troop), dl['14'], t(d_lctn), dl['42'], d_lst[0]['quantity']))
     ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['45'], d_batch, dl['47'], d_delay))
     dvsn('-')
-    prg(1, 1, '{0} {1}'.format(dl['60'], cvttm(time() - d_start)))
+    prg(1, 1, '{0} {1}'.format(dl['07'], cvttm(time() - d_start)))
     if powders_used:
         ctrt('~~~ {0} ~~~'.format(dl['53']), prefix=True)
         dsply(powders_used, single=False)
@@ -3538,8 +3516,8 @@ def revive_soul():
     ctrt('~~~ {0} ~~~'.format(dl['56']), prefix=True)
     ctrt('{0:,}'.format(d_lst[0]['quantity'] * d_batch * d_lst[0]['power']))
     dvsn()
-    input(dl['61'])
-    print(dl['62'])
+    input(dl['08'])
+    print(dl['10'])
     gtdt(pl=True, unmute=False)
 
 
@@ -3573,16 +3551,16 @@ def refresh_data():
 #                                                      MENU CLASS                                                      #
 # -------------------------------------------------------------------------------------------------------------------- #
 def menu():
-    dl = {'00': 'MAIN MENU', '01': 'What Would You Like To Do?', '03': 'Game Modules', '04': 'System Modules',
-          '05': 'NOTE: Enter QUIT to exit script', '06': lo['a52'], '07': 'quit', '08': 'Craft Equipment',
-          '09': 'Farm Mission', '10': 'Fill Slot', '11': 'Forge Ingredient', '12': 'Load Account', '13': 'Open Chest',
-          '14': 'Refresh Game', '15': 'Revive Soul', '16': 'Switch Realm', '17': 'Train Troop', '18': 'Unpack Arsenal',
-          '19': 'Upgrade Building', '20': 'Choose Language', '21': 'Marketplace', '22': 'Science Research',
-          '23': 'Treasure Hold'}
-    module_dict = {craft_equipment: dl['08'], forge_ingredient: dl['11'], farm_mission: dl['09'], open_chest: dl['13'],
-                   unpack_arsenal: dl['18'], upgrade_building: dl['19'], fill_slot: dl['10'], train_troop: dl['17'],
-                   revive_soul: dl['15']}
-    system_dict = {switch_realm: dl['16'], refresh_data: dl['14'], scpnt: dl['12'], chslng: dl['20']}
+    dl = {'00': lo['b08'], '01': lo['c82'], '02': lo['c63'], '03': lo['a80'], '04': lo['c33'], '05': lo['b27'],
+          '06': lo['a52'], '07': lo['b54'], '08': lo['a31'], '09': lo['a61'], '10': lo['a69'], '11': lo['a73'],
+          '12': lo['b06'], '13': lo['b36'], '14': lo['b60'], '15': lo['b77'], '16': lo['c32'], '17': lo['c59'],
+          '18': lo['c69'], '19': lo['c73'], '20': lo['a29'], '21': lo['b09'], '22': lo['b78']}
+    module_dict = {craft_equipment: dl['08'].title(), forge_ingredient: dl['11'].title(),
+                   farm_mission: dl['09'].title(), open_chest: dl['13'].title(), unpack_arsenal: dl['18'].title(),
+                   upgrade_building: dl['19'].title(), fill_slot: dl['10'].title(), train_troop: dl['17'].title(),
+                   revive_soul: dl['15'].title()}
+    system_dict = {switch_realm: dl['16'].title(), refresh_data: dl['14'].title(), scpnt: dl['12'].title(),
+                   chslng: dl['20'].title()}
     while True:
         scrn(dl['00'], dl['01'])
         ctrt('~~~ {0} ~~~'.format(dl['03']))
