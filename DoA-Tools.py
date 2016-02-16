@@ -112,8 +112,6 @@ def gtdt(pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, un
     if unmute:
         scrn(dl['00'], sub_hdr)
         prg(count, m_count, dl['05'])
-
-    # Get Manifest and Translation
     conn = http.client.HTTPConnection('wackoscripts.com', 80)
     req = [{'0': w1, '1': dl['06'], '2': 'manifest'},
            {'0': w2, '1': dl['07'], '2': 'chest'},
@@ -155,8 +153,6 @@ def gtdt(pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, un
                         tData[key] = value
                     if key not in tData and value == '':
                         tData[key] = key
-
-    # Get Forge and Player
     req = [{'0': pl, '1': dl['11'], '2': 'player.json', '3': '?', '4': 'GET', '5': False},
            {'0': fm, '1': dl['12'], '2': 'forge/forge.json', '3': '', '4': 'GET', '5': True},
            {'0': pf, '1': dl['13'], '2': 'forge/player_forge_info.json', '3': '', '4': 'GET', '5': True}]
@@ -186,8 +182,6 @@ def gtdt(pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, un
                     continue
             else:
                 errmsg('{0} {1}'.format(dl['10'], name))
-
-    # Process City Data
     if op:
         cData = {}
         for loc_key in sorted(pData['cities']):
@@ -207,8 +201,6 @@ def gtdt(pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, un
                     continue
             else:
                 errmsg(dl['15'])
-
-    # Save Entry If Loading Went Well...
     acct = list()
     verify_record = list()
     unique_id = '{0}-{1}'.format(d_ui, d_rn)
@@ -264,7 +256,8 @@ def ctrt(string, prefix=False, suffix=False):
 
 def chslng(title=True, shut_script=True):
     global lo
-    dl = {'00': lo['a29'], '01': lo['c01'], '02': lo['a52'], '03': lo['b93'], '04': lo['c10']}
+    if title:
+        dl = {'00': lo['a29'], '01': lo['c01'], '02': lo['a52'], '03': lo['b93'], '04': lo['c10']}
     conn = http.client.HTTPConnection('wackoscripts.com', 80)
     url = 'http://wackoscripts.com/sanctuary/locale.json'
     conn_data = None
@@ -280,7 +273,10 @@ def chslng(title=True, shut_script=True):
             sleep(1)
             continue
     else:
-        errmsg(dl['04'])
+        if title:
+            errmsg(dl['04'])
+        else:
+            errmsg('ERROR ACCESSING LANGUAGE FILE')
     if conn_data:
         d_lang = None
         while d_lang is None:
@@ -594,7 +590,6 @@ def craft_equipment():
           '30': lo['a34'], '31': lo['b34'], '32': lo['c30'], '33': lo['a60'], '34': lo['b02'], '35': lo['a37'],
           '36': lo['b01'], '37': lo['a36'], '38': lo['b84'], '39': lo['b82'], '40': lo['c31'], '41': lo['b49'],
           '42': lo['b47'], '43': lo['c72']}
-    # Initialize Craftable Equipment
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
     d_lst, slctn = [list(), {}]
@@ -642,8 +637,6 @@ def craft_equipment():
         for x in range(len(d_lst)):
             if d_lst[x]['troop'] not in slctn.keys():
                 slctn[d_lst[x]['troop']] = t(d_lst[x]['troop'])
-
-    # Select Troop For Equipment Crafting
     d_troop = None
     while d_troop is None:
         scrn(dl['00'], dl['01'])
@@ -661,8 +654,6 @@ def craft_equipment():
     for x in range(len(d_lst)):
         if d_lst[x]['item'] not in slctn.keys():
             slctn[d_lst[x]['item']] = t(d_lst[x]['item'])
-
-    # Select Equipment To Craft
     a, b, c, d, e, f, g, h = [dl['07'], dl['08'], dl['09'].title(), dl['10'].title(), dl['11'].title(),
                               dl['12'].title(), dl['13'].title(), dl['14'].title()]
     a1, b1, c1, d1, e1, f1, g1, h1 = [len(a), len(b), len(c), len(d), len(e), len(f), len(g), len(h)]
@@ -705,8 +696,6 @@ def craft_equipment():
             else:
                 d_item = chkinp(d_select, slctn)
     d_lst[:] = [d for d in d_lst if d.get('item') == d_item]
-
-    # Set Minimum Equipment Stat
     d_attrib, d_stat = [None, None]
     while d_attrib is None:
         scrn(dl['00'], dl['18'])
@@ -746,8 +735,6 @@ def craft_equipment():
                         break
                 except(TypeError, ValueError):
                     sleep(1)
-
-    # Set Number Of Batches
     d_batch = None
     while d_batch is None:
         scrn(dl['00'], dl['21'])
@@ -756,8 +743,6 @@ def craft_equipment():
         d_batch = stbtch(d_lst[0]['craftable'] + 1, '{0}'.format(dl['23']))
         if d_batch == dl['06'] or d_batch == 'exit':
             return
-
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['25'])
@@ -766,8 +751,6 @@ def craft_equipment():
         d_delay = stdly()
         if d_batch == dl['06'] or d_batch == 'exit':
             return
-
-    # Proceed Forging
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['27'])
@@ -777,8 +760,6 @@ def craft_equipment():
         d_proceed = prcd()
         if d_proceed == dl['06'] or d_proceed == 'exit':
             return
-
-    # Forge Equipment
     d_strt, f_succ, f_fail, len_item, kpt_itm, crsh_itm = [time(), 0, 0, 0, list(), {}]
     for x in range(1, d_batch + 1):
         scrn(dl['00'], dl['28'])
@@ -875,7 +856,6 @@ def forge_ingredient():
           '06': lo['a77'], '07': lo['a52'], '08': lo['a59'], '09': lo['b32'], '10': lo['a76'], '11': lo['c15'],
           '12': lo['a43'], '13': lo['b57'], '14': lo['b51'], '15': lo['a47'], '16': lo['a78'], '17': lo['a97'],
           '18': lo['b85'], '19': lo['c31'], '20': lo['b49'], '21': lo['b47'], '22': lo['c72'], '23': lo['a88']}
-    # Initialize Craftable Ingredient
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
     d_lst, slctn = [list(), {}]
@@ -916,8 +896,6 @@ def forge_ingredient():
     if not d_lst:
         nthng(dl['00'], dl['01'], dl['03'])
         return
-
-    # Select Ingredient for Crafting
     a, b, c = [dl['04'], dl['05'], dl['06']]
     a1, b1, c1 = [len(a), len(b), len(c)]
     for x in range(len(d_lst)):
@@ -944,8 +922,6 @@ def forge_ingredient():
         else:
             d_item = chkinp(d_select, slctn)
     d_lst[:] = [d for d in d_lst if d.get('item') == d_item]
-
-    # Set Number Of Batches
     d_batch = None
     while d_batch is None:
         scrn(dl['00'], dl['09'])
@@ -954,8 +930,6 @@ def forge_ingredient():
         d_batch = stbtch(d_lst[0]['craftable'] + 1, dl['23'])
         if d_batch == dl['08'] or d_batch == 'exit':
             return
-
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['11'])
@@ -964,8 +938,6 @@ def forge_ingredient():
         d_delay = stdly()
         if d_delay == dl['08'] or d_delay == 'exit':
             return
-
-    # Proceed Forging
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['13'])
@@ -974,8 +946,6 @@ def forge_ingredient():
         d_proceed = prcd()
         if d_proceed == dl['08'] or d_proceed == 'exit':
             return
-
-    # Forge Ingredients
     slctn.clear()
     base_list, d_start = [{}, time()]
     for x in range(len(pData['forge']['items']['ingredients'])):
@@ -1027,7 +997,6 @@ def forge_ingredient():
 
 
 def farm_mission():
-    # Initialize Player Missions
     dl = {'00': lo['a61'], '01': lo['c03'], '02': lo['a92'], '03': lo['c44'], '04': lo['b13'], '05': lo['c54'],
           '06': lo['a62'], '07': lo['b17'], '08': lo['a52'], '09': lo['a59'], '10': lo['a20'], '11': lo['a18'],
           '12': lo['a21'], '13': lo['a22'], '14': lo['a23'], '15': lo['b03'], '16': lo['a99'], '17': lo['c21'],
@@ -1106,8 +1075,8 @@ def farm_mission():
             if len('{0:,}'.format(d_lst[x]['batch'])) > c1:
                 c1 = len('{0:,}'.format(d_lst[x]['batch']))
         d_ms = None
-        # Select Mission
         while d_ms is None:
+            slctn.clear()
             scrn(dl['00'], dl['01'])
             ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
             ctrt('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
@@ -1133,7 +1102,6 @@ def farm_mission():
         d_adv = d_lst[0]['adventurer']
     else:
         d_adv = None
-        # Select Adventurer
         while d_adv is None:
             scrn(dl['00'], dl['50'])
             ctrt('{0}: {1} ({2})'.format(dl['04'], t(d_ms), cvttm(d_tm, ss=False)))
@@ -1148,7 +1116,6 @@ def farm_mission():
             else:
                 d_adv = chkinp(d_select, slctn)
     d_lst[:] = [d for d in d_lst if d.get('adventurer') == d_adv]
-    # Select Speed Items
     spd_itm = [{'item': 'Blitz', 'exceed': 216000, 'time': 345600, 'desc': dl['10']},
                {'item': 'Blast', 'exceed': 86400, 'time': 216000, 'desc': dl['11']},
                {'item': 'Bolt', 'exceed': 54000, 'time': 86400, 'desc': dl['12']},
@@ -1222,8 +1189,6 @@ def farm_mission():
         if d_queue > int(d_speed[x]['qty'] / d_speed[x]['use']):
             d_queue = int(d_speed[x]['qty'] / d_speed[x]['use'])
     d_batch = 1 if d_queue == 1 else None
-
-    # Set Number Of Batches
     while d_batch is None:
         scrn(dl['00'], dl['31'])
         ctrt('{0}: {1} ({2})   {3}: {4}'.format(dl['27'], t(d_ms), cvttm(d_tm, ss=False), dl['28'], t(d_adv)))
@@ -1231,8 +1196,6 @@ def farm_mission():
         d_batch = stbtch(d_queue + 1, dl['32'])
         if d_batch == dl['09'] or d_batch == 'exit':
             return
-
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['33'])
@@ -1241,8 +1204,6 @@ def farm_mission():
         d_delay = stdly()
         if d_delay == dl['09'] or d_delay == 'exit':
             return
-
-    # Proceed With Farming
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['49'])
@@ -1251,8 +1212,6 @@ def farm_mission():
         d_proceed = prcd()
         if d_proceed == dl['09'] or d_proceed == 'exit':
             return
-
-    # Farm Mission
     d_start = time()
     spd_use, itm_gain = [{}, {}]
     for x in range(d_batch):
@@ -1358,7 +1317,6 @@ def open_chest():
           '24': lo['a43'], '25': lo['b57'], '26': lo['b51'], '27': lo['a06'], '28': lo['c29'], '29': lo['c41'],
           '30': lo['a82'], '31': lo['b40'], '32': lo['b51'], '33': lo['a47'], '34': lo['b41'], '35': lo['a38'],
           '36': lo['b39'], '37': lo['b88'], '38': lo['c31'], '39': lo['b49'], '40': lo['b47']}
-    # Initialize Chest Opener
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
     d_lst, slctn, max_len = [list(), {}, 0]
@@ -1378,7 +1336,6 @@ def open_chest():
         return
     else:
         d_lst = sorted(d_lst, key=itemgetter('desc'))
-        # Select Chests
         if len(d_lst) == 1:
             d_lst[0]['open'] = True
         else:
@@ -1399,7 +1356,7 @@ def open_chest():
                 ctrt('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
                 selected = False
                 for x in range(len(d_lst)):
-                    d = dl['08'] if d_lst[x]['open'] else dl['09']
+                    d = dl['08'].title() if d_lst[x]['open'] else dl['09'].title()
                     if d_lst[x]['open']:
                         selected = True
                     ctrt('{0:<{1}}  {2:>{3},}  {4:>{5}}'.format(d_lst[x]['desc'], a1, d_lst[x]['qty'], b1, d, c1))
@@ -1449,8 +1406,6 @@ def open_chest():
                 max_chest = d_lst[x]['qty']
             if max_chest > d_lst[x]['max_use']:
                 max_chest = d_lst[x]['max_use']
-
-    # Set Number Of Batches
     while d_batch is None:
         scrn(dl['00'], dl['19'])
         ctrt('{0}   {1}: {2:,}'.format(d_chest, dl['20'], d_total))
@@ -1458,8 +1413,6 @@ def open_chest():
         d_batch = stbtch(max_chest + 1, dl['21'])
         if d_batch == dl['14'] or d_batch == 'exit':
             return
-
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['22'])
@@ -1468,8 +1421,6 @@ def open_chest():
         d_delay = stdly()
         if d_delay == dl['14'] or d_delay == 'exit':
             return
-
-    # Proceed With Run
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['25'])
@@ -1478,8 +1429,6 @@ def open_chest():
         d_proceed = prcd()
         if d_proceed == dl['14'] or d_proceed == 'exit':
             return
-
-    # Open Chests
     scrn(dl['00'], dl['26'])
     ctrt('{0}   {1}: {2:,}'.format(d_chest, dl['20'], d_total))
     ctrt('{0}: {1}   {2}: {3}s'.format(dl['23'], d_batch, dl['24'], d_delay))
@@ -1589,7 +1538,6 @@ def open_chest():
 # -------------------------------------------------------------------------------------------------------------------- #
 
 def unpack_arsenal():
-    # Initialize Open Arsenal
     dl = {'00': lo['c69'], '01': lo['c08'], '02': lo['a92'], '03': lo['a66'], '04': lo['a71'], '05': lo['b35'],
           '06': lo['c36'], '07': lo['a65'], '08': lo['c53'], '09': lo['c64'], '10': lo['c56'], '11': lo['b44'],
           '12': lo['a52'], '13': lo['a59'], '14': lo['c67'], '15': lo['b52'], '16': lo['b44'], '17': lo['b38'],
@@ -1647,7 +1595,6 @@ def unpack_arsenal():
                 b1 = len('{0:,}'.format(slctn[d_lst[x]['dsc']]['ttl']))
             if len('{0:,}'.format(slctn[d_lst[x]['dsc']]['gain'])) > c1:
                 c1 = len('{0:,}'.format(slctn[d_lst[x]['dsc']]['gain']))
-        # Select Troop Type
         while not d_troop:
             scrn(dl['00'], dl['01'])
             ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
@@ -1672,7 +1619,6 @@ def unpack_arsenal():
     if len(d_lst) == 1:
         d_lst[0]['use'] = True
     else:
-        # Select Bins To Open
         a, b, c, d = [dl['14'], dl['15'], dl['16'], dl['17']]
         a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
         for x in range(len(d_lst)):
@@ -1742,8 +1688,6 @@ def unpack_arsenal():
             d_batch = stbtch(d_lst[0]['qty'] + 1, dl['32'])
             if d_batch == dl['13'] or d_batch == 'exit':
                 return
-
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['34'])
@@ -1752,8 +1696,6 @@ def unpack_arsenal():
         d_delay = stdly()
         if d_delay == dl['13'] or d_delay == 'exit':
             return
-
-    # Proceed With Run
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['35'])
@@ -1762,8 +1704,6 @@ def unpack_arsenal():
         d_proceed = prcd()
         if d_proceed == dl['13'] or d_proceed == 'exit':
             return
-
-    # Unpack Troop Bins
     scrn(dl['00'], dl['37'])
     ctrt('{0}: {1}   {2}: {3}'.format(dl['19'], t(d_troop), dl['29'], d_bin_type))
     ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['33'], d_batch, dl['36'], d_delay))
@@ -1837,7 +1777,6 @@ def fill_slot():
           '48': lo['b51'], '49': lo['a47'], '50': lo['a70'], '51': lo['c28'], '52': lo['c79'], '53': lo['b83'],
           '54': lo['b79'], '55': lo['c31'], '56': lo['b49'], '57': lo['a97'], '58': lo['b71'], '59': lo['b47'],
           '60': lo['c72'], '61': lo['c85'], '62': lo['b19']}
-    # Initialize
     bldg_dict = {
         'capital': {
             'fs': {1: 11, 2: 14, 3: 17, 4: 20, 5: 23, 6: 26, 7: 29, 8: 32, 9: 35, 10: 38, 11: 39},
@@ -1940,7 +1879,6 @@ def fill_slot():
     else:
         d_lst = sorted(d_lst, key=itemgetter('desc'))
         d_lct = None
-        # Select Location
         a, b, c = [dl['04'], dl['05'], dl['06']]
         a1, b1, c1 = [len(a), len(b), len(c)]
         for x in range(len(d_lst)):
@@ -1977,7 +1915,6 @@ def fill_slot():
         d_bldg = d_lst[0]['type']
     else:
         d_bldg = None
-        # Select Building
         a, b, c = [dl['09'], dl['10'], dl['11']]
         a1, b1, c1 = [len(a), len(b), len(c)]
         for x in range(len(d_lst)):
@@ -2018,8 +1955,6 @@ def fill_slot():
         max_slot = d_lst[0]['c_slot_max'] - len(d_lst[0]['c_slot'])
     else:
         max_slot = d_lst[0]['f_slot_max'] - len(d_lst[0]['f_slot'])
-
-    # Set Slots If Applicable
     gtg = False
     req = d_lst[0]['levels']['requirements']
     d_req = {'items': {}, 'buildings': {}, 'resources': {}}
@@ -2110,7 +2045,6 @@ def fill_slot():
         d_speed = list()
     else:
         slctn, d_speed = [list(), list()]
-        # Select Speed Items
         spd_itm = [{'item': 'Blitz', 'exceed': 216000, 'time': 345600, 'desc': dl['25']},
                    {'item': 'Blast', 'exceed': 86400, 'time': 216000, 'desc': dl['26']},
                    {'item': 'Bolt', 'exceed': 54000, 'time': 86400, 'desc': dl['27']},
@@ -2146,7 +2080,7 @@ def fill_slot():
                 ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}'.format(a, a1, b, b1, c, c1, d, d1, e, e1))
                 ctrt('{0}  {1}  {2}  {3}  {4}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1))
                 for key in range(len(slctn)):
-                    use_item = dl['61'] if slctn[key]['use'] is True else dl['62']
+                    use_item = dl['61'].title() if slctn[key]['use'] is True else dl['62'].title()
                     ctrt('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>{9}}'.format(
                             slctn[key]['desc'], a1, cvttm(slctn[key]['time'], ss=False), b1,
                             slctn[key]['quantity'], c1, cvttm(slctn[key]['exceed'], ss=False), d1, use_item, e1))
@@ -2181,8 +2115,6 @@ def fill_slot():
         for x in range(len(slctn)):
             if slctn[x]['use'] is True:
                 d_speed.append(slctn[x])
-
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['45'])
@@ -2191,8 +2123,6 @@ def fill_slot():
         d_delay = stdly()
         if d_delay == dl['08'] or d_delay == 'exit':
             return
-
-    # Proceed With Run
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['47'])
@@ -2201,8 +2131,6 @@ def fill_slot():
         d_proceed = prcd()
         if d_proceed == dl['08'] or d_proceed == 'exit':
             return
-
-    # Run Auto Fill
     scrn(dl['00'], dl['48'])
     ctrt('{0}: {1}   {2}: {3}'.format(dl['04'], d_lct, dl['09'], t(d_bldg)))
     ctrt('{0}: {1}   {2}: {3}s'.format(dl['36'], d_slots, dl['46'], d_delay))
@@ -2327,7 +2255,6 @@ def upgrade_building():
           '48': lo['b51'], '49': lo['a47'], '50': lo['c75'], '51': lo['c28'], '52': lo['b64'], '53': lo['b83'],
           '54': lo['b79'], '55': lo['c31'], '56': lo['b49'], '57': lo['a97'], '58': lo['b71'], '59': lo['b47'],
           '60': lo['c72'], '61': lo['c85'], '62': lo['b19'], '63': lo['c74']}
-    # Initialize
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
     slctn, c_bldg, d_lst = [{}, {}, list()]
@@ -2367,7 +2294,6 @@ def upgrade_building():
         for x in range(len(d_lst)):
             if d_lst[x]['city'] not in slctn.keys():
                 slctn[d_lst[x]['city']] = t(d_lst[x]['city'])
-        # Select Location
         while d_lct is None:
             scrn(dl['00'], dl['01'])
             ctrt('~~~ {0} ~~~'.format(dl['04']))
@@ -2387,7 +2313,6 @@ def upgrade_building():
         for x in range(len(d_lst)):
             if d_lst[x]['type'] not in slctn:
                 slctn[d_lst[x]['type']] = t(d_lst[x]['type'])
-        # Select Building
         d_bldg = None
         while d_bldg is None:
             scrn(dl['00'], dl['07'])
@@ -2410,7 +2335,6 @@ def upgrade_building():
     for x in range(len(d_lst)):
         if d_lst[x]['level'] < min_lvl:
             min_lvl = d_lst[x]['level'] + 1
-    # Select Level
     gtg, d_lvl, d_req = [False, 0, {'items': {}, 'buildings': {}, 'research': {}, 'resources': {}}]
     while d_lvl is 0:
         scrn(dl['00'], dl['11'])
@@ -2514,7 +2438,6 @@ def upgrade_building():
                         d_lvl = int(d_select)
                         max_level = int(d_select) - 1
                         req_check.clear()
-    # Select Speed Items
     slctn = list()
     spd_itm = [{'item': 'Blitz', 'exceed': 216000, 'time': 345600, 'desc': dl['25']},
                {'item': 'Blast', 'exceed': 86400, 'time': 216000, 'desc': dl['26']},
@@ -2551,7 +2474,7 @@ def upgrade_building():
             ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}'.format(a, a1, b, b1, c, c1, d, d1, e, e1))
             ctrt('{0}  {1}  {2}  {3}  {4}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1))
             for x in range(len(slctn)):
-                use_item = dl['61'] if slctn[x]['use'] is True else dl['62']
+                use_item = dl['61'].title() if slctn[x]['use'] is True else dl['62'].title()
                 ctrt('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
                         slctn[x]['desc'], a1, cvttm(slctn[x]['time'], ss=False), b1, slctn[x]['quantity'], c1,
                         cvttm(slctn[x]['exceed'], ss=False), d1, use_item))
@@ -2586,7 +2509,6 @@ def upgrade_building():
     for x in range(len(slctn)):
         if slctn[x]['use'] is True:
             d_speed.append(slctn[x])
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['45'])
@@ -2595,8 +2517,6 @@ def upgrade_building():
         d_delay = stdly()
         if d_delay == dl['06'] or d_delay == 'exit':
             return
-
-    # Proceed With Run
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['47'])
@@ -2605,15 +2525,13 @@ def upgrade_building():
         d_proceed = prcd()
         if d_proceed == dl['06'] or d_proceed == 'exit':
             return
-
-    # Run Auto Upgrade
     scrn(dl['00'], dl['48'])
     ctrt('{0}: {1}   {2}: {3}   {4}: {5}'.format(dl['08'], t(d_lct), dl['09'], d_bldg, dl['36'], d_lvl))
     ctrt('{0}: {1}s'.format(dl['46'], d_delay))
     dvsn('-')
     prg(0, 1, dl['02'])
     d_start, spd_usd, len_d_lst = [time(), {}, len(d_lst)]
-    for y in range(min_lvl, d_lvl):
+    for y in range(min_lvl, d_lvl + 1):
         total = len([d for d in d_lst if d.get('level') == y])
         count = 0
         speed_item = None
@@ -2689,12 +2607,12 @@ def upgrade_building():
                     ctrt('{0}: {1}s   {2}: {3}'.format(dl['46'], d_delay, dl['49'], cvttm(time() - d_start)))
                     dvsn('-')
                     prg_sf = '{0} {1}/{2}'.format(dl['63'], count, total) if total > 1 else ' '
-                    prg((d_lvl - min_lvl) - (d_lvl - y) + 1, d_lvl - min_lvl, '{0} {1}'.format(dl['50'], y + 1), prg_sf)
+                    prg((d_lvl - min_lvl) - (d_lvl - y), (d_lvl - min_lvl), '{0} {1}'.format(dl['50'], y), prg_sf)
                     if speed_item:
                         prg(prog_dur - dur, prog_dur, '{0}: {1}'.format(dl['14'], speed_item),
                             '{0}: {1}'.format(dl['52'], cvttm(dur)))
                     else:
-                        if dur != -1 and len(d_speed) == 0:
+                        if dur != -1:
                             prg(prog_dur - dur, prog_dur, dl['44'], '{0}: {1}'.format(dl['52'], cvttm(dur)))
                         else:
                             prg(prog_dur - dur, prog_dur, dl['02'])
@@ -2738,7 +2656,6 @@ def train_troop():
           '54': lo['c28'], '55': lo['c66'], '56': lo['b45'], '57': lo['b87'], '58': lo['b79'], '59': lo['c31'],
           '60': lo['b49'], '61': lo['b47'], '62': lo['c72'], '63': lo['c27'], '64': lo['a44'], '65': lo['a13'],
           '66': lo['c76'], '67': lo['b80']}
-    # Initialize
     low_req = None
     while low_req is None:
         scrn(dl['00'], dl['01'])
@@ -2882,9 +2799,9 @@ def train_troop():
                 b1 = len('{0:,}'.format(d_lst[x]['trnbl']))
             if len('{0:,}'.format(d_lst[x]['trnbl'] * d_lst[x]['power'])) > c1:
                 c1 = len('{0:,}'.format(d_lst[x]['trnbl'] * d_lst[x]['power']))
-        # Select Troop To Train
         d_trp = None
         while d_trp is None:
+            slctn.clear()
             scrn(dl['00'], dl['01'])
             ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
             ctrt('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
@@ -2907,7 +2824,6 @@ def train_troop():
     else:
         d_lctn = None
         d_lst = sorted(d_lst, key=itemgetter('loc_desc'))
-        # Select Location To Train
         a, b, c, d = [dl['14'], dl['15'], dl['16'], dl['17']]
         a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
         for x in range(len(d_lst)):
@@ -2947,7 +2863,6 @@ def train_troop():
                                 break
     d_lst[:] = [d for d in d_lst if d.get('location') == d_lctn]
     d_queue = 1 if d_lst[0]['qty'] == 1 else 0
-    # Set Training Queue Size
     while d_queue is 0:
         scrn(dl['00'], dl['19'])
         ctrt('{0}: {1}   {2}: {3}'.format(dl['11'], t(d_trp), dl['14'], t(d_lctn)))
@@ -2968,8 +2883,6 @@ def train_troop():
                     d_queue = int(d_select)
     d_lst[0]['qty'] = d_queue
     slctn.clear()
-
-    # Set Speed Items
     a, b, c, d = [dl['63'], dl['64'], dl['65'], dl['66']]
     a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
     slctn = [{'item': 'TestroniusInfusion', 'time': 0.99, 'desc': dl['22']},
@@ -3060,8 +2973,6 @@ def train_troop():
         if 'Testronius' not in d_speed[x]['item']:
             speed_cut_off += d_speed[x]['time']
     d_batch = 1 if d_queue == 1 else None
-
-    # Set Number Of Batches
     while d_batch is None:
         scrn(dl['00'], dl['40'])
         ctrt('{0}: {1}   {2}: {3}   {4}: {5:,}'.format(
@@ -3070,8 +2981,6 @@ def train_troop():
         d_batch = stbtch(d_queue + 1, '{0}'.format(dl['43']))
         if d_batch == dl['06'] or d_batch == 'exit':
             return
-
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['44'])
@@ -3081,8 +2990,6 @@ def train_troop():
         d_delay = stdly()
         if d_delay == dl['06'] or d_delay == 'exit':
             return
-
-    # Proceed With Run
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['46'])
@@ -3092,8 +2999,6 @@ def train_troop():
         d_proceed = prcd()
         if d_proceed == dl['06'] or d_proceed == 'exit':
             return
-
-    # Train Troops
     speeds_used, powders_used = [{}, {}]
     d_start = time()
     for x in range(d_batch):
@@ -3207,7 +3112,6 @@ def revive_soul():
           '42': lo['b53'], '43': lo['a84'], '44': lo['c15'], '45': lo['c34'], '46': lo['b57'], '47': lo['a43'],
           '48': lo['b51'], '49': lo['a47'], '50': lo['a58'], '51': lo['b64'], '52': lo['b80'], '53': lo['c40'],
           '54': lo['c28'], '55': lo['c26'], '56': lo['b45'], '57': lo['b86'], '58': lo['b79'], '59': lo['b52']}
-    # Initialize
     scrn(dl['00'], dl['01'])
     ctrt(dl['09'])
     d_lst, dp_level, dp_total, dp_combo, d_lctn = [list(), 0, 0, 0, 'spectral']
@@ -3278,7 +3182,6 @@ def revive_soul():
     d_lst[:] = [d for d in d_lst if d.get('troop') == d_troop]
     if d_lst[0]['total'] > 1:
         d_queue = 0
-        # Set Training Queue Size
         while d_queue is 0:
             scrn(dl['00'], dl['19'])
             ctrt('{0}: {1}   {2}: {3}'.format(dl['11'], t(d_troop), dl['14'], t(d_lctn)))
@@ -3298,7 +3201,6 @@ def revive_soul():
                     if int(d_select) in range(1, d_lst[0]['quantity'] + 1):
                         d_queue = int(d_select)
         d_lst[0]['quantity'] = d_queue
-    # Set Speed Items
     a, b, c, d = [dl['13'], dl['15'], dl['59'], dl['18']]
     a1, b1, c1, d1 = [len(a), len(b), len(c), len(d)]
     slctn = [{'item': 'DarkTestroniusInfusion', 'time': 0.99, 'desc': dl['22']},
@@ -3388,8 +3290,6 @@ def revive_soul():
         if 'Testronius' not in d_speed[x]['item']:
             speed_cut_off += d_speed[x]['time']
     d_batch = 1 if d_queue == 1 else None
-
-    # Set Number Of Batches
     while d_batch is None:
         scrn(dl['00'], dl['40'])
         ctrt('{0}: {1}   {2}: {3}   {4}: {5:,}'.format(
@@ -3398,8 +3298,6 @@ def revive_soul():
         d_batch = stbtch(d_queue + 1, dl['43'])
         if d_batch == dl['06'] or d_batch == 'exit':
             return
-
-    # Set Delay
     d_delay = None
     while d_delay is None:
         scrn(dl['00'], dl['44'])
@@ -3409,8 +3307,6 @@ def revive_soul():
         d_delay = stdly()
         if d_delay == dl['06'] or d_delay == 'exit':
             return
-
-    # Proceed With Run
     d_proceed = False
     while not d_proceed:
         scrn(dl['00'], dl['46'])
@@ -3420,8 +3316,6 @@ def revive_soul():
         d_proceed = prcd()
         if d_proceed == dl['06'] or d_proceed == 'exit':
             return
-
-    # Revive Troops
     speeds_used, powders_used = [{}, {}]
     d_start = time()
     for x in range(d_batch):
@@ -3528,15 +3422,11 @@ def switch_realm(title, realm_no=0, c_no=0):
     d_rn = realm_no
     d_cn = c_no
     gtrlm(title)
-
-    # Fixed Variables
     d_si = b2a_hex(os.urandom(16))
     realm = 'realm{0}.c{1}.castle.rykaiju.com'.format(d_rn, d_cn)
     d_conn = http.client.HTTPConnection(realm, 80)
     cookie = 'dragons={0}'.format(d_si)
     std_param = 'dragon%5Fheart={0}&user%5Fid={1}&version=overarch&%5Fsession%5Fid={2}'.format(d_dh, d_ui, d_si)
-
-    # Refresh Data Files
     refresh_data()
 
 
@@ -3589,23 +3479,23 @@ def menu():
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                         MAIN                                                         #
 # -------------------------------------------------------------------------------------------------------------------- #
-
-# Initialize Global Variables
 d_dh, d_si, realm, cookie, std_param, d_conn, d_ui, d_rn, d_cn = [None, None, None, None, None, None, None, None, None]
 pData, mData, fData, pfData, cData, fStat, lo, tData = [None, None, None, None, None, None, None, {}]
 try:
     with open('locale.doa', 'r') as load_file:
-        pass
         lo = json.load(load_file)
+        if lo['a00'] == __version__:
+            pass
 except FileNotFoundError:
     chslng(title=False, shut_script=False)
-# Load Translations
+except KeyError:
+    del lo
+    os.remove('locale.doa')
+    chslng(title=False, shut_script=False)
 for tlookup in ('dict_f_eqp', 'dict_build', 'dict_troop', 'dict_f_adv', 'dict_f_mis', 'dict_f_itm'):
     for tkey, tvalue in lo[tlookup].items():
         if tkey not in tData:
             tData[tkey] = tvalue
-
-# Launch Menu
 if __name__ == '__main__':
     scpnt()
     chkver()

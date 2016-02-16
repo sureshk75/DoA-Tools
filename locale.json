@@ -2,6 +2,7 @@
   {
     "type": "English",
     "locale": {
+      "a00": "2.0.4",
       "a01": "* - Item will be used when duration exceeds the listed time",
       "a02": "*Exceeding",
       "a03": "Adventurer",
