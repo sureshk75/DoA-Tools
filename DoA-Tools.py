@@ -7,7 +7,7 @@ from hashlib import sha1
 from operator import itemgetter
 from time import time, sleep
 
-__version__ = '2.0.3'
+__version__ = '2.0.4'
 
 
 ########################################################################################################################
@@ -2334,7 +2334,7 @@ def upgrade_building():
     min_lvl = max_level
     for x in range(len(d_lst)):
         if d_lst[x]['level'] < min_lvl:
-            min_lvl = d_lst[x]['level'] + 1
+            min_lvl = d_lst[x]['level']
     gtg, d_lvl, d_req = [False, 0, {'items': {}, 'buildings': {}, 'research': {}, 'resources': {}}]
     while d_lvl is 0:
         scrn(dl['00'], dl['11'])
@@ -2342,14 +2342,14 @@ def upgrade_building():
         ctrt(' ')
         dvsn('-')
         ctrt('{0}'.format(dl['12']), prefix=True)
-        ctrt('{0} - {1}'.format(min_lvl, max_level), suffix=True)
+        ctrt('{0} - {1}'.format(min_lvl + 1, max_level), suffix=True)
         dvsn()
         d_select = input(' {0} : '.format(dl['05']))
         if len(d_select) >= 1:
             if d_select.lower() == dl['06'] or d_select.lower() == 'exit':
                 return
             if d_select.isnumeric():
-                if int(d_select) in range(min_lvl, max_level + 1):
+                if int(d_select) in range(min_lvl + 1, max_level + 1):
                     d_lvl = int(d_select)
     while gtg is False:
         d_req = {'items': {}, 'buildings': {}, 'research': {}, 'resources': {}}
@@ -2418,7 +2418,7 @@ def upgrade_building():
         ctrt(' ')
         dvsn('-')
         ctrt(dl['12'], prefix=True)
-        ctrt('{0} - {1}'.format(min_lvl, max_level), suffix=True)
+        ctrt('{0} - {1}'.format(min_lvl + 1, max_level), suffix=True)
         if len(req_check) != 0:
             dvsn('#')
             ctrt(dl['19'], suffix=True)
@@ -2434,9 +2434,8 @@ def upgrade_building():
                 if d_select.lower() == dl['06'] or d_select.lower() == 'exit':
                     return
                 if d_select.isnumeric():
-                    if int(d_select) in range(min_lvl, max_level + 1):
+                    if int(d_select) in range(min_lvl + 1, max_level + 1):
                         d_lvl = int(d_select)
-                        max_level = int(d_select) - 1
                         req_check.clear()
     slctn = list()
     spd_itm = [{'item': 'Blitz', 'exceed': 216000, 'time': 345600, 'desc': dl['25']},
@@ -2536,7 +2535,7 @@ def upgrade_building():
         count = 0
         speed_item = None
         for x in range(len_d_lst):
-            if d_lst[x]['level'] == y - 1:
+            if d_lst[x]['level'] == y:
                 job_id, dur, prog_dur = [0, -1, 0]
                 while dur != 0:
                     if dur == -1:
