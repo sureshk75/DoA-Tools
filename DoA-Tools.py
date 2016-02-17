@@ -258,6 +258,9 @@ def chslng(title=True, shut_script=True):
     global lo
     if title:
         dl = {'00': lo['a29'], '01': lo['c01'], '02': lo['a52'], '03': lo['b93'], '04': lo['c10']}
+        x = dl['04']
+    else:
+        x = 'ERROR ACCESSING LANGUAGE FILE'
     conn = http.client.HTTPConnection('wackoscripts.com', 80)
     url = 'http://wackoscripts.com/sanctuary/locale.json'
     conn_data = None
@@ -273,10 +276,7 @@ def chslng(title=True, shut_script=True):
             sleep(1)
             continue
     else:
-        if title:
-            errmsg(dl['04'])
-        else:
-            errmsg('ERROR ACCESSING LANGUAGE FILE')
+        errmsg(x)
     if conn_data:
         d_lang = None
         while d_lang is None:
@@ -2342,7 +2342,8 @@ def upgrade_building():
         ctrt(' ')
         dvsn('-')
         ctrt('{0}'.format(dl['12']), prefix=True)
-        ctrt('{0} - {1}'.format(min_lvl + 1, max_level), suffix=True)
+        x = '{0}'.format(min_lvl + 1) if max_level == min_lvl + 1 else '{0} - {1}'.format(min_lvl + 1, max_level)
+        ctrt(x, suffix=True)
         dvsn()
         d_select = input(' {0} : '.format(dl['05']))
         if len(d_select) >= 1:
@@ -2530,7 +2531,7 @@ def upgrade_building():
     dvsn('-')
     prg(0, 1, dl['02'])
     d_start, spd_usd, len_d_lst = [time(), {}, len(d_lst)]
-    for y in range(min_lvl, d_lvl + 1):
+    for y in range(min_lvl, d_lvl):
         total = len([d for d in d_lst if d.get('level') == y])
         count = 0
         speed_item = None
@@ -2606,7 +2607,8 @@ def upgrade_building():
                     ctrt('{0}: {1}s   {2}: {3}'.format(dl['46'], d_delay, dl['49'], cvttm(time() - d_start)))
                     dvsn('-')
                     prg_sf = '{0} {1}/{2}'.format(dl['63'], count, total) if total > 1 else ' '
-                    prg((d_lvl - min_lvl) - (d_lvl - y), (d_lvl - min_lvl), '{0} {1}'.format(dl['50'], y), prg_sf)
+                    # prg_sf = '{0} {1}/{2}'.format(dl['63'], count, total) if total > 1 else ' '
+                    prg((d_lvl - min_lvl) - (d_lvl - y), (d_lvl - min_lvl), '{0} {1}'.format(dl['50'], y + 1), prg_sf)
                     if speed_item:
                         prg(prog_dur - dur, prog_dur, '{0}: {1}'.format(dl['14'], speed_item),
                             '{0}: {1}'.format(dl['52'], cvttm(dur)))
@@ -3416,11 +3418,13 @@ def revive_soul():
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
-def switch_realm(title, realm_no=0, c_no=0):
+def switch_realm(title='', realm_no=0, c_no=0):
+    dl = {'00': lo['c32']}
     global d_rn, d_cn, realm, cookie, std_param, d_si, d_conn
+    x = dl['00'] if not title else title
     d_rn = realm_no
     d_cn = c_no
-    gtrlm(title)
+    gtrlm(x)
     d_si = b2a_hex(os.urandom(16))
     realm = 'realm{0}.c{1}.castle.rykaiju.com'.format(d_rn, d_cn)
     d_conn = http.client.HTTPConnection(realm, 80)
