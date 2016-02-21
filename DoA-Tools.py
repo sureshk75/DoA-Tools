@@ -7,15 +7,13 @@ from hashlib import sha1
 from operator import itemgetter
 from time import time, sleep
 
-__version__ = '2.0.4'
+__version__ = '2.1.0'
 
 
 ########################################################################################################################
 #                                             SCRIPT SECTION - Do Not Edit!                                            #
 ########################################################################################################################
-# -------------------------------------------------------------------------------------------------------------------- #
-#                                              FUNCTIONAL CLASSES/MODULES                                              #
-# -------------------------------------------------------------------------------------------------------------------- #
+
 def dvsn(default='_', suffix=True):
     print(' ' + (default * 78))
     if suffix:
@@ -40,7 +38,7 @@ def web_op(operation, param_add_on, method='POST', post=True):
           '06': lo['c12']}
     url = 'http://{0}/api/{1}'.format(realm, operation)
     params = param_add_on + '{0}&timestamp={1}'.format(std_param, int(time()))
-    d_conn.connect()
+    d_conn = http.client.HTTPConnection(realm, 80)
     if not post:
         d_conn.request(method, url + params)
     else:
@@ -58,25 +56,22 @@ def web_op(operation, param_add_on, method='POST', post=True):
             conn_json = conn_resp.read().decode('utf-8')
             return json.loads(conn_json)
         elif conn_resp.status == 429:
-            d_conn.close()
             for cd_ban in range(3660):
                 scrn(dl['00'], dl['01'])
                 prg(cd_ban, 3660, '{0}: {1}'.format(dl['02'], cvttm(3660 - cd_ban)))
                 sleep(1)
         elif conn_resp.status == 509:
-            d_conn.close()
             for cd_ban in range(60):
                 scrn(dl['00'], dl['03'])
                 prg(cd_ban, 60, '{0}: {1}'.format(dl['04'], cvttm(60 - cd_ban)))
                 sleep(1)
-        elif conn_resp.status in (500, 502):
+        elif conn_resp.status in (404, 500, 502):
             sleep(5)
         else:
             errmsg('{0} {1}'.format(dl['05'], conn_resp.status))
     except http.client.CannotSendRequest:
         errmsg(dl['06'])
     except http.client.HTTPException:
-        d_conn.close()
         sleep(2)
 
 
@@ -99,23 +94,21 @@ def errmsg(string):
     quit()
 
 
-def gtdt(pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, unmute=True):
-    global pData, mData, fData, pfData, cData, tData, d_conn, fStat
+def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, unmute=True):
+    global pData, mData, fData, pfData, cData, tData, fStat
     dl = {'00': lo['a92'].upper(), '01': lo['b61'], '02': lo['b72'], '03': lo['b62'], '04': lo['b73'], '05': lo['a92'],
           '06': lo['a79'], '07': lo['a28'], '08': lo['a75'], '09': lo['b74'], '10': lo['c11'], '11': lo['b42'],
           '12': lo['a74'], '13': lo['a72'], '14': lo['b50'], '15': lo['c09']}
     prg_hdr, sub_hdr = [dl['03'], dl['01']] if pData or mData or fData or pfData or cData else [dl['04'], dl['02']]
     w1_data, w2_data, m_count, count = [None, None, 0, 0]
-    for check in (w1, w2, w3, pl, fm, pf):
+    for check in (w1, w2, pl, fm, pf, md):
         if check:
             m_count += 1
     if unmute:
         scrn(dl['00'], sub_hdr)
         prg(count, m_count, dl['05'])
-    conn = http.client.HTTPConnection('wackoscripts.com', 80)
-    req = [{'0': w1, '1': dl['06'], '2': 'manifest'},
-           {'0': w2, '1': dl['07'], '2': 'chest'},
-           {'0': w3, '1': dl['08'], '2': 'forgestat'}]
+
+    req = [{'0': w1, '1': dl['07'], '2': 'chest'}, {'0': w2, '1': dl['08'], '2': 'forgestat'}]
     for x in range(len(req)):
         if req[x]['0']:
             name = req[x]['1']
@@ -123,9 +116,9 @@ def gtdt(pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, un
             if unmute:
                 scrn(dl['00'], sub_hdr)
                 prg(count, m_count, '{0} {1}'.format(prg_hdr, name))
-            for web_retry in range(2):
+            for web_retry in range(1, 3):
                 try:
-                    conn.connect()
+                    conn = http.client.HTTPConnection('wackoscripts.com', 80)
                     conn.request('GET', url)
                     conn_resp = conn.getresponse()
                     conn_data = json.loads(conn_resp.read().decode('utf-8'))
@@ -136,13 +129,11 @@ def gtdt(pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, un
                         w1_data = conn_data
                     elif req[x]['2'] == 'forgestat':
                         fStat = conn_data
-                    conn.close()
                     break
                 except (KeyError, TypeError):
                     if unmute:
                         scrn(dl['00'], sub_hdr)
-                        prg(count, m_count, '{0} {1}'.format(prg_hdr, name),
-                            '{0}: {1}/2'.format(dl['09'], web_retry + 1))
+                        prg(count, m_count, '{0} {1}'.format(prg_hdr, name), '{0}: {1}/2'.format(dl['09'], web_retry))
                     sleep(1)
                     continue
             else:
@@ -155,33 +146,45 @@ def gtdt(pl=True, fm=False, pf=False, op=False, w1=False, w2=False, w3=False, un
                         tData[key] = key
     req = [{'0': pl, '1': dl['11'], '2': 'player.json', '3': '?', '4': 'GET', '5': False},
            {'0': fm, '1': dl['12'], '2': 'forge/forge.json', '3': '', '4': 'GET', '5': True},
-           {'0': pf, '1': dl['13'], '2': 'forge/player_forge_info.json', '3': '', '4': 'GET', '5': True}]
+           {'0': pf, '1': dl['13'], '2': 'forge/player_forge_info.json', '3': '', '4': 'GET', '5': True},
+           {'0': md, '1': dl['06'], '2': 'manifest.json', '3': '?', '4': 'GET', '5': False}]
     for x in range(len(req)):
         if req[x]['0']:
             name = req[x]['1']
             if unmute:
                 scrn(dl['00'], sub_hdr)
                 prg(count, m_count, '{0} {1}'.format(prg_hdr, name))
-            for web_retry in range(2):
+            for web_retry in range(1, 3):
                 try:
                     conn_data = web_op(req[x]['2'], req[x]['3'], req[x]['4'], req[x]['5'])
-                    count += 1
-                    if req[x]['2'] == 'forge/forge.json':
-                        fData = conn_data
-                    elif req[x]['2'] == 'player.json':
-                        pData = conn_data
-                    elif req[x]['2'] == 'forge/player_forge_info.json':
-                        pfData = conn_data
-                    break
+                    if conn_data:
+                        count += 1
+                        if req[x]['2'] == 'forge/forge.json':
+                            fData = conn_data
+                        elif req[x]['2'] == 'player.json':
+                            pData = conn_data
+                        elif req[x]['2'] == 'forge/player_forge_info.json':
+                            pfData = conn_data
+                        elif req[x]['2'] == 'manifest.json':
+                            mData = conn_data
+                        break
+                    else:
+                        raise TypeError
                 except (KeyError, TypeError):
                     if unmute:
                         scrn(dl['00'], sub_hdr)
-                        prg(count, m_count, '{0} {1}'.format(prg_hdr, name),
-                            '{0}: {1}/2'.format(dl['09'], web_retry + 1))
+                        prg(count, m_count, '{0} {1}'.format(prg_hdr, name), '{0}: {1}/2'.format(dl['09'], web_retry))
                     sleep(1)
                     continue
             else:
-                errmsg('{0} {1}'.format(dl['10'], name))
+                if req[x]['0'] == md:
+                    url = 'http://wackoscripts.com/sanctuary/mani.json'
+                    conn = http.client.HTTPConnection('wackoscripts.com', 80)
+                    conn.request('GET', url)
+                    conn_resp = conn.getresponse()
+                    mData = json.loads(conn_resp.read().decode('utf-8'))
+                else:
+                    errmsg('{0} {1}'.format(dl['10'], name))
     if op:
         cData = {}
         for loc_key in sorted(pData['cities']):
@@ -579,8 +582,8 @@ def gtrlm(title=''):
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
-#                                                      FORGE CLASS                                                     #
-# -------------------------------------------------------------------------------------------------------------------- #
+
+
 def craft_equipment():
     dl = {'00': lo['a31'], '01': lo['c08'], '02': lo['a92'], '03': lo['c47'], '04': lo['a12'], '05': lo['a52'],
           '06': lo['a59'], '07': lo['a57'], '08': lo['a33'], '09': lo['a42'], '10': lo['b05'], '11': lo['b11'],
@@ -850,6 +853,7 @@ def craft_equipment():
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
+
 
 def forge_ingredient():
     dl = {'00': lo['a73'], '01': lo['b99'], '02': lo['a92'], '03': lo['c48'], '04': lo['a91'], '05': lo['a13'],
@@ -1306,8 +1310,6 @@ def farm_mission():
     gtdt(pf=True, unmute=False)
 
 
-# -------------------------------------------------------------------------------------------------------------------- #
-#                                                      CHEST CLASS                                                     #
 # -------------------------------------------------------------------------------------------------------------------- #
 def open_chest():
     dl = {'00': lo['b36'], '01': lo['b97'], '02': lo['a92'], '03': lo['c46'], '04': lo['a27'], '05': lo['c72'],
@@ -2607,7 +2609,6 @@ def upgrade_building():
                     ctrt('{0}: {1}s   {2}: {3}'.format(dl['46'], d_delay, dl['49'], cvttm(time() - d_start)))
                     dvsn('-')
                     prg_sf = '{0} {1}/{2}'.format(dl['63'], count, total) if total > 1 else ' '
-                    # prg_sf = '{0} {1}/{2}'.format(dl['63'], count, total) if total > 1 else ' '
                     prg((d_lvl - min_lvl) - (d_lvl - y), (d_lvl - min_lvl), '{0} {1}'.format(dl['50'], y + 1), prg_sf)
                     if speed_item:
                         prg(prog_dur - dur, prog_dur, '{0}: {1}'.format(dl['14'], speed_item),
@@ -2657,22 +2658,6 @@ def train_troop():
           '54': lo['c28'], '55': lo['c66'], '56': lo['b45'], '57': lo['b87'], '58': lo['b79'], '59': lo['c31'],
           '60': lo['b49'], '61': lo['b47'], '62': lo['c72'], '63': lo['c27'], '64': lo['a44'], '65': lo['a13'],
           '66': lo['c76'], '67': lo['b80']}
-    low_req = None
-    while low_req is None:
-        scrn(dl['00'], dl['01'])
-        ctrt(dl['02'], prefix=True, suffix=True)
-        ctrt('~~~ {0} ~~~'.format(dl['03']))
-        ctrt(dl['04'])
-        dvsn()
-        d_select = input(' {0} : '.format(dl['05']))
-        if len(d_select) >= 1:
-            if d_select.lower() == dl['06'] or d_select.lower() == 'exit':
-                break
-            if d_select.isalpha():
-                if d_select.lower() == dl['07'].lower() or d_select.lower() == 'yes':
-                    low_req = True
-                elif d_select.lower() == dl['08'].lower() or d_select.lower() == 'no':
-                    low_req = False
     scrn(dl['00'], dl['01'])
     ctrt(dl['09'])
     d_lst, slctn, pseudo_tc, d_rookery = [list(), {}, ('Garrison', 'TrainingCamp', 'CaveTrainingCamp'), 0]
@@ -2688,8 +2673,6 @@ def train_troop():
         slctn[x] = my_dict
     for x in range(len(mData['units'])):
         train_in = None
-        if mData['units'][x]['category'] == 'limited' and low_req:
-            train_in = ('capital', 'chrono')
         if mData['units'][x]['trainable_in'] or train_in:
             d_queue, d_pop = [-1, -1]
             met_rsch, met_rsc, met_item, met_unit, met_idle, met_bldg = [True, True, True, True, True, True]
@@ -2706,8 +2689,6 @@ def train_troop():
                 met_req = len(d_req['resources'])
                 lookup = cData['capital']['city']['resources']
                 for key, value in d_req['resources'].items():
-                    if key == 'blue_energy' and low_req:
-                        value = 1
                     if key in lookup:
                         if value <= lookup[key]:
                             met_req -= 1
@@ -2716,19 +2697,16 @@ def train_troop():
                                     d_queue = int(lookup[key] / value)
                 met_rsc = True if met_req == 0 else False
             if 'items' in d_req.keys():
-                if low_req:
-                    met_item = True
-                else:
-                    met_req = len(d_req['items'])
-                    lookup = pData['items']
-                    for key, value in d_req['items'].items():
-                        if key in lookup:
-                            if value <= lookup[key]:
-                                met_req -= 1
-                                if value != 0:
-                                    if d_queue > int(lookup[key] / value) or d_queue == -1:
-                                        d_queue = int(lookup[key] / value)
-                    met_item = True if met_req == 0 else False
+                met_req = len(d_req['items'])
+                lookup = pData['items']
+                for key, value in d_req['items'].items():
+                    if key in lookup:
+                        if value <= lookup[key]:
+                            met_req -= 1
+                            if value != 0:
+                                if d_queue > int(lookup[key] / value) or d_queue == -1:
+                                    d_queue = int(lookup[key] / value)
+                met_item = True if met_req == 0 else False
             if 'units' in d_req.keys():
                 met_req = len(d_req['units'])
                 lookup = cData['capital']['city']['units']
@@ -2762,10 +2740,7 @@ def train_troop():
                                 break
                 met_bldg = True if met_req == 0 else False
             if met_rsch and met_rsc and met_item and met_unit and met_idle and met_bldg:
-                if low_req and not mData['units'][x]['trainable_in']:
-                    train_in_loc = train_in
-                else:
-                    train_in_loc = mData['units'][x]['trainable_in']
+                train_in_loc = mData['units'][x]['trainable_in']
                 for d_loc in train_in_loc:
                     if 'buildings' in d_req.keys():
                         for key, value in d_req['buildings'].items():
@@ -3096,7 +3071,7 @@ def train_troop():
     dvsn()
     input(dl['61'])
     print(dl['62'])
-    gtdt(pl=True, unmute=False)
+    gtdt(pl=True, op=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3413,21 +3388,35 @@ def revive_soul():
     dvsn()
     input(dl['08'])
     print(dl['10'])
-    gtdt(pl=True, unmute=False)
+    gtdt(pl=True, op=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
 
+
+def marketplace():
+    dl = {'00': 'MARKETPLACE', '01': 'Select Trade Item', '02': 'Initializing...'}
+    scrn(dl['00'], dl['01'])
+    ctrt(dl['02'])
+    #  d_lst = list()
+    mp = web_op('marketplace/list', '?', 'GET', post=False)
+    for x in range(len(mp['result']['trades'])):
+        print(mp['result']['trades'][x])
+        pass
+
+
+# -------------------------------------------------------------------------------------------------------------------- #
+
+
 def switch_realm(title='', realm_no=0, c_no=0):
     dl = {'00': lo['c32']}
-    global d_rn, d_cn, realm, cookie, std_param, d_si, d_conn
+    global d_rn, d_cn, realm, cookie, std_param, d_si
     x = dl['00'] if not title else title
     d_rn = realm_no
     d_cn = c_no
     gtrlm(x)
     d_si = b2a_hex(os.urandom(16))
     realm = 'realm{0}.c{1}.castle.rykaiju.com'.format(d_rn, d_cn)
-    d_conn = http.client.HTTPConnection(realm, 80)
     cookie = 'dragons={0}'.format(d_si)
     std_param = 'dragon%5Fheart={0}&user%5Fid={1}&version=overarch&%5Fsession%5Fid={2}'.format(d_dh, d_ui, d_si)
     refresh_data()
@@ -3437,7 +3426,7 @@ def switch_realm(title='', realm_no=0, c_no=0):
 
 def refresh_data():
     global pData, mData, fData, pfData, cData, tData
-    gtdt(pl=True, fm=True, pf=True, op=True, w1=True, w2=True, w3=True, unmute=True)
+    gtdt(pl=True, fm=True, pf=True, op=True, w1=True, w2=True, md=True, unmute=True)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3451,7 +3440,7 @@ def menu():
     module_dict = {craft_equipment: dl['08'].title(), forge_ingredient: dl['11'].title(),
                    farm_mission: dl['09'].title(), open_chest: dl['13'].title(), unpack_arsenal: dl['18'].title(),
                    upgrade_building: dl['19'].title(), fill_slot: dl['10'].title(), train_troop: dl['17'].title(),
-                   revive_soul: dl['15'].title()}
+                   revive_soul: dl['15'].title(), marketplace: dl['21'].title()}
     system_dict = {switch_realm: dl['16'].title(), refresh_data: dl['14'].title(), scpnt: dl['12'].title(),
                    chslng: dl['20'].title()}
     while True:
