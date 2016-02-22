@@ -252,7 +252,7 @@ def cvttm(time_value=0, ss=True):
 def ctrt(string, prefix=False, suffix=False):
     if prefix:
         print('')
-    print(string.center(78))
+    print(string.center(80), end='', flush=True)
     if suffix:
         print('')
 
@@ -3395,15 +3395,19 @@ def revive_soul():
 
 
 def marketplace():
-    dl = {'00': 'MARKETPLACE', '01': 'Select Trade Item', '02': 'Initializing...', '03': 'Trade In', '04': 'For',
-          '05': 'Quantity', '06': 'Enter selection', '07': 'exit'}
+    dl = {'00': 'MARKETPLACE', '01': 'Select Trade In Item', '02': 'Initializing...', '03': 'Trade In', '04': 'For',
+          '05': 'Quantity', '06': 'Enter selection', '07': 'exit', '08': 'Number Of Batches To Trade',
+          '09': 'How Many Batches To Trade?', '10': 'Batches', '11': 'Set Delay Between Game Requests', '12': 'Delay',
+          '13': 'Ready To Begin', '14': 'There Are No Coral Doubloons', '15': 'There Are No Tradeable Items',
+          '16': 'Progress Report', '17': 'Elapsed Time', '18': 'Summary Report', '19': 'Process Completed in',
+          '20': 'Press ENTER to continue...', '21': 'Updating Game Files.. Please Wait!'}
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
     d_lst = list()
     try:
         max_queue = pData['items']['CoralDoubloon']
     except KeyError:
-        nthng(dl['00'], dl['01'], dl['02'])
+        nthng(dl['00'], dl['01'], dl['14'])
         return
     mp = web_op('marketplace/list', '?', 'GET', post=False)
     for x in range(len(mp['result']['trades'])):
@@ -3420,7 +3424,7 @@ def marketplace():
                            'in_desc': t(itm_key), 'out_qty': trd_qty * itm_max, 'id': mp['result']['trades'][x]['id']}
                 d_lst.append(my_dict)
     if not d_lst:
-        nthng(dl['00'], dl['01'], dl['02'])
+        nthng(dl['00'], dl['01'], dl['15'])
         return
     elif len(d_lst) == 1:
         d_trade = d_lst[0]['id']
@@ -3429,6 +3433,7 @@ def marketplace():
         d_lst = sorted(d_lst, key=itemgetter('in_desc'))
         a, b, c = [dl['03'], dl['04'], dl['05']]
         a1, b1, c1 = [len(a), len(b), len(c)]
+        sm_trc = 76
         for x in range(len(d_lst)):
             if len(d_lst[x]['in_desc']) > a1:
                 a1 = len(d_lst[x]['in_desc'])
@@ -3436,19 +3441,82 @@ def marketplace():
                 b1 = len(d_lst[x]['out_desc'])
             if len('{0:,}'.format(d_lst[x]['out_qty'])) > c1:
                 c1 = len('{0:,}'.format(d_lst[x]['out_qty']))
+        if sm_trc < a1 + b1 + c1 + 4:
+            b1 = sm_trc - (a1 + c1 + 4)
+            sm_trc = b1
         while d_trade is None:
             scrn(dl['00'], dl['01'])
             ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
             ctrt('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
             for x in range(len(d_lst)):
                 ctrt('{0:<{1}}  {2:<{3}}  {4:>{5},}'.format(
-                        d_lst[x]['in_desc'], a1, d_lst[x]['out_desc'], b1, d_lst[x]['out_qty'], c1))
+                    d_lst[x]['in_desc'], a1, trnct(d_lst[x]['out_desc'], sm_trc), b1, d_lst[x]['out_qty'], c1))
             dvsn()
             d_slct = input(' {0} : '.format(dl['06']))
             if d_slct == dl['07'] or d_slct == 'exit':
                 return
             else:
-
+                for x in range(len(d_lst)):
+                    if d_slct.lower() == d_lst[x]['in_desc'].lower():
+                        d_trade = d_lst[x]['id']
+                        break
+                else:
+                    for x in range(len(d_lst)):
+                        if d_slct.lower() in d_lst[x]['in_desc'].lower():
+                            d_trade = d_lst[x]['id']
+                            break
+    d_lst[:] = [d for d in d_lst if d.get('id') == d_trade]
+    sm_trc = 76
+    if len(dl['03']) + len(d_lst[0]['in_desc']) + len(dl['04']) + len(d_lst[0]['out_desc']) + 7 > sm_trc:
+        sm_trc = 76 - (len(dl['03']) + len(d_lst[0]['in_desc']) + len(dl['04']) + 7)
+    d_out = trnct(d_lst[0]['out_desc'], sm_trc)
+    if d_lst[0]['out_qty'] == 1:
+        d_batch = 1
+    else:
+        d_batch = None
+        while d_batch is None:
+            scrn(dl['00'], dl['08'])
+            ctrt('{0}: {1}   {2}: {3}'.format(dl['03'], d_lst[0]['in_desc'], dl['04'], d_out))
+            ctrt(' ')
+            d_batch = stbtch(d_lst[0]['out_qty'] + 1, dl['09'])
+            if d_batch == dl['06'] or d_batch == 'exit':
+                return
+    d_delay = None
+    while d_delay is None:
+        scrn(dl['00'], dl['11'])
+        ctrt('{0}: {1}   {2}: {3}'.format(dl['03'], d_lst[0]['in_desc'], dl['04'], d_out))
+        ctrt('{0}: {1:,}'.format(dl['10'], d_batch))
+        d_delay = stdly()
+        if d_delay == dl['06'] or d_delay == 'exit':
+            return
+    d_proceed = False
+    while not d_proceed:
+        scrn(dl['00'], dl['13'])
+        ctrt('{0}: {1}   {2}: {3}'.format(dl['03'], d_lst[0]['in_desc'], dl['04'], d_out))
+        ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['10'], d_batch, dl['12'], d_delay))
+        d_proceed = prcd()
+        if d_proceed == dl['06'] or d_proceed == 'exit':
+            return
+    scrn(dl['00'], dl['16'])
+    ctrt('{0}: {1}   {2}: {3}'.format(dl['03'], d_lst[0]['in_desc'], dl['04'], d_out))
+    ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['10'], d_batch, dl['12'], d_delay))
+    ctrt(dl['xx'])
+    d_strt = time()
+    for x in range(1, d_batch + 1):
+        #  add_on_params = ''
+        for web_retry in range(5):
+            try:
+                pass
+            except KeyError:
+                pass
+    scrn(dl['00'], dl['18'])
+    ctrt('{0}: {1}   {2}: {3}'.format(dl['03'], d_lst[0]['in_desc'], dl['04'], d_out))
+    ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['10'], d_batch, dl['12'], d_delay))
+    prg(1, 1, '{0} {1}'.format(dl['19'], cvttm(time() - d_strt)))
+    dvsn()
+    input(dl['20'])
+    print(dl['21'])
+    gtdt(pl=True, op=True, unmute=False)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
