@@ -3395,14 +3395,60 @@ def revive_soul():
 
 
 def marketplace():
-    dl = {'00': 'MARKETPLACE', '01': 'Select Trade Item', '02': 'Initializing...'}
+    dl = {'00': 'MARKETPLACE', '01': 'Select Trade Item', '02': 'Initializing...', '03': 'Trade In', '04': 'For',
+          '05': 'Quantity', '06': 'Enter selection', '07': 'exit'}
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
-    #  d_lst = list()
+    d_lst = list()
+    try:
+        max_queue = pData['items']['CoralDoubloon']
+    except KeyError:
+        nthng(dl['00'], dl['01'], dl['02'])
+        return
     mp = web_op('marketplace/list', '?', 'GET', post=False)
     for x in range(len(mp['result']['trades'])):
-        print(mp['result']['trades'][x])
-        pass
+        itm_key = mp['result']['trades'][x]['requirement'][0]
+        itm_qty = mp['result']['trades'][x]['requirement'][1]
+        trd_key = mp['result']['trades'][x]['output'][0]
+        trd_qty = mp['result']['trades'][x]['output'][1]
+        if itm_key in pData['items']:
+            itm_max = int(pData['items'][itm_key] / itm_qty)
+            if itm_max > max_queue:
+                itm_max = max_queue
+            if itm_max > 0:
+                my_dict = {'in_nm': itm_key, 'in_qty': itm_max, 'out_nm': trd_key, 'out_desc': t(trd_key),
+                           'in_desc': t(itm_key), 'out_qty': trd_qty * itm_max, 'id': mp['result']['trades'][x]['id']}
+                d_lst.append(my_dict)
+    if not d_lst:
+        nthng(dl['00'], dl['01'], dl['02'])
+        return
+    elif len(d_lst) == 1:
+        d_trade = d_lst[0]['id']
+    else:
+        d_trade = None
+        d_lst = sorted(d_lst, key=itemgetter('in_desc'))
+        a, b, c = [dl['03'], dl['04'], dl['05']]
+        a1, b1, c1 = [len(a), len(b), len(c)]
+        for x in range(len(d_lst)):
+            if len(d_lst[x]['in_desc']) > a1:
+                a1 = len(d_lst[x]['in_desc'])
+            if len(d_lst[x]['out_desc']) > b1:
+                b1 = len(d_lst[x]['out_desc'])
+            if len('{0:,}'.format(d_lst[x]['out_qty'])) > c1:
+                c1 = len('{0:,}'.format(d_lst[x]['out_qty']))
+        while d_trade is None:
+            scrn(dl['00'], dl['01'])
+            ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
+            ctrt('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
+            for x in range(len(d_lst)):
+                ctrt('{0:<{1}}  {2:<{3}}  {4:>{5},}'.format(
+                        d_lst[x]['in_desc'], a1, d_lst[x]['out_desc'], b1, d_lst[x]['out_qty'], c1))
+            dvsn()
+            d_slct = input(' {0} : '.format(dl['06']))
+            if d_slct == dl['07'] or d_slct == 'exit':
+                return
+            else:
+
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
