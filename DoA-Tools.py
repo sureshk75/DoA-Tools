@@ -3400,7 +3400,8 @@ def marketplace():
           '09': 'How Many Batches To Trade?', '10': 'Batches', '11': 'Set Delay Between Game Requests', '12': 'Delay',
           '13': 'Ready To Begin', '14': 'There Are No Coral Doubloons', '15': 'There Are No Tradeable Items',
           '16': 'Progress Report', '17': 'Elapsed Time', '18': 'Summary Report', '19': 'Process Completed in',
-          '20': 'Press ENTER to continue...', '21': 'Updating Game Files.. Please Wait!'}
+          '20': 'Press ENTER to continue...', '21': 'Updating Game Files.. Please Wait!',
+          '22': 'SCRIPT ERROR: Failed To Initialize Trade'}
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
     d_lst = list()
@@ -3509,6 +3510,8 @@ def marketplace():
                 pass
             except KeyError:
                 pass
+        else:
+            errmsg(dl['22'])
     scrn(dl['00'], dl['18'])
     ctrt('{0}: {1}   {2}: {3}'.format(dl['03'], d_lst[0]['in_desc'], dl['04'], d_out))
     ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['10'], d_batch, dl['12'], d_delay))
