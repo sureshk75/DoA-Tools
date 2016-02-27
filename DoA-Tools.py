@@ -38,7 +38,7 @@ def web_op(operation, param_add_on, method='POST', post=True):
           '06': lo['c12']}
     url = 'http://{0}/api/{1}'.format(realm, operation)
     params = param_add_on + '{0}&timestamp={1}'.format(std_param, int(time()))
-    d_conn = http.client.HTTPConnection(realm, 80)
+    d_conn = http.client.HTTPConnection(realm, 80, timeout=60)
     if not post:
         d_conn.request(method, url + params)
     else:
@@ -69,8 +69,10 @@ def web_op(operation, param_add_on, method='POST', post=True):
             sleep(5)
         else:
             errmsg('{0} {1}'.format(dl['05'], conn_resp.status))
+            quit()
     except http.client.CannotSendRequest:
         errmsg(dl['06'])
+        quit()
     except http.client.HTTPException:
         sleep(2)
 
@@ -91,7 +93,6 @@ def errmsg(string):
     ctrt(dl['00'], suffix=True)
     dvsn('#')
     input(dl['01'])
-    quit()
 
 
 def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, unmute=True):
@@ -125,11 +126,15 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
                     count += 1
                     if req[x]['2'] == 'manifest':
                         mData = conn_data
+                        break
                     elif req[x]['2'] == 'chest':
                         w1_data = conn_data
+                        break
                     elif req[x]['2'] == 'forgestat':
                         fStat = conn_data
-                    break
+                        break
+                    else:
+                        sleep(web_retry * 3)
                 except (KeyError, TypeError):
                     if unmute:
                         scrn(dl['00'], sub_hdr)
@@ -138,6 +143,7 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
                     continue
             else:
                 errmsg('{0} {1}'.format(dl['10'], name))
+                return
             if w1_data:
                 for key, value in w1_data.items():
                     if key not in tData and value != '':
@@ -169,6 +175,7 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
                             mData = conn_data
                         break
                     else:
+                        sleep(web_retry * 3)
                         raise TypeError
                 except (KeyError, TypeError):
                     if unmute:
@@ -185,13 +192,14 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
                     mData = json.loads(conn_resp.read().decode('utf-8'))
                 else:
                     errmsg('{0} {1}'.format(dl['10'], name))
+                    return
     if op:
         cData = {}
         for loc_key in sorted(pData['cities']):
             if unmute:
                 scrn(dl['00'], sub_hdr)
                 prg(1, 1, '{0} {1}'.format(dl['14'], t(loc_key)))
-            for web_retry in range(5):
+            for web_retry in range(1, 6):
                 try:
                     current_location = web_op('cities/{0}.json'.format(pData['cities'][loc_key]['id']), '')
                     cData[loc_key] = current_location
@@ -204,6 +212,7 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
                     continue
             else:
                 errmsg(dl['15'])
+                return
     acct = list()
     verify_record = list()
     unique_id = '{0}-{1}'.format(d_ui, d_rn)
@@ -266,7 +275,6 @@ def chslng(title=True, shut_script=True):
         x = 'ERROR ACCESSING LANGUAGE FILE'
     conn = http.client.HTTPConnection('wackoscripts.com', 80)
     url = 'http://wackoscripts.com/sanctuary/locale.json'
-    conn_data = None
     for web_retry in range(2):
         try:
             conn.connect()
@@ -280,6 +288,7 @@ def chslng(title=True, shut_script=True):
             continue
     else:
         errmsg(x)
+        return
     if conn_data:
         d_lang = None
         while d_lang is None:
@@ -787,7 +796,7 @@ def craft_equipment():
             dsply(crsh_itm, single=False)
         crush_it = False
         x_param = 'output%5Fname={0}&'.format(d_item)
-        for web_retry in range(5):
+        for web_retry in range(1, 6):
             sleep(d_delay)
             try:
                 main_json = web_op('forge/forge_item', x_param)
@@ -804,13 +813,16 @@ def craft_equipment():
                     else:
                         f_fail += 1
                     break
+                else:
+                    sleep(web_retry * 3)
             except (KeyError, TypeError):
                 sleep(1)
                 continue
         else:
             errmsg(dl['38'])
+            return
         if crush_it:
-            for web_retry in range(5):
+            for web_retry in range(1, 6):
                 sleep(d_delay)
                 try:
                     crush_json = web_op('forge/disenchant_equipment', x_param)
@@ -822,11 +834,14 @@ def craft_equipment():
                             else:
                                 crsh_itm[t(crush_json['result']['disenchanted_ingredients'][y])] = 1
                         break
+                    else:
+                        sleep(web_retry * 3)
                 except (KeyError, TypeError):
                     sleep(1)
                     continue
             else:
                 errmsg(dl['39'])
+                return
     scrn(dl['00'], dl['40'])
     ctrt('{0}: {1}   {2}: {3}'.format(dl['16'], t(d_troop), dl['19'], t(d_item)))
     ctrt('{0}: {1:,} {2}   {3}: {4:,}   {5}: {6}s   {7}: {8}'.format(
@@ -965,7 +980,7 @@ def forge_ingredient():
         if slctn:
             ctrt('~~~ {0} ~~~'.format(dl['17']), prefix=True)
             dsply(slctn, single=False)
-        for web_retry in range(5):
+        for web_retry in range(1, 6):
             sleep(d_delay)
             try:
                 x_param = 'output%5Fname={0}&'.format(d_item)
@@ -978,11 +993,14 @@ def forge_ingredient():
                         if item_name in base_list.keys() and check_use[y]['quantity'] < base_list[item_name]:
                             slctn[item_name] = base_list[item_name] - check_use[y]['quantity']
                     break
+                else:
+                    sleep(web_retry * 3)
             except (KeyError, TypeError):
                 sleep(1)
                 continue
         else:
             errmsg(dl['18'])
+            return
     scrn(dl['00'], dl['19'])
     ctrt('{0}: {1}   {2}: {3:,}'.format(dl['04'], t(d_item), dl['10'], d_batch))
     ctrt('{0}: {1}s'.format(dl['12'], d_delay))
@@ -1238,7 +1256,7 @@ def farm_mission():
                     ctrt('~~~ {0} ~~~'.format(dl['39']), prefix=True)
                     dsply(itm_gain, single=False)
                 if dur == -1:
-                    for web_retry in range(5):
+                    for web_retry in range(1, 6):
                         sleep(d_delay)
                         x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_lst[0]['id'], d_ms)
                         try:
@@ -1253,8 +1271,9 @@ def farm_mission():
                             continue
                     else:
                         errmsg(dl['40'])
+                        return
                 if dur > 0:
-                    for web_retry in range(5):
+                    for web_retry in range(1, 6):
                         sleep(d_delay)
                         x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(job_id)
                         try:
@@ -1269,13 +1288,16 @@ def farm_mission():
                                 else:
                                     spd_use[t(item['item'])] = 1
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
                             sleep(1)
                             continue
                     else:
                         errmsg(dl['41'])
+                        return
                 if dur == 0:
-                    for web_retry in range(5):
+                    for web_retry in range(1, 6):
                         sleep(d_delay)
                         x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_lst[0]['id'], d_ms)
                         try:
@@ -1288,11 +1310,14 @@ def farm_mission():
                                     else:
                                         itm_gain[t(claim_json['result']['items'][z])] = 1
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
                             sleep(1)
                             continue
                     else:
                         errmsg(dl['42'])
+                        return
     scrn(dl['00'], dl['43'])
     ctrt('{0}: {1} ({2})   {3}: {4}'.format(dl['27'], t(d_ms), cvttm(d_tm, ss=False), dl['28'], t(d_adv)))
     ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['34'], d_batch, dl['36'], d_delay))
@@ -1450,7 +1475,7 @@ def open_chest():
         while opened != 0:
             if opened < open_qty:
                 open_qty = opened
-            for web_retry in range(5):
+            for web_retry in range(1, 6):
                 sleep(d_delay)
                 try:
                     x_param = '%5Fmethod=delete&quantity={0}&'.format(open_qty)
@@ -1510,11 +1535,14 @@ def open_chest():
                         if count == d_lst[x]['qty']:
                             look_up = main_data['result']['items']
                         break
+                    else:
+                        sleep(web_retry * 3)
                 except (KeyError, TypeError):
                     sleep(1)
                     continue
             else:
                 errmsg(dl['37'])
+                return
         for category in (dl['04'], dl['27'], dl['28'], dl['29'], dl['30'], dl['31']):
             for key, value in i_received[category].items():
                 if key in o_rcvd[category].keys():
@@ -1734,7 +1762,7 @@ def unpack_arsenal():
             ctrt('{0:,}'.format(d_power))
             if d_quantity < open_quantity:
                 open_quantity = d_quantity
-            for web_retry in range(5):
+            for web_retry in range(1, 6):
                 sleep(d_delay)
                 try:
                     x_param = '%5Fmethod=delete&quantity={0}&'.format(open_quantity)
@@ -1746,11 +1774,14 @@ def unpack_arsenal():
                         d_quantity -= open_quantity
                         d_power += (open_quantity * d_lst[x]['b_typ']) * d_lst[x]['pwr']
                         break
+                    else:
+                        sleep(web_retry * 3)
                 except (KeyError, TypeError):
                     sleep(1)
                     continue
             else:
                 errmsg(dl['30'])
+                return
     scrn(dl['00'], dl['41'])
     ctrt('{0}: {1}   {2}: {3}'.format(dl['19'], t(d_troop), dl['29'], d_bin_type))
     ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['33'], d_batch, dl['36'], d_delay))
@@ -2168,7 +2199,7 @@ def fill_slot():
             if dur == -1:
                 x_param = 'city%5F{0}%5B{0}%5Ftype%5D={1}&%5Fmethod=post&city%5F{0}%5Bslot%5D={2}&'.format(
                         'building', d_bldg, slots[x])
-                for web_retry in range(5):
+                for web_retry in range(1, 6):
                     try:
                         sleep(d_delay)
                         json_data = web_op('cities/{0}/buildings'.format(d_lst[0]['lctn_id']), x_param)
@@ -2177,11 +2208,14 @@ def fill_slot():
                             dur = json_data['result']['job']['duration']
                             job_id = json_data['result']['job']['id']
                             break
+                        else:
+                            sleep(web_retry * 3)
                     except (KeyError, TypeError):
                         sleep(1)
                         continue
                 else:
                     errmsg(dl['53'])
+                    return
             elif dur != 0 and len(d_speed) > 0:
                 speed_item = None
                 for y in range(len(d_speed)):
@@ -2197,7 +2231,7 @@ def fill_slot():
                                 speed_item = d_speed[y]['item']
                                 break
                 x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(job_id)
-                for web_retry in range(5):
+                for web_retry in range(1, 6):
                     try:
                         sleep(d_delay)
                         json_data = web_op('player_items/{0}'.format(speed_item), x_param)
@@ -2211,11 +2245,14 @@ def fill_slot():
                             if dur < 1:
                                 dur = 0
                             break
+                        else:
+                            sleep(web_retry * 3)
                     except TypeError:
                         sleep(1)
                         continue
                 else:
                     errmsg(dl['54'])
+                    return
             else:
                 dur -= 1
                 if dur < 1:
@@ -2543,7 +2580,7 @@ def upgrade_building():
                 while dur != 0:
                     if dur == -1:
                         x_param = '%5Fmethod=put&'
-                        for server_retry in range(5):
+                        for web_retry in range(1, 6):
                             sleep(d_delay + 1)
                             try:
                                 main_json = web_op('cities/{0}/buildings/{1}'.format(
@@ -2555,11 +2592,14 @@ def upgrade_building():
                                     job_id = main_json['result']['job']['id']
                                     count += 1
                                     break
+                                else:
+                                    sleep(web_retry * 3)
                             except (KeyError, TypeError):
                                 sleep(1)
                                 continue
                         else:
                             errmsg(dl['53'])
+                            return
                     elif dur > 15 and len(d_speed) > 0:
                         speed_item = None
                         for z in range(len(d_speed)):
@@ -2575,7 +2615,7 @@ def upgrade_building():
                                         speed_item = d_speed[z]['item']
                                         break
                         x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(job_id)
-                        for server_retry in range(5):
+                        for web_retry in range(1, 6):
                             sleep(d_delay + 1)
                             try:
                                 item_json = web_op('player_items/{0}'.format(speed_item), x_param)
@@ -2593,11 +2633,14 @@ def upgrade_building():
                                         dur = 0
                                         d_lst[x]['level'] = item_json['result']['item_response']['level']
                                     break
+                                else:
+                                    sleep(web_retry * 3)
                             except (KeyError, TypeError):
                                 sleep(1)
                                 continue
                         else:
                             errmsg(dl['54'])
+                            return
                     else:
                         dur -= 1
                         if dur < 1:
@@ -3010,7 +3053,7 @@ def train_troop():
                 if dur == -1:
                     x_param = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
                             d_lst[0]['qty'], d_trp)
-                    for server_retry in range(5):
+                    for web_retry in range(1, 6):
                         sleep(d_delay)
                         try:
                             main_json = web_op('cities/{0}/units.json'.format(d_lst[0]['id']), x_param)
@@ -3019,14 +3062,18 @@ def train_troop():
                                 job_id = main_json['result']['job']['id']
                                 dur = int(main_json['result']['job']['duration'])
                                 break
+                            else:
+                                print('MAIN:', main_json['result'])
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
                             sleep(1)
                             continue
                     else:
                         errmsg(dl['57'])
+                        return
                 if dur > 0:
                     x_param = 'job%5Fid={0}&%5Fmethod=delete&'.format(job_id)
-                    for server_retry in range(5):
+                    for web_retry in range(1, 6):
                         sleep(d_delay)
                         try:
                             item_json = web_op('player_items/{0}'.format(item['item']), x_param)
@@ -3046,12 +3093,15 @@ def train_troop():
                                     else:
                                         powders_used[t(item['item'])] = 1
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
                             sleep(1)
                             continue
                     else:
                         z = dl['67'] if 'Testronius' in item['item'] else dl['58']
                         errmsg(z)
+                        return
     scrn(dl['00'], dl['59'])
     ctrt('{0}: {1}   {2}: {3}   {4}: {5:,}'.format(
             dl['11'], t(d_trp), dl['14'], t(d_lctn), dl['42'], d_lst[0]['qty']))
@@ -3327,7 +3377,7 @@ def revive_soul():
                 if dur == -1:
                     x_param = 'units%5Bquantity%5D={0}&units%5Bunit%5Ftype%5D={1}&%5Fmethod=post&'.format(
                             d_lst[0]['quantity'], d_troop)
-                    for server_retry in range(5):
+                    for web_retry in range(1, 6):
                         sleep(d_delay)
                         try:
                             main_json = web_op('cities/{0}/units/resurrect.json'.format(d_lst[0]['id']), x_param)
@@ -3342,9 +3392,10 @@ def revive_soul():
                     else:
                         z = dl['52'] if 'Testronius' in item['item'] else dl['58']
                         errmsg(z)
+                        return
                 if dur > 0:
                     x_param = 'job%5Fid={0}&%5Fmethod=delete&'.format(job_id)
-                    for server_retry in range(5):
+                    for web_retry in range(1, 6):
                         sleep(d_delay)
                         try:
                             item_json = web_op('player_items/{0}'.format(item['item']), x_param)
@@ -3364,11 +3415,14 @@ def revive_soul():
                                     else:
                                         powders_used[t(item['item'])] = 1
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
                             sleep(1)
                             continue
                     else:
                         errmsg(dl['58'])
+                        return
     scrn(dl['00'], dl['04'])
     ctrt('{0}: {1}   {2}: {3}   {4}: {5:,}'.format(
             dl['11'], t(d_troop), dl['14'], t(d_lctn), dl['42'], d_lst[0]['quantity']))
@@ -3451,7 +3505,7 @@ def marketplace():
             ctrt('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
             for x in range(len(d_lst)):
                 ctrt('{0:<{1}}  {2:<{3}}  {4:>{5},}'.format(
-                    d_lst[x]['in_desc'], a1, trnct(d_lst[x]['out_desc'], sm_trc), b1, d_lst[x]['out_qty'], c1))
+                        d_lst[x]['in_desc'], a1, trnct(d_lst[x]['out_desc'], sm_trc), b1, d_lst[x]['out_qty'], c1))
             dvsn()
             d_slct = input(' {0} : '.format(dl['06']))
             if d_slct == dl['07'] or d_slct == 'exit':
@@ -3505,13 +3559,14 @@ def marketplace():
     d_strt = time()
     for x in range(1, d_batch + 1):
         #  add_on_params = ''
-        for web_retry in range(5):
+        for web_retry in range(1, 6):
             try:
                 pass
             except KeyError:
                 pass
         else:
             errmsg(dl['22'])
+            return
     scrn(dl['00'], dl['18'])
     ctrt('{0}: {1}   {2}: {3}'.format(dl['03'], d_lst[0]['in_desc'], dl['04'], d_out))
     ctrt('{0}: {1:,}   {2}: {3}s'.format(dl['10'], d_batch, dl['12'], d_delay))
