@@ -2,12 +2,13 @@
 import http.client
 import json
 import os
+import shutil
 from binascii import b2a_hex
 from hashlib import sha1
 from operator import itemgetter
 from time import time, sleep
 
-__version__ = '2.1.0b'
+scp_ver = '2.2'
 
 
 ########################################################################################################################
@@ -15,24 +16,34 @@ __version__ = '2.1.0b'
 ########################################################################################################################
 
 def dvsn(default='_', suffix=True):
-    print(' ' + (default * 78))
+    print(' ' + (default * (conW - 2)))
     if suffix:
         print(' ')
 
 
 def scrn(title, subtitle):
+    global conW, conC
+    conW, conC = shutil.get_terminal_size()
+    while conW < 80:
+        con_width, con_column = shutil.get_terminal_size()
+        if con_width < 80:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print('Minimum Console Width of 80 is required\nPlease resize your Console...')
+            sleep(1)
+        else:
+            conW = con_width
     os.system('cls' if os.name == 'nt' else 'clear')
-    v_len = len(__version__)
     try:
-        a = '{0}({1})'.format(pData['name'], d_rn) if d_rn != 0 else ''
+        ign = '{0}({1})'.format(pData['name'], d_rn) if d_rn != 0 else ''
     except (KeyError, NameError, TypeError):
-        a = ''
-    print('\n {0:<55}  {1:>21}\n   {2:<{3}}{4}'.format(
-        title.upper(), a, subtitle.title(), 76 - v_len, __version__))
+        ign = ''
+    scpt = 'DoA Tools v{0}'.format(scp_ver)
+    print('\n {0:<{1}}{2}\n   {3:<{4}}{5}'.format(
+        title.upper(), (conW - 2) - len(ign), ign, subtitle.title(), (conW - 4) - len(scpt), scpt))
     dvsn()
 
 
-def scrn_hdr(hdr0, hdr1='', hdr2='', hdr3='', hdr4='', hdr5='', hdr6='', hdr7=''):
+def scrn_hdr():
     pass
 
 
@@ -47,18 +58,17 @@ def web_op(operation, param_add_on, method='POST', post=True):
         d_conn.request(method, url + params)
     else:
         cmd = 'Draoumculiasis' + params + 'LandCrocodile' + url + 'Bevar-Asp'
-        headers = {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate, sdch', 'Accept-Language': 'en-US,en;q=0.8',
-                   'Connection': 'keep-alive', 'Content-Length': len(params), 'Origin': 'http://' + realm,
-                   'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': cookie, 'DNT': 1, 'Host': realm,
-                   'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like'
-                                 ' Gecko Chrome/45.0.2454.101 Safari/537.36)',
-                   'X-Requested-With': 'ShockwaveFlash/19.0.0.226', 'X-S3-AWS': sha1(cmd.encode('utf-8')).hexdigest()}
-        d_conn.request(method, url, params, headers)
+        header = {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate, sdch', 'Accept-Language': 'en-US,en;q=0.8',
+                  'Connection': 'keep-alive', 'Content-Length': len(params), 'Origin': 'http://' + realm,
+                  'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': cookie, 'DNT': 1, 'Host': realm,
+                  'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like'
+                                ' Gecko Chrome/45.0.2454.101 Safari/537.36)',
+                  'X-Requested-With': 'ShockwaveFlash/19.0.0.226', 'X-S3-AWS': sha1(cmd.encode('utf-8')).hexdigest()}
+        d_conn.request(method, url, params, header)
     try:
         conn_resp = d_conn.getresponse()
         if conn_resp.status == 200:
-            conn_json = conn_resp.read().decode('utf-8')
-            return json.loads(conn_json)
+            return json.loads(conn_resp.read().decode('utf-8'))
         elif conn_resp.status == 429:
             for cd_ban in range(3660):
                 scrn(dl['00'], dl['01'])
@@ -71,21 +81,22 @@ def web_op(operation, param_add_on, method='POST', post=True):
                 sleep(1)
         else:
             pass
-    except Exception as err:
-        print(err)
+    except Exception:
+        pass
 
 
 def prg(p_count, p_total, prefix, suffix=None):
-    filled_len = int(round(50 * p_count / float(p_total)))
-    bar = ('▓' * filled_len) + ('░' * (50 - filled_len))
-    print(prefix.center(78))
-    print(bar.center(78))
+    prg_wdt = int(conW * 0.75)
+    filled_len = int(round(prg_wdt * p_count / float(p_total)))
+    bar = ('▓' * filled_len) + ('░' * (prg_wdt - filled_len))
+    print(prefix.center(conW - 2))
+    print(bar.center(conW - 2))
     if suffix:
-        print(suffix.center(78))
+        print(suffix.center(conW - 2))
 
 
 def errmsg(string):
-    dl = {'00': lo['b43'], '01': lo['b46']}
+    dl = {'00': lo['b43'], '01': lo['b47']}
     dvsn('#')
     ctrt(string)
     ctrt(dl['00'], suffix=True)
@@ -93,21 +104,23 @@ def errmsg(string):
     input(dl['01'])
 
 
-def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, unmute=True):
-    global pData, mData, fData, pfData, cData, tData, fStat
+def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, sm=False, unmute=True):
+    global pData, mData, fData, pfData, cData, tData, smData, fStat
     dl = {'00': lo['a92'].upper(), '01': lo['b61'], '02': lo['b72'], '03': lo['b62'], '04': lo['b73'], '05': lo['a92'],
           '06': lo['a79'], '07': lo['a28'], '08': lo['a75'], '09': lo['b74'], '10': lo['c11'], '11': lo['b42'],
-          '12': lo['a74'], '13': lo['a72'], '14': lo['b50'], '15': lo['c09']}
+          '12': lo['a74'], '13': lo['a72'], '14': lo['b50'], '15': lo['c09'], '16': 'Store Manifest'}
     prg_hdr, sub_hdr = [dl['03'], dl['01']] if pData or mData or fData or pfData or cData else [dl['04'], dl['02']]
     w1_data, w2_data, m_count, count = [None, None, 0, 0]
-    for check in (w1, w2, pl, fm, pf, md):
+    for check in (w1, w2, pl, fm, pf, md, sm):
         if check:
             m_count += 1
     if unmute:
         scrn(dl['00'], sub_hdr)
         prg(count, m_count, dl['05'])
 
-    req = [{'0': w1, '1': dl['07'], '2': 'chest'}, {'0': w2, '1': dl['08'], '2': 'forgestat'}]
+    req = [{'0': w1, '1': dl['07'], '2': 'chest'},
+           {'0': w2, '1': dl['08'], '2': 'forgestat'},
+           {'0': md, '1': dl['06'], '2': 'mani'}]
     for x in range(len(req)):
         if req[x]['0']:
             name = req[x]['1']
@@ -122,8 +135,14 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
                     conn_resp = conn.getresponse()
                     conn_data = json.loads(conn_resp.read().decode('utf-8'))
                     count += 1
-                    if req[x]['2'] == 'manifest':
+                    if req[x]['2'] == 'mani':
                         mData = conn_data
+                        if not mData:
+                            url = 'http://wackoscripts.com/sanctuary/manifest.json'
+                            conn = http.client.HTTPConnection('wackoscripts.com', 80)
+                            conn.request('GET', url)
+                            conn_resp = conn.getresponse()
+                            mData = json.loads(conn_resp.read().decode('utf-8'))
                     elif req[x]['2'] == 'chest':
                         w1_data = conn_data
                     elif req[x]['2'] == 'forgestat':
@@ -147,7 +166,7 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
     req = [{'0': pl, '1': dl['11'], '2': 'player.json', '3': '?', '4': 'GET', '5': False},
            {'0': fm, '1': dl['12'], '2': 'forge/forge.json', '3': '', '4': 'GET', '5': True},
            {'0': pf, '1': dl['13'], '2': 'forge/player_forge_info.json', '3': '', '4': 'GET', '5': True},
-           {'0': md, '1': dl['06'], '2': 'manifest.json', '3': '?', '4': 'GET', '5': False}]
+           {'0': sm, '1': dl['16'], '2': 'store_manifest.json', '3': '?', '4': 'GET', '5': False}]
     for x in range(len(req)):
         if req[x]['0']:
             name = req[x]['1']
@@ -167,6 +186,13 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
                             pfData = conn_data
                         elif req[x]['2'] == 'manifest.json':
                             mData = conn_data
+                        elif req[x]['2'] == 'store_manifest.json':
+                            smData = conn_data
+                            for key in conn_data:
+                                item_list = list()
+                                for items in range(len(conn_data[key])):
+                                    item_list.append(conn_data[key][items]['type'])
+                                smData[key] = item_list
                         break
                     else:
                         raise TypeError
@@ -174,18 +200,11 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
                     if unmute:
                         scrn(dl['00'], sub_hdr)
                         prg(count, m_count, '{0} {1}'.format(prg_hdr, name), '{0}: {1}/2'.format(dl['09'], web_retry))
-                    sleep(1)
+                    sleep(web_retry * 3)
                     continue
             else:
-                if req[x]['0'] == md:
-                    url = 'http://wackoscripts.com/sanctuary/mani.json'
-                    conn = http.client.HTTPConnection('wackoscripts.com', 80)
-                    conn.request('GET', url)
-                    conn_resp = conn.getresponse()
-                    mData = json.loads(conn_resp.read().decode('utf-8'))
-                else:
-                    errmsg('{0} {1}'.format(dl['10'], name))
-                    return
+                errmsg('{0} {1}'.format(dl['10'], name))
+                quit()
     if op:
         cData = {}
         for loc_key in sorted(pData['cities']):
@@ -213,6 +232,8 @@ def gtdt(pl=True, fm=False, pf=False, op=False, md=False, w1=False, w2=False, un
         with open('DoA-Tools.doa', 'r') as read_file:
             r_file = json.load(read_file)
             for x in range(len(r_file)):
+                if r_file[x]['rn'] == d_rn and r_file[x]['ui'] == d_ui and r_file[x]['ac'] != pData['name']:
+                    r_file[x]['ac'] = pData['name']
                 acct.append(r_file[x])
                 if r_file[x]['id'] not in verify_record:
                     verify_record.append(r_file[x]['id'])
@@ -254,7 +275,7 @@ def cvttm(time_value=0, ss=True):
 def ctrt(string, prefix=False, suffix=False):
     if prefix:
         print('')
-    print(string.center(80), end='', flush=True)
+    print(string.center(conW), end='', flush=True)
     if suffix:
         print('')
 
@@ -319,7 +340,7 @@ def chslng(title=True, shut_script=True):
 
 def chkver():
     dl = {'00': lo['b08'], '01': lo['c82'], '02': lo['a93'], '03': lo['a81'], '04': lo['b92']}
-    if __version__ != fStat['version']:
+    if scp_ver != fStat['version']:
         pass
         for x in range(5):
             scrn(dl['00'], dl['01'])
@@ -343,7 +364,7 @@ def t(string):
 def dsply(my_list, single=True):
     if single:
         max_len = len(max(my_list.values(), key=len))
-        max_items = int(76 / (max_len + 2)) if max_len <= 34 else 1
+        max_items = int((conW - 4) / (max_len + 2)) if max_len <= ((conW / 2) - 6) else 1
         if len(my_list) < max_items:
             max_items = len(my_list)
         x = ''
@@ -368,7 +389,7 @@ def dsply(my_list, single=True):
             if len(str(value)) > max_len_value:
                 max_len_value = len(str(value))
         max_len = max_len_key + max_len_value
-        max_items = int(76 / (max_len + 4)) if max_len <= 32 else 1
+        max_items = int((conW - 4) / (max_len + 4)) if max_len <= ((conW / 2) - 8) else 1
         if len(my_list) < max_items:
             max_items = len(my_list)
         x = ''
@@ -460,7 +481,7 @@ def trnct(content, length=100, suffix='..'):
 def scpxt():
     dl = {'00': lo['c42'], '01': lo['a24'], '02': lo['c83'], '03': lo['a98']}
     os.system('cls' if os.name == 'nt' else 'clear')
-    ctrt('{0} DoA Tools v{1}'.format(dl['00'], __version__), prefix=True, suffix=True)
+    ctrt('{0} DoA Tools v{1}'.format(dl['00'], scp_ver), prefix=True, suffix=True)
     ctrt(dl['01'])
     ctrt(fStat['author'])
     ctrt('{0} {1}'.format(dl['02'], fStat['contrib']), suffix=True)
@@ -807,8 +828,10 @@ def craft_equipment():
                     else:
                         f_fail += 1
                     break
+                else:
+                    sleep(web_retry * 3)
             except (KeyError, TypeError):
-                sleep(1)
+                sleep(web_retry * 3)
                 continue
         else:
             errmsg(dl['38'])
@@ -818,16 +841,18 @@ def craft_equipment():
                 sleep(d_delay)
                 try:
                     crush_json = web_op('forge/disenchant_equipment', x_param)
-                    result = crush_json['result']['success']
-                    if result:
+                    result_crush = crush_json['result']['success']
+                    if result_crush:
                         for y in range(len(crush_json['result']['disenchanted_ingredients'])):
                             if t(crush_json['result']['disenchanted_ingredients'][y]) in crsh_itm:
                                 crsh_itm[t(crush_json['result']['disenchanted_ingredients'][y])] += 1
                             else:
                                 crsh_itm[t(crush_json['result']['disenchanted_ingredients'][y])] = 1
                         break
+                    else:
+                        sleep(web_retry * 3)
                 except (KeyError, TypeError):
-                    sleep(1)
+                    sleep(web_retry * 3)
                     continue
             else:
                 errmsg(dl['39'])
@@ -983,8 +1008,10 @@ def forge_ingredient():
                         if item_name in base_list.keys() and check_use[y]['quantity'] < base_list[item_name]:
                             slctn[item_name] = base_list[item_name] - check_use[y]['quantity']
                     break
+                else:
+                    sleep(web_retry * 3)
             except (KeyError, TypeError):
-                sleep(1)
+                sleep(web_retry * 3)
                 continue
         else:
             errmsg(dl['18'])
@@ -1254,8 +1281,10 @@ def farm_mission():
                                 dur = int(main_json['result']['job']['duration'])
                                 job_id = main_json['result']['job']['id']
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
-                            sleep(1)
+                            sleep(web_retry * 3)
                             continue
                     else:
                         errmsg(dl['40'])
@@ -1266,8 +1295,8 @@ def farm_mission():
                         x_param = '%5Fmethod=delete&job%5Fid={0}&'.format(job_id)
                         try:
                             item_json = web_op('player_items/{0}'.format(item['item']), x_param)
-                            result = item_json['result']['success']
-                            if result:
+                            result_item = item_json['result']['success']
+                            if result_item:
                                 dur = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
                                 if dur < 0:
                                     dur = 0
@@ -1276,8 +1305,10 @@ def farm_mission():
                                 else:
                                     spd_use[t(item['item'])] = 1
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
-                            sleep(1)
+                            sleep(web_retry * 3)
                             continue
                     else:
                         errmsg(dl['41'])
@@ -1288,16 +1319,18 @@ def farm_mission():
                         x_param = 'adventurer_id={0}&mission_type={1}&'.format(d_lst[0]['id'], d_ms)
                         try:
                             claim_json = web_op('player_missions/claim_mission', x_param)
-                            result = claim_json['result']['success']
-                            if result:
+                            result_claim = claim_json['result']['success']
+                            if result_claim:
                                 for z in range(len(claim_json['result']['items'])):
                                     if t(claim_json['result']['items'][z]) in itm_gain:
                                         itm_gain[t(claim_json['result']['items'][z])] += 1
                                     else:
                                         itm_gain[t(claim_json['result']['items'][z])] = 1
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
-                            sleep(1)
+                            sleep(web_retry * 3)
                             continue
                     else:
                         errmsg(dl['42'])
@@ -1327,21 +1360,23 @@ def open_chest():
           '18': lo['c68'], '19': lo['c14'], '20': lo['c57'], '21': lo['a86'], '22': lo['c15'], '23': lo['b37'],
           '24': lo['a43'], '25': lo['b57'], '26': lo['b51'], '27': lo['a06'], '28': lo['c29'], '29': lo['c41'],
           '30': lo['a82'], '31': lo['b40'], '32': lo['b51'], '33': lo['a47'], '34': lo['b41'], '35': lo['a38'],
-          '36': lo['b39'], '37': lo['b88'], '38': lo['c31'], '39': lo['b49'], '40': lo['b47']}
+          '36': lo['b39'], '37': lo['b88'], '38': lo['c31'], '39': lo['b49'], '40': lo['b47'], '41': lo['c89'],
+          '42': lo['a06'].title(), '43': lo['a27'], '44': lo['c90'], '45': lo['c91'], '46': lo['c92'],
+          '47': lo['c93'], '48': lo['c29'].title(), '49': lo['b40']}
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
-    d_lst, slctn, max_len = [list(), {}, 0]
+    d_lst, slctn = [list(), {}]
     for key, value in pData['items'].items():
-        if 'ConfigurableChest' in key and value != 0:
-            max_qty = 0
+        if key in smData['chest'] and value != 0:
             for manifest in range(len(mData['store']['chest'])):
                 if key in mData['store']['chest'][manifest]['type']:
-                    max_qty = mData['store']['chest'][manifest]['max_use_quantity']
+                    if mData['store']['chest'][manifest]['max_use_quantity'] is not None:
+                        max_qty = mData['store']['chest'][manifest]['max_use_quantity']
+                    else:
+                        max_qty = 1
+                    my_dict = {'chest': key, 'desc': t(key), 'qty': value, 'max_use': max_qty, 'open': False}
+                    d_lst.append(my_dict)
                     break
-            max_len = len(str(value)) if max_len < len(str(value)) else max_len
-            my_dict = {'chest': key, 'desc': t(key), 'qty': value, 'max_use': max_qty, 'open': False}
-            d_lst.append(my_dict)
-
     if not d_lst:
         nthng(dl['00'], dl['01'], dl['03'])
         return
@@ -1406,17 +1441,20 @@ def open_chest():
         if d_total == 1:
             d_batch = 1
         max_chest = d_lst[0]['qty']
-        if max_chest > d_lst[0]['max_use']:
-            max_chest = d_lst[0]['max_use']
+        if d_lst[0]['max_use'] is not None:
+            if max_chest > d_lst[0]['max_use']:
+                max_chest = d_lst[0]['max_use']
     else:
         d_chest = '{0}: {1}'.format(dl['18'], len(d_lst))
         d_total, max_chest = [0, 0]
         for x in range(len(d_lst)):
             d_total += d_lst[x]['qty']
-            if max_chest < d_lst[x]['qty']:
-                max_chest = d_lst[x]['qty']
-            if max_chest > d_lst[x]['max_use']:
-                max_chest = d_lst[x]['max_use']
+            if d_lst[x]['qty'] > d_lst[x]['max_use']:
+                if max_chest < d_lst[x]['max_use']:
+                    max_chest = d_lst[x]['max_use']
+            else:
+                if max_chest < d_lst[x]['qty']:
+                    max_chest = d_lst[x]['max_use']
     while d_batch is None:
         scrn(dl['00'], dl['19'])
         ctrt('{0}   {1}: {2:,}'.format(d_chest, dl['20'], d_total))
@@ -1448,11 +1486,11 @@ def open_chest():
     slctn.clear()
     d_start, ttl_open = [time(), 0]
     look_up = pData['items']
-    o_rcvd = {dl['04']: {}, dl['27']: {}, dl['28']: {}, dl['29']: {}, dl['30']: {}, dl['31']: {}}
-    spd_itms = ('Hop', 'TranceMarchDrops', 'ForcedMarchDrops', 'TranceMarchElixir', 'Godspeed', 'Bounce', 'Skip',
-                'Jump', 'Leap', 'Bore', 'Bolt', 'Blast', 'Blitz', 'Blink')
+    o_rcvd = {dl['41']: {}, dl['42']: {}, dl['43']: {}, dl['44']: {}, dl['45']: {}, dl['46']: {}, dl['47']: {},
+              dl['48']: {}, dl['49']: {}}
     for x in range(len(d_lst)):
-        i_received = {dl['04']: {}, dl['27']: {}, dl['28']: {}, dl['29']: {}, dl['30']: {}, dl['31']: {}}
+        i_received = {dl['41']: {}, dl['42']: {}, dl['43']: {}, dl['44']: {}, dl['45']: {}, dl['46']: {}, dl['47']: {},
+                      dl['48']: {}, dl['49']: {}}
         opened, count = [d_lst[x]['qty'], 0]
         open_qty = d_batch if d_lst[x]['max_use'] >= d_batch else d_lst[x]['max_use']
         open_qty = d_lst[x]['qty'] if d_lst[x]['qty'] <= open_qty else open_qty
@@ -1463,43 +1501,58 @@ def open_chest():
                 sleep(d_delay)
                 try:
                     x_param = '%5Fmethod=delete&quantity={0}&'.format(open_qty)
-                    main_data = web_op('player_items/{0}'.format(d_lst[x]['chest']), x_param)
+                    main_data = web_op('player_items/{0}.json'.format(d_lst[x]['chest']), x_param)
                     result = main_data['result']['success']
                     if result:
                         opened -= open_qty
                         count += open_qty
                         ttl_open += open_qty
                         for key, value in main_data['result']['items'].items():
-                            if 'Chest' in key:
+                            if key in smData['armor']:
                                 if key in look_up.keys() and value > look_up[key]:
-                                    i_received[dl['04']][t(key)] = value - look_up[key]
+                                    i_received[dl['41']][t(key)] = value - look_up[key]
                                 if key not in look_up.keys():
-                                    i_received[dl['04']][t(key)] = value
-                            elif 'TroopPrize' in key:
+                                    i_received[dl['41']][t(key)] = value
+                            elif key in smData['arsenal']:
                                 if key in look_up.keys() and value > look_up[key]:
-                                    i_received[dl['27']][t(key)] = value - look_up[key]
+                                    i_received[dl['42']][t(key)] = value - look_up[key]
                                 if key not in look_up.keys():
-                                    i_received[dl['27']][t(key)] = value
-                            elif 'Seal' in key or 'Grant' in key:
+                                    i_received[dl['42']][t(key)] = value
+                            elif key in smData['chest']:
                                 if key in look_up.keys() and value > look_up[key]:
-                                    i_received[dl['30']][t(key)] = value - look_up[key]
+                                    i_received[dl['43']][t(key)] = value - look_up[key]
                                 if key not in look_up.keys():
-                                    i_received[dl['30']][t(key)] = value
-                            elif 'Testronius' in key:
+                                    i_received[dl['43']][t(key)] = value
+                            elif key in smData['dragon-egg']:
                                 if key in look_up.keys() and value > look_up[key]:
-                                    i_received[dl['29']][t(key)] = value - look_up[key]
+                                    i_received[dl['44']][t(key)] = value - look_up[key]
                                 if key not in look_up.keys():
-                                    i_received[dl['29']][t(key)] = value
-                            elif key in spd_itms:
+                                    i_received[dl['44']][t(key)] = value
+                            elif key in smData['general']:
                                 if key in look_up.keys() and value > look_up[key]:
-                                    i_received[dl['28']][t(key)] = value - look_up[key]
+                                    i_received[dl['45']][t(key)] = value - look_up[key]
                                 if key not in look_up.keys():
-                                    i_received[dl['28']][t(key)] = value
+                                    i_received[dl['45']][t(key)] = value
+                            elif key in smData['production']:
+                                if key in look_up.keys() and value > look_up[key]:
+                                    i_received[dl['46']][t(key)] = value - look_up[key]
+                                if key not in look_up.keys():
+                                    i_received[dl['46']][t(key)] = value
+                            elif key in smData['resource']:
+                                if key in look_up.keys() and value > look_up[key]:
+                                    i_received[dl['47']][t(key)] = value - look_up[key]
+                                if key not in look_up.keys():
+                                    i_received[dl['47']][t(key)] = value
+                            elif key in smData['speedup']:
+                                if key in look_up.keys() and value > look_up[key]:
+                                    i_received[dl['48']][t(key)] = value - look_up[key]
+                                if key not in look_up.keys():
+                                    i_received[dl['48']][t(key)] = value
                             else:
                                 if key in look_up.keys() and value > look_up[key]:
-                                    i_received[dl['31']][t(key)] = value - look_up[key]
+                                    i_received[dl['49']][t(key)] = value - look_up[key]
                                 if key not in look_up.keys():
-                                    i_received[dl['31']][t(key)] = value
+                                    i_received[dl['49']][t(key)] = value
                         scrn(dl['00'], dl['32'])
                         ctrt('{0}   {1}: {2:,}'.format(d_chest, dl['20'], d_total))
                         ctrt('{0}: {1}   {2}: {3}s   {4}: {5}'.format(
@@ -1511,7 +1564,8 @@ def open_chest():
                                 '{0}: {1:,}/{2:,}'.format(dl['36'], count, d_lst[x]['qty']))
                         else:
                             prg(count, d_lst[x]['qty'], '{0} {1:,}/{2:,}'.format(dl['36'], count, d_lst[x]['qty']))
-                        for category in (dl['04'], dl['27'], dl['28'], dl['29'], dl['30'], dl['31']):
+                        for category in (dl['41'], dl['42'], dl['43'], dl['44'], dl['45'], dl['46'], dl['47'],
+                                         dl['48'], dl['49']):
                             if len(i_received[category]) > 0:
                                 slctn = i_received[category]
                                 ctrt('~~~ {0} ~~~'.format(category.title()), prefix=True)
@@ -1519,13 +1573,15 @@ def open_chest():
                         if count == d_lst[x]['qty']:
                             look_up = main_data['result']['items']
                         break
+                    else:
+                        sleep(web_retry * 3)
                 except (KeyError, TypeError):
-                    sleep(1)
+                    sleep(web_retry * 3)
                     continue
             else:
                 errmsg(dl['37'])
                 return
-        for category in (dl['04'], dl['27'], dl['28'], dl['29'], dl['30'], dl['31']):
+        for category in (dl['41'], dl['42'], dl['43'], dl['44'], dl['45'], dl['46'], dl['47'], dl['48'], dl['49']):
             for key, value in i_received[category].items():
                 if key in o_rcvd[category].keys():
                     o_rcvd[category][key] += value
@@ -1536,7 +1592,7 @@ def open_chest():
     ctrt('{0}: {1}   {2}: {3}s'.format(dl['23'], d_batch, dl['24'], d_delay))
     dvsn('-')
     prg(1, 1, '{0} {1}'.format(dl['39'], cvttm(time() - d_start)))
-    for category in (dl['04'], dl['27'], dl['28'], dl['29'], dl['30'], dl['31']):
+    for category in (dl['41'], dl['42'], dl['43'], dl['44'], dl['45'], dl['46'], dl['47'], dl['48'], dl['49']):
         if len(o_rcvd[category]) > 0:
             slctn = o_rcvd[category]
             ctrt('~~~ {0} ~~~'.format(category.title()), prefix=True)
@@ -1692,7 +1748,6 @@ def unpack_arsenal():
     else:
         d_batch = None
         d_bin_type = '{0:,} {1}'.format(d_lst[0]['b_typ'], dl['29'])
-        # Set Number Of Batches
         while d_batch is None:
             scrn(dl['00'], dl['31'])
             ctrt('{0}: {1}   {2}: {3}'.format(dl['19'], t(d_troop), dl['29'], d_bin_type))
@@ -1756,8 +1811,10 @@ def unpack_arsenal():
                         d_quantity -= open_quantity
                         d_power += (open_quantity * d_lst[x]['b_typ']) * d_lst[x]['pwr']
                         break
+                    else:
+                        sleep(web_retry * 3)
                 except (KeyError, TypeError):
-                    sleep(1)
+                    sleep(web_retry * 3)
                     continue
             else:
                 errmsg(dl['30'])
@@ -1825,8 +1882,8 @@ def fill_slot():
             'fs': {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0},
             'cs': {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}},
         'spectral': {
-            'fs': {1: 2, 2: 2, 3: 2, 4: 4, 5: 6, 6: 8, 7: 11, 8: 14, 9: 17, 10: 20, 11: 20, 12: 20},
-            'cs': {1: 2, 2: 2, 3: 4, 4: 6, 5: 8, 6: 10, 7: 14, 8: 18, 9: 22, 10: 26, 11: 26, 12: 26}},
+            'fs': {1: 11, 2: 12, 3: 13, 4: 14, 5: 15, 6: 16, 7: 17, 8: 18, 9: 19, 10: 20, 11: 20, 12: 20},
+            'cs': {1: 22, 2: 23, 3: 24, 4: 25, 5: 26, 6: 26, 7: 26, 8: 26, 9: 26, 10: 26, 11: 26, 12: 26}},
         'stone': {
             'fs': {1: 11, 2: 14, 3: 17, 4: 20, 5: 23, 6: 26, 7: 29, 8: 30, 9: 30, 10: 30, 11: 30, 12: 30},
             'cs': {1: 31, 2: 31, 3: 31, 4: 31, 5: 31, 6: 31, 7: 31, 8: 31, 9: 31, 10: 31, 11: 31, 12: 31}},
@@ -1842,6 +1899,16 @@ def fill_slot():
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
     d_lst, built, slctn, cptl_bldg = [list(), list(), {}, {}]
+    try:
+        sanc_lev = pData['boosts']['levitation'][0]['amount']
+        sanc_lev = 5 if sanc_lev > 0.5 else sanc_lev * 10
+    except KeyError:
+        sanc_lev = 0
+    try:
+        res_lev = pData['research']['Levitation']
+    except KeyError:
+        res_lev = 0
+    upg_multiplier = (1 + (0.1 * (res_lev + sanc_lev))) if (res_lev + sanc_lev) > 0 else 1
     for x in range(len(cData['capital']['city']['buildings'])):
         building = cData['capital']['city']['buildings'][x]
         if building['type'] not in cptl_bldg:
@@ -1878,11 +1945,12 @@ def fill_slot():
                             for z in range(len(manifest['levels'])):
                                 if manifest['levels'][z]['level'] == 1:
                                     level = manifest['levels'][z]
-                                    my_dict = {'city': key, 'location': manifest['location'], 'f_slot': field_slot,
-                                               'type': manifest['type'], 'f_slot_max': f_slot, 'c_slot_max': c_slot,
-                                               'levels': level, 'per_city': manifest['per_city'], 'c_slot': city_slot,
-                                               'lctn_id': cData[key]['city']['id'], 'desc': t(key),
-                                               'time': manifest['levels'][z]['time']}
+                                    my_dict = {'city': key, 'time': int(manifest['levels'][z]['time'] / upg_multiplier),
+                                               'location': manifest['location'], 'lctn_id': cData[key]['city']['id'],
+                                               'f_slot': field_slot, 'per_city': manifest['per_city'], 'desc': t(key),
+                                               'type': manifest['type'], 'bld_dsc': t(manifest['type']),
+                                               'f_slot_max': f_slot, 'c_slot_max': c_slot, 'c_slot': city_slot,
+                                               'levels': level}
                                     d_lst.append(my_dict)
     if not d_lst:
         nthng(dl['00'], dl['01'], dl['03'])
@@ -1901,6 +1969,7 @@ def fill_slot():
             scrn(dl['00'], dl['01'])
             ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}'.format(a, a1, b, b1, c, c1))
             ctrt('{0}  {1}  {2}'.format('~' * a1, '~' * b1, '~' * c1))
+            slctn.clear()
             for x in range(len(d_lst)):
                 d1, d2 = [d_lst[x]['c_slot_max'] - len(d_lst[x]['c_slot']),
                           d_lst[x]['f_slot_max'] - len(d_lst[x]['f_slot'])]
@@ -1947,7 +2016,7 @@ def fill_slot():
                     d = d_lst[x]['c_slot_max'] - len(d_lst[x]['c_slot'])
                 else:
                     d = d_lst[x]['f_slot_max'] - len(d_lst[x]['f_slot'])
-                ctrt('{0:<{1}}  {2:>{3}}  {4:^{5}}'.format(t(d_lst[x]['type']), a1, cvttm(d_lst[x]['time']), b1, d, c1))
+                ctrt('{0:<{1}}  {2:>{3}}  {4:^{5}}'.format(d_lst[x]['bld_dsc'], a1, cvttm(d_lst[x]['time']), b1, d, c1))
             dvsn()
             d_select = input(' {0} : '.format(dl['07']))
             if len(d_select) >= 3:
@@ -1955,12 +2024,12 @@ def fill_slot():
                     return
                 else:
                     for x in range(len(d_lst)):
-                        if d_select.lower() == t(d_lst[x]['type'].lower()):
+                        if d_select.lower() == d_lst[x]['bld_dsc'].lower():
                             d_bldg = d_lst[x]['type']
                             break
                     else:
                         for x in range(len(d_lst)):
-                            if d_select.lower() in t(d_lst[x]['type'].lower()):
+                            if d_select.lower() in d_lst[x]['bld_dsc'].lower():
                                 d_bldg = d_lst[x]['type']
                                 break
     d_lst[:] = [d for d in d_lst if d.get('type') == d_bldg]
@@ -1971,7 +2040,7 @@ def fill_slot():
     gtg = False
     req = d_lst[0]['levels']['requirements']
     d_req = {'items': {}, 'buildings': {}, 'resources': {}}
-    if d_lst[0]['per_city'] == 1:
+    if d_lst[0]['per_city'] == 1 or max_slot == 1:
         d_slots = 1
     else:
         d_slots = 0
@@ -2182,16 +2251,16 @@ def fill_slot():
                 for web_retry in range(1, 6):
                     try:
                         sleep(d_delay)
-                        json_data = web_op('cities/{0}/buildings'.format(d_lst[0]['lctn_id']), x_param)
-                        if json_data['result']['success']:
-                            dur = json_data['result']['job']['duration']
-                            job_id = json_data['result']['job']['id']
+                        main_json = web_op('cities/{0}/buildings'.format(d_lst[0]['lctn_id']), x_param)
+                        result = main_json['result']['success']
+                        if result:
+                            dur = main_json['result']['job']['duration']
+                            job_id = main_json['result']['job']['id']
                             break
                         else:
-                            print(json_data['result'])
                             sleep(web_retry * 3)
                     except (KeyError, TypeError):
-                        sleep(1)
+                        sleep(web_retry * 3)
                         continue
                 else:
                     errmsg(dl['53'])
@@ -2214,21 +2283,21 @@ def fill_slot():
                 for web_retry in range(1, 6):
                     try:
                         sleep(d_delay)
-                        json_data = web_op('player_items/{0}'.format(speed_item), x_param)
-                        if json_data['result']['success']:
+                        item_json = web_op('player_items/{0}'.format(speed_item), x_param)
+                        result_item = item_json['result']['success']
+                        if result_item:
                             if speed_item in speeds_used:
                                 speeds_used[speed_item] += 1
                             else:
                                 speeds_used[speed_item] = 1
-                            dur = int(json_data['result']['item_response']['run_at'] - json_data['timestamp'])
+                            dur = int(item_json['result']['item_response']['run_at'] - item_json['timestamp'])
                             if dur < 1:
                                 dur = 0
                             break
                         else:
-                            print(json_data['result'])
                             sleep(web_retry * 3)
                     except TypeError:
-                        sleep(1)
+                        sleep(web_retry * 3)
                         continue
                 else:
                     errmsg(dl['54'])
@@ -2273,10 +2342,22 @@ def upgrade_building():
           '42': lo['a04'], '43': lo['b20'], '44': lo['b18'], '45': lo['c15'], '46': lo['a43'], '47': lo['b57'],
           '48': lo['b51'], '49': lo['a47'], '50': lo['c75'], '51': lo['c28'], '52': lo['b64'], '53': lo['b83'],
           '54': lo['b79'], '55': lo['c31'], '56': lo['b49'], '57': lo['a97'], '58': lo['b71'], '59': lo['b47'],
-          '60': lo['c72'], '61': lo['c85'], '62': lo['b19'], '63': lo['c74']}
+          '60': lo['c72'], '61': lo['c85'], '62': lo['b19'], '63': lo['c74'], '64': 'Upgrade Duration for next level'}
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
     slctn, c_bldg, d_lst = [{}, {}, list()]
+    try:
+        if pData['boosts']['levitation'][0]['amount'] > 0.5:
+            sanc_lev = 5
+        else:
+            sanc_lev = pData['boosts']['levitation'][0]['amount'] * 10
+    except KeyError:
+        sanc_lev = 0
+    try:
+        res_lev = pData['research']['Levitation']
+    except KeyError:
+        res_lev = 0
+    upg_multiplier = 1 + (0.1 * (res_lev + sanc_lev)) if (res_lev + sanc_lev) > 0 else 1
     for x in range(len(cData['capital']['city']['buildings'])):
         if cData['capital']['city']['buildings'][x]['type'] not in c_bldg:
             c_bldg[cData['capital']['city']['buildings'][x]['type']] = cData['capital']['city']['buildings'][x]['level']
@@ -2354,7 +2435,7 @@ def upgrade_building():
     for x in range(len(d_lst)):
         if d_lst[x]['level'] < min_lvl:
             min_lvl = d_lst[x]['level']
-    gtg, d_lvl, d_req = [False, 0, {'items': {}, 'buildings': {}, 'research': {}, 'resources': {}}]
+    gtg, d_lvl, d_dur, d_req = [False, 0, 0, {'items': {}, 'buildings': {}, 'research': {}, 'resources': {}}]
     while d_lvl is 0:
         scrn(dl['00'], dl['11'])
         ctrt('{0}: {1}   {2}: {3}'.format(dl['08'], t(d_lct), dl['09'], d_bldg))
@@ -2376,6 +2457,8 @@ def upgrade_building():
         req_check = list()
         for x in range(len(d_lst)):
             for y in range(len(d_lst[x]['levels'])):
+                if d_lst[x]['levels'][y]['level'] == min_lvl + 1:
+                    d_dur = int(d_lst[x]['levels'][y]['time'] / upg_multiplier)
                 if d_lst[x]['levels'][y]['level'] <= d_lvl:
                     req = d_lst[x]['levels'][y]['requirements']
                     for key in req.keys():
@@ -2485,45 +2568,48 @@ def upgrade_building():
                        'quantity': pData['items'][look_up['item']], 'use': False, 'desc': look_up['desc']}
             slctn.append(my_dict)
     if slctn:
-        while True:
-            scrn(dl['00'], dl['35'])
-            ctrt('{0}: {1}   {2}: {3}   {4}: {5}'.format(dl['08'], t(d_lct), dl['09'], d_bldg, dl['36'], d_lvl))
-            ctrt(' ')
-            dvsn('-')
-            ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}'.format(a, a1, b, b1, c, c1, d, d1, e, e1))
-            ctrt('{0}  {1}  {2}  {3}  {4}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1))
-            for x in range(len(slctn)):
-                use_item = dl['61'].title() if slctn[x]['use'] is True else dl['62'].title()
-                ctrt('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
-                    slctn[x]['desc'], a1, cvttm(slctn[x]['time'], ss=False), b1, slctn[x]['quantity'], c1,
-                    cvttm(slctn[x]['exceed'], ss=False), d1, use_item))
-            print('\n {0}'.format(dl['40']))
-            dvsn('.')
-            print(' {0}'.format(dl['37']))
-            print('       {0}'.format(dl['38']))
-            print('       {0}'.format(dl['39']))
-            dvsn()
-            d_select = input(' {0} : '.format(dl['05']))
-            if len(d_select) >= 2:
-                if d_select.lower() == dl['06'] or d_select.lower() == 'exit':
-                    return
-                elif d_select.lower() == dl['41'] or d_select.lower() == 'next':
-                    break
-                elif d_select.lower() == dl['42'] or d_select.lower() == 'all':
-                    for x in range(len(slctn)):
-                        slctn[x]['use'] = True
-                elif d_select.lower() == dl['43'] or d_select.lower() == 'none':
-                    for x in range(len(slctn)):
-                        slctn[x]['use'] = False
-                else:
-                    for x in range(len(slctn)):
-                        if d_select.lower() == slctn[x]['desc'].lower():
-                            slctn[x]['use'] = True if not slctn[x]['use'] else False
-                            break
+        if (d_lvl == min_lvl + 1 and d_dur > 20) or d_lvl > min_lvl + 1:
+            while True:
+                scrn(dl['00'], dl['35'])
+                ctrt('{0}: {1}   {2}: {3}   {4}: {5}'.format(dl['08'], t(d_lct), dl['09'], d_bldg, dl['36'], d_lvl))
+                ctrt(' ')
+                dvsn('-')
+                ctrt('{0:^{1}}  {2:^{3}}  {4:^{5}}  {6:^{7}}  {8:^{9}}'.format(a, a1, b, b1, c, c1, d, d1, e, e1))
+                ctrt('{0}  {1}  {2}  {3}  {4}'.format('~' * a1, '~' * b1, '~' * c1, '~' * d1, '~' * e1))
+                for x in range(len(slctn)):
+                    use_item = dl['61'].title() if slctn[x]['use'] is True else dl['62'].title()
+                    ctrt('{0:<{1}}  {2:>{3}}  {4:>{5},}  {6:>{7}}  {8:>3}'.format(
+                        slctn[x]['desc'], a1, cvttm(slctn[x]['time'], ss=False), b1, slctn[x]['quantity'], c1,
+                        cvttm(slctn[x]['exceed'], ss=False), d1, use_item))
+                if d_lvl == min_lvl + 1:
+                    ctrt('{0}: {1}'.format(dl['64'], cvttm(d_dur)), prefix=True)
+                print('\n {0}'.format(dl['40']))
+                dvsn('.')
+                print(' {0}'.format(dl['37']))
+                print('       {0}'.format(dl['38']))
+                print('       {0}'.format(dl['39']))
+                dvsn()
+                d_select = input(' {0} : '.format(dl['05']))
+                if len(d_select) >= 2:
+                    if d_select.lower() == dl['06'] or d_select.lower() == 'exit':
+                        return
+                    elif d_select.lower() == dl['41'] or d_select.lower() == 'next':
+                        break
+                    elif d_select.lower() == dl['42'] or d_select.lower() == 'all':
+                        for x in range(len(slctn)):
+                            slctn[x]['use'] = True
+                    elif d_select.lower() == dl['43'] or d_select.lower() == 'none':
+                        for x in range(len(slctn)):
+                            slctn[x]['use'] = False
                     else:
                         for x in range(len(slctn)):
-                            if d_select.lower() in slctn[x]['desc'].lower():
+                            if d_select.lower() == slctn[x]['desc'].lower():
                                 slctn[x]['use'] = True if not slctn[x]['use'] else False
+                                break
+                        else:
+                            for x in range(len(slctn)):
+                                if d_select.lower() in slctn[x]['desc'].lower():
+                                    slctn[x]['use'] = True if not slctn[x]['use'] else False
     d_speed = list()
     for x in range(len(slctn)):
         if slctn[x]['use'] is True:
@@ -2572,13 +2658,15 @@ def upgrade_building():
                                     job_id = main_json['result']['job']['id']
                                     count += 1
                                     break
+                                else:
+                                    sleep(web_retry * 3)
                             except (KeyError, TypeError):
-                                sleep(1)
+                                sleep(web_retry * 3)
                                 continue
                         else:
                             errmsg(dl['53'])
                             return
-                    elif dur > 15 and len(d_speed) > 0:
+                    elif dur > 20 and len(d_speed) > 0:
                         speed_item = None
                         for z in range(len(d_speed)):
                             if dur > d_speed[z]['exceed'] and d_speed[z]['quantity'] != 0:
@@ -2597,8 +2685,8 @@ def upgrade_building():
                             sleep(d_delay + 1)
                             try:
                                 item_json = web_op('player_items/{0}'.format(speed_item), x_param)
-                                result = item_json['result']['success']
-                                if result:
+                                result_itm = item_json['result']['success']
+                                if result_itm:
                                     for z in range(len(d_speed)):
                                         if speed_item == d_speed[z]['item']:
                                             d_speed[z]['quantity'] -= 1
@@ -2611,8 +2699,10 @@ def upgrade_building():
                                         dur = 0
                                         d_lst[x]['level'] = item_json['result']['item_response']['level']
                                     break
+                                else:
+                                    sleep(web_retry * 3)
                             except (KeyError, TypeError):
-                                sleep(1)
+                                sleep(web_retry * 3)
                                 continue
                         else:
                             errmsg(dl['54'])
@@ -2761,6 +2851,8 @@ def train_troop():
             if met_rsch and met_rsc and met_item and met_unit and met_idle and met_bldg:
                 train_in_loc = mData['units'][x]['trainable_in']
                 for d_loc in train_in_loc:
+                    if d_loc not in cData.keys():
+                        continue
                     if 'buildings' in d_req.keys():
                         for key, value in d_req['buildings'].items():
                             if key in pseudo_tc and value <= slctn[d_loc]['tclvl']:
@@ -3038,9 +3130,18 @@ def train_troop():
                                 job_id = main_json['result']['job']['id']
                                 dur = int(main_json['result']['job']['duration'])
                                 break
+                            else:
+                                raise KeyError
                         except (KeyError, TypeError):
-                            sleep(1)
+                            sleep(web_retry * 3)
                             continue
+                        except KeyboardInterrupt:
+                            dvsn('#')
+                            ctrt('Keyboard Interrupt detected')
+                            ctrt('Press ENTER to return to MAIN MENU', suffix=True)
+                            dvsn('#')
+                            input('')
+                            return
                     else:
                         errmsg(dl['57'])
                         return
@@ -3066,9 +3167,18 @@ def train_troop():
                                     else:
                                         powders_used[t(item['item'])] = 1
                                 break
+                            else:
+                                raise KeyError
                         except (KeyError, TypeError):
-                            sleep(1)
+                            sleep(web_retry * 3)
                             continue
+                        except KeyboardInterrupt:
+                            dvsn('#')
+                            ctrt('Keyboard Interrupt detected')
+                            ctrt('Press ENTER to return to MAIN MENU', suffix=True)
+                            dvsn('#')
+                            input('')
+                            return
                     else:
                         z = dl['67'] if 'Testronius' in item['item'] else dl['58']
                         errmsg(z)
@@ -3108,7 +3218,8 @@ def revive_soul():
           '36': lo['b76'], '37': lo['b24'], '38': lo['a51'], '39': lo['b16'], '40': lo['b29'], '41': lo['c18'],
           '42': lo['b53'], '43': lo['a84'], '44': lo['c15'], '45': lo['c34'], '46': lo['b57'], '47': lo['a43'],
           '48': lo['b51'], '49': lo['a47'], '50': lo['a58'], '51': lo['b64'], '52': lo['b80'], '53': lo['c40'],
-          '54': lo['c28'], '55': lo['c26'], '56': lo['b45'], '57': lo['b86'], '58': lo['b79'], '59': lo['b52']}
+          '54': lo['c28'], '55': lo['c26'], '56': lo['b45'], '57': lo['b86'], '58': lo['b79'], '59': lo['b52'],
+          '60': lo['c49']}
     scrn(dl['00'], dl['01'])
     ctrt(dl['09'])
     d_lst, dp_level, dp_total, dp_combo, d_lctn = [list(), 0, 0, 0, 'spectral']
@@ -3138,7 +3249,7 @@ def revive_soul():
                                    'power': mData['units'][x]['stats']['power']}
                         d_lst.append(my_dict)
     if not d_lst:
-        nthng(dl['00'], dl['01'], dl['02'])
+        nthng(dl['00'], dl['01'], dl['60'])
         return
     if len(d_lst) == 1:
         d_troop = d_lst[0]['troop']
@@ -3357,8 +3468,10 @@ def revive_soul():
                                 job_id = main_json['result']['job']['id']
                                 dur = int(main_json['result']['job']['duration'])
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
-                            sleep(1)
+                            sleep(web_retry * 3)
                             continue
                     else:
                         z = dl['52'] if 'Testronius' in item['item'] else dl['58']
@@ -3386,8 +3499,10 @@ def revive_soul():
                                     else:
                                         powders_used[t(item['item'])] = 1
                                 break
+                            else:
+                                sleep(web_retry * 3)
                         except (KeyError, TypeError):
-                            sleep(1)
+                            sleep(web_retry * 3)
                             continue
                     else:
                         errmsg(dl['58'])
@@ -3418,12 +3533,10 @@ def revive_soul():
 
 
 def marketplace():
-    dl = {'00': lo['b09'], '01': 'Select Trade In Item', '02': lo['a92'], '03': 'Trade In', '04': 'For',
-          '05': lo['b52'], '06': lo['a52'], '07': lo['a59'], '08': 'Number Of Batches To Trade',
-          '09': 'How Many Batches To Trade?', '10': 'Batches', '11': lo['c15'], '12': lo['a43'],
-          '13': lo['b57'], '14': 'There Are No Coral Doubloons', '15': 'There Are No Tradeable Items',
-          '16': lo['b51'], '17': lo['a47'], '18': lo['c31'], '19': lo['b49'],
-          '20': lo['c88'], '21': lo['c72'], '22': 'Trading', '23': 'SCRIPT ERROR: Failed To Initialize Trade',
+    dl = {'00': lo['b09'], '01': lo['c95'], '02': lo['a92'], '03': lo['c96'], '04': lo['c97'], '05': lo['b52'],
+          '06': lo['a52'], '07': lo['a59'], '08': lo['c98'], '09': lo['c99'], '10': lo['c94'], '11': lo['c15'],
+          '12': lo['a43'], '13': lo['b57'], '14': lo['d01'], '15': lo['d02'], '16': lo['b51'], '17': lo['a47'],
+          '18': lo['c31'], '19': lo['b49'], '20': lo['c88'], '21': lo['c72'], '22': lo['d03'], '23': lo['d04'],
           '24': lo['b74'], '25': lo['b92']}
     scrn(dl['00'], dl['01'])
     ctrt(dl['02'])
@@ -3532,18 +3645,16 @@ def marketplace():
             sleep(d_delay)
             try:
                 main_json = web_op('marketplace/trade/{0}'.format(d_lst[0]['id']), '')
+                result = main_json['result']['success']
                 scrn(dl['00'], dl['16'])
                 ctrt('{0}: {1}   {2}: {3}'.format(dl['03'], d_lst[0]['in_desc'], dl['04'], d_out))
                 ctrt('{0}: {1:,}   {2}: {3}s   {4}: {5}'.format(
                     dl['10'], d_batch, dl['12'], d_delay, dl['17'], cvttm(time() - d_strt)))
                 dvsn()
-                if main_json['result']['success']:
+                if result:
                     prg(x, d_batch, '{0}: {1:,}/{2:,}'.format(dl['22'], x, d_batch))
                     break
                 else:
-                    for y in range(web_retry * 3, -1, -1):
-                        prg(x, d_batch, '{0}: {1:,}/{2:,}'.format(dl['22'], x, d_batch), '{0}: {1}{2}'.format(
-                            dl['24'], dl['25'], cvttm(y)))
                     sleep(web_retry * 3)
             except (KeyError, TypeError):
                 sleep(web_retry * 3)
@@ -3582,7 +3693,7 @@ def switch_realm(title='', realm_no=0, c_no=0):
 
 def refresh_data():
     global pData, mData, fData, pfData, cData, tData
-    gtdt(pl=True, fm=True, pf=True, op=True, w1=True, w2=True, md=True, unmute=True)
+    gtdt(pl=True, fm=True, pf=True, op=True, sm=True, w1=True, w2=True, md=True, unmute=True)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -3628,12 +3739,18 @@ def menu():
 #                                                         MAIN                                                         #
 # -------------------------------------------------------------------------------------------------------------------- #
 d_dh, d_si, realm, cookie, std_param, d_conn, d_ui, d_rn, d_cn = [None, None, None, None, None, None, None, None, None]
-pData, mData, fData, pfData, cData, fStat, lo, tData = [None, None, None, None, None, None, None, {}]
+pData, mData, fData, pfData, cData, fStat, lo, smData, tData = [None, None, None, None, None, None, None, {}, {}]
+conW, conC = shutil.get_terminal_size()
+if conW < 80:
+    print('Minimum Console Width of 80 is required')
+    quit()
 try:
     with open('locale.doa', 'r') as load_file:
         lo = json.load(load_file)
-        if lo['a00'] == __version__:
+        if scp_ver in lo['000']:
             pass
+        else:
+            raise KeyError
 except FileNotFoundError:
     chslng(title=False, shut_script=False)
 except KeyError:
